@@ -54,6 +54,12 @@ Thumbs.db
 desktop.ini
 *.tmp
 
-# === NGROK ESEGUIBILE ===
+# === NGROK ===
 PYTHON_SCRIPTS/ngrok.exe
 ngrok.exe
+NGROK/ngrok_authtoken.txt
+NGROK/ngrok_domain.txt
+
+# === SESSIONI ===
+PYTHON_SCRIPTS/.sessions.json
+sessions.json
