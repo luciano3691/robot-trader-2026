@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader 2026 - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .login-container.hidden {
+            display: none;
+        }
+        
+        .login-box {
+            background: #16213e;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.3);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ff8c42;
+        }
+        
+        .login-box h1 {
+            margin-bottom: 30px;
+            color: #ff8c42;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a2e;
+            border: 1px solid #ff8c42;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff8c42;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover:not(:disabled) {
+            background: #fbb042;
+            transform: translateY(-2px);
+        }
+        
+        .login-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .error-msg {
+            color: #ff6b6b;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .header {
+            background: rgba(255, 140, 66, 0.1);
+            border-bottom: 2px solid #ff8c42;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-logo {
+            height: 50px;
+            margin-right: 30px;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            color: #ff8c42;
+        }
+        
+        .user-info {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .logout-btn:hover {
+            background: #ff5252;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #ff8c42;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #ff8c42;
+            border-bottom-color: #ff8c42;
+            background: rgba(255, 140, 66, 0.05);
+        }
+        
+        .tab-btn:hover {
+            color: #ff8c42;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .table th {
+            background: #ff8c42;
+            color: #1a1a2e;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+        }
+        
+        .table tr:hover {
+            background: rgba(255, 140, 66, 0.05);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #ff8c42;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover:not(:disabled) {
+            background: #fbb042;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .status.info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 140, 66, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .card h3 {
+            color: #ff8c42;
+            margin-bottom: 10px;
+        }
+        
+        .card p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN FORM -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>🤖 Robot Trader 2026</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="admin" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••••" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">ACCEDI</button>
+                <div class="error-msg" id="loginError"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <!-- HEADER -->
+        <div class="header">
+            <div style="display: flex; align-items: center; flex: 1;">
+                <img src="data:image/jpeg;base64,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" alt="Fuerte Venture Capital" class="header-logo">
+                <div class="header-info">
+                    <h1>Robot Trader 2026</h1>
+                    <div class="user-info">
+                        Utente: <strong id="dashboardUsername">-</strong>
+                    </div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">Esci</button>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+            <button class="tab-btn" data-tab="parametri">⚙️ Parametri</button>
+            <button class="tab-btn" data-tab="clienti">👥 Clienti</button>
+            <button class="tab-btn" data-tab="reports">📄 Reports</button>
+        </div>
+
+        <!-- TAB: DASHBOARD -->
+        <div class="tab-content active" id="tab-dashboard">
+            <h2>📊 Dashboard Principale</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Clienti</h3>
+                    <p id="clienti-count">Caricamento...</p>
+                </div>
+                <div class="card">
+                    <h3>Reports Recenti</h3>
+                    <p id="reports-count">Caricamento...</p>
+                </div>
+                <div class="card">
+                    <h3>Ultimo Aggiornamento</h3>
+                    <p id="last-update">-</p>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn" id="runOrchestratorBtn">▶️ Esegui Orchestrator</button>
+                <button class="btn" id="refreshDashboardBtn">🔄 Aggiorna</button>
+            </div>
+            <div id="orchestratorStatus"></div>
+        </div>
+
+        <!-- TAB: PARAMETRI -->
+        <div class="tab-content" id="tab-parametri">
+            <h2>⚙️ Parametri Filtri</h2>
+            <div id="parametriContainer">
+                <p>Caricamento parametri...</p>
+            </div>
+            <button class="btn" id="saveParametriBtn">💾 Salva Modifiche</button>
+            <div id="parametriStatus"></div>
+        </div>
+
+        <!-- TAB: CLIENTI -->
+        <div class="tab-content" id="tab-clienti">
+            <h2>👥 Gestione Clienti</h2>
+            <table class="table" id="clientiTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Data Aggiunta</th>
+                    </tr>
+                </thead>
+                <tbody id="clientiBody">
+                    <tr><td colspan="4" style="text-align: center;">Caricamento...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB: REPORTS -->
+        <div class="tab-content" id="tab-reports">
+            <h2>📄 Reports Recenti</h2>
+            <table class="table" id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>Nome File</th>
+                        <th>Data</th>
+                        <th>Dimensione</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsBody">
+                    <tr><td colspan="3" style="text-align: center;">Caricamento...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://127.0.0.1:5000/api';
+        let token = localStorage.getItem('rt_token');
+
+        // ===== AUTH =====
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const error = document.getElementById('loginError');
+
+            btn.disabled = true;
+            btn.textContent = 'Accesso in corso...';
+            error.textContent = '';
+
+            try {
+                const res = await fetch(`${API}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    token = data.token;
+                    localStorage.setItem('rt_token', token);
+                    showDashboard();
+                } else {
+                    error.textContent = data.message || 'Credenziali non valide';
+                }
+            } catch (err) {
+                error.textContent = 'Errore connessione: ' + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'ACCEDI';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('rt_token');
+            token = null;
+            showLogin();
+        });
+
+        function showLogin() {
+            document.getElementById('loginContainer').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('active');
+            loadDashboard();
+            setupTabs();
+        }
+
+        // ===== TAB NAVIGATION =====
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.tab;
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById(`tab-${tab}`).classList.add('active');
+
+                    if (tab === 'parametri') loadParametri();
+                    if (tab === 'clienti') loadClienti();
+                    if (tab === 'reports') loadReports();
+                });
+            });
+        }
+
+        // ===== DASHBOARD =====
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`${API}/dashboard`, {
+                    headers: getHeaders()
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    showLogin();
+                    return;
+                }
+
+                document.getElementById('dashboardUsername').textContent = data.username;
+                document.getElementById('clienti-count').textContent = `${data.clienti_totali} clienti registrati`;
+                document.getElementById('reports-count').textContent = `${data.reports_recenti.length} reports recenti`;
+                document.getElementById('last-update').textContent = new Date(data.timestamp).toLocaleString('it-IT');
+            } catch (err) {
+                console.error('Errore:', err);
+            }
+        }
+
+        // ===== PARAMETRI =====
+        async function loadParametri() {
+            try {
+                const res = await fetch(`${API}/parametri`, {
+                    headers: getHeaders()
+                });
+
+                const data = await res.json();
+
+                if (data.error) {
+                    showLogin();
+                    return;
+                }
+
+                let html = '<form id="parametriForm">';
+                Object.entries(data).forEach(([section, values]) => {
+                    html += `<h3>${section.toUpperCase()}</h3>`;
+                    Object.entries(values).forEach(([key, obj]) => {
+                        const value = obj.value !== undefined ? obj.value : obj;
+                        html += `
+                            <div class="form-group">
+                                <label>${key}</label>
+                                <input type="text" name="${section}.${key}" value="${value}" style="background: #1a1a2e; border: 1px solid #ff8c42; padding: 8px; border-radius: 4px; color: #fff;">
+                            </div>
+                        `;
+                    });
+                });
+                html += '</form>';
+
+                document.getElementById('parametriContainer').innerHTML = html;
+            } catch (err) {
+                console.error('Errore:', err);
+            }
+        }
+
+        // ===== CLIENTI =====
+        async function loadClienti() {
+            try {
+                const res = await fetch(`${API}/clienti`, {
+                    headers: getHeaders()
+                });
+
+                const clienti = await res.json();
+
+                if (clienti.error) {
+                    showLogin();
+                    return;
+                }
+
+                const tbody = document.getElementById('clientiBody');
+                tbody.innerHTML = '';
+
+                clienti.forEach(c => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${c.id}</td>
+                            <td>${c.nome || '-'}</td>
+                            <td>${c.email || '-'}</td>
+                            <td>${c.data_aggiunta ? new Date(c.data_aggiunta).toLocaleString('it-IT') : '-'}</td>
+                        </tr>
+                    `;
+                });
+
+                if (clienti.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nessun cliente</td></tr>';
+                }
+            } catch (err) {
+                console.error('Errore:', err);
+            }
+        }
+
+        // ===== REPORTS =====
+        async function loadReports() {
+            try {
+                const res = await fetch(`${API}/reports`, {
+                    headers: getHeaders()
+                });
+
+                const reports = await res.json();
+
+                if (reports.error) {
+                    showLogin();
+                    return;
+                }
+
+                const tbody = document.getElementById('reportsBody');
+                tbody.innerHTML = '';
+
+                reports.forEach(r => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${r.nome}</td>
+                            <td>${new Date(r.data).toLocaleString('it-IT')}</td>
+                            <td>${(r.size / 1024 / 1024).toFixed(2)} MB</td>
+                        </tr>
+                    `;
+                });
+
+                if (reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Nessun report</td></tr>';
+                }
+            } catch (err) {
+                console.error('Errore:', err);
+            }
+        }
+
+        // ===== ORCHESTRATOR =====
+        document.getElementById('runOrchestratorBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('runOrchestratorBtn');
+            const status = document.getElementById('orchestratorStatus');
+
+            btn.disabled = true;
+            status.innerHTML = '<div class="status info">⏳ Avviando orchestrator...</div>';
+
+            try {
+                const res = await fetch(`${API}/run_orchestrator`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    status.innerHTML = '<div class="status success">✅ Orchestrator avviato!</div>';
+                } else {
+                    status.innerHTML = '<div class="status error">❌ Errore: ' + (data.message || data.error) + '</div>';
+                }
+            } catch (err) {
+                status.innerHTML = '<div class="status error">❌ Errore: ' + err.message + '</div>';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('refreshDashboardBtn').addEventListener('click', loadDashboard);
+
+        document.getElementById('saveParametriBtn').addEventListener('click', async () => {
+            const form = document.getElementById('parametriForm');
+            if (!form) return;
+
+            const formData = new FormData(form);
+            const data = {};
+
+            formData.forEach((value, key) => {
+                const [section, param] = key.split('.');
+                if (!data[section]) data[section] = {};
+                data[section][param] = { value: parseFloat(value) || value };
+            });
+
+            try {
+                const res = await fetch(`${API}/parametri`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    document.getElementById('parametriStatus').innerHTML = '<div class="status success">✅ ' + result.message + '</div>';
+                } else {
+                    document.getElementById('parametriStatus').innerHTML = '<div class="status error">❌ Errore</div>';
+                }
+            } catch (err) {
+                document.getElementById('parametriStatus').innerHTML = '<div class="status error">❌ Errore: ' + err.message + '</div>';
+            }
+        });
+
+        // ===== INIT =====
+        if (token) {
+            showDashboard();
+        }
+    </script>
+</body>
+</html>

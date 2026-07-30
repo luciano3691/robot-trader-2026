@@ -1,0 +1,132 @@
+================================================================================
+  FUERTE SCREENER — STATO DEL PROGETTO
+  Fuerte Venture Capital SL · CIF B23881691
+  Aggiornato: 17 Giugno 2026 (sessione mattina — fix retry SMTP)
+================================================================================
+
+
+================================================================================
+SEZIONE 1: FIX APPLICATI IN QUESTA SESSIONE
+================================================================================
+
+FILE: orchestrator.py
+─────────────────────
+PROBLEMA:
+  Durante il run screener FONDI (17/06/2026 ~09:42), le email BASIC e VALUE
+  hanno restituito:
+    Errore connessione SMTP: [Errno 11001] getaddrinfo failed
+  Causa: errore DNS transitorio — smtp.gmail.com non si risolveva in quel
+  momento (PC che si riattivava, rete instabile, o microglitch DNS Windows).
+  Il config.json era corretto. Test con test_smtp.py ha confermato che SMTP
+  funziona (email inviata con successo durante la diagnosi).
+
+FIX:
+  Aggiunto retry automatico in send_plan_email():
+    - 3 tentativi totali (1 principale + 2 retry)
+    - 30 secondi di pausa tra un tentativo e l'altro
+    - Se almeno 1 tentativo ha successo (exit 0) → prosegue
+    - Solo se tutti e 3 falliscono → log ERRORE
+
+CODICE:
+  def send_plan_email(report_type, piano, filename, max_retry=3, retry_wait=30):
+      for attempt in range(1, max_retry + 1):
+          proc = subprocess.Popen(...)
+          ...
+          if proc.returncode == 0:
+              return 0
+          if attempt < max_retry:
+              print(f"  [retry {attempt}/{max_retry-1}] Riprovo tra {retry_wait}s...")
+              time.sleep(retry_wait)
+      return proc.returncode
+
+IMPORT aggiunto:
+  import time  (riga 4 di orchestrator.py)
+
+
+================================================================================
+SEZIONE 2: DIAGNOSTICA SMTP — CONFIGURAZIONE VERIFICATA
+================================================================================
+
+FILE: config.json → sezione "email"
+
+  Chiavi usate da email_notifier.py (NON smtp_host/smtp_user/from_email):
+    smtp_server  → "smtp.gmail.com"
+    smtp_port    → 587
+    smtp_login   → "newcapitalfuerte@gmail.com"
+    app_password → "rqbblcaekgfonixo"   ← App Password Gmail (16 caratteri)
+    sender       → "newcapitalfuerte@gmail.com"
+
+  Test manuale (17/06/2026):
+    python test_smtp.py → ✅ Email inviata a newcapitalfuerte@gmail.com
+
+  NOTA: L'App Password era visibile in config.json in chiaro.
+  Sessione 16/06 aveva consigliato di rigenerarla. Se non ancora fatto,
+  rigenerare da myaccount.google.com → Sicurezza → Password per le app.
+
+
+================================================================================
+SEZIONE 3: REINVIO MANUALE EMAIL MANCATE
+================================================================================
+
+Se BASIC o VALUE non sono arrivate, reinviare manualmente:
+
+  cd "C:\Users\lucia\Desktop\Robot Trader 2026\PYTHON_SCRIPTS"
+  python email_notifier.py FONDI BASIC FONDI_Screener_BASIC_20260617_094258.xlsx
+  python email_notifier.py FONDI VALUE FONDI_Screener_VALUE_20260617_094258.xlsx
+
+  (verificare il nome esatto dei file in ..\REPORTS_DAILY\)
+
+
+================================================================================
+SEZIONE 4: TODO PRE-LANCIO (invariato dal 04/06/2026)
+================================================================================
+
+CRITICO (blocca il lancio):
+  [ ] fuertescreener.com da pubblicare online
+      → set CLIENT_LOGIN_URL=https://fuertescreener.com/area-clienti
+      → verifica hello@fuertescreener.com
+      → grep link statici in dashboard.py
+  [ ] Pagina /privacy mancante (link GDPR punta a /privacy)
+  [ ] Password admin "123" → cambiare ADMIN_PASSWORD in dashboard.py
+  [ ] Stripe → chiavi vuote → bottoni acquisto non funzionano
+  [ ] HTTPS → necessario per login clienti su dominio pubblico
+
+AZIONI MANUALI PENDENTI (da sessione 16/06):
+  [ ] Ruotare API key Anthropic (era esposta nei log debug)
+  [ ] Rigenerare App Password Gmail (era in chiaro in config.json)
+  [ ] Impostare password admin forte (config.json → admin_password o env ADMIN_PASSWORD)
+
+IMPORTANTE (migliora qualità):
+  [ ] Cloudflare Tunnel → cloudflared.exe + config.yml → base_url fuertescreener.com
+  [ ] Sessioni admin non scadono automaticamente
+  [ ] Score ETF negativo per TER alto (cosmetic)
+  [ ] Deduplicazione ETF stesso ISIN su più exchange
+  [ ] Universo ETF EU ACC troppo piccolo
+  [ ] Reset password clienti non implementato
+  [ ] Fattura PDF da integrare con Stripe
+
+SOCIAL AUTOMATION — DA CONFIGURARE:
+  [ ] Brevo api_key → social.brevo in config.json
+  [ ] LinkedIn Company Page → social.linkedin in config.json
+  [ ] Meta Facebook/Instagram → social.meta in config.json
+  [ ] Aggiungere social_automation.run() a scheduler_daemon.py alle 08:00
+
+
+================================================================================
+SEZIONE 5: RIEPILOGO FIX PER SESSIONE
+================================================================================
+
+  16/06/2026 — 20 bug fix:
+    dashboard.py:      threading lock, scrittura atomica, password env, except nudi,
+                       startup makedirs, init fatture_counter, cleanup chat thread
+    chat_service.py:   _session_ts + cleanup_expired_sessions (memory leak)
+    email_notifier.py: timeout=15 su smtplib.SMTP
+    screener_utils.py: import math, filtro NaN, condizione ridondante rimossa
+    social_automation.py: guard try/except import circolare
+    whatsapp_service.py:  _WA_API_VERSION costante
+    value_screener_azioni.py: _get_param() helper
+
+  17/06/2026 — 1 fix:
+    orchestrator.py:   retry automatico send_plan_email (3 tentativi, 30s pausa)
+
+================================================================================

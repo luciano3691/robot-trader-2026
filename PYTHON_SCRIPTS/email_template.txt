@@ -1,0 +1,84 @@
+═══════════════════════════════════════════════════════════════════
+ROBOT TRADER 2026 - REPORT {TIPO} {PIANO}
+Powered by Fuerte Venture Capital
+═══════════════════════════════════════════════════════════════════
+
+Ciao {NOME},
+
+Come abbonato al servizio {TIPO} {PIANO}, ti inviamo il report aggiornato al {DATA}.
+
+Il sistema ha analizzato {NUM_TICKER} strumenti e ha selezionato i 
+migliori candidati secondo i nostri criteri di screening.
+
+───────────────────────────────────────────────────────────────────
+📊 COSA CONTIENE IL REPORT:
+───────────────────────────────────────────────────────────────────
+
+• Dashboard - Statistiche globali e breakdown per categoria
+• Top 50 per Score - I migliori strumenti selezionati
+• Selezionati - Tutti gli strumenti che hanno superato i filtri
+• Scartati per Motivo - Analisi degli esclusi (5 categorie)
+
+───────────────────────────────────────────────────────────────────
+🌍 ANALISI SETTORIALE & MERCATI — Incluso nel tuo abbonamento
+───────────────────────────────────────────────────────────────────
+
+Accedi alla mappa interattiva dei settori GICS e dei mercati globali:
+
+• Card settoriali verde/rosso — momentum 1G · 1S · 1M · 3M · 1A
+  per 11 settori USA (SPDR) + 11 settori Europa (iShares STOXX)
+
+• Semaforo nazioni 🟢🟡🔴 — 21 paesi con indici reali (Yahoo Finance)
+
+• ETF consigliati per ogni settore e paese con TER e link diretto
+
+• Drill-down sui titoli del tuo screener per settore con Score
+
+• Segnali tattici: pullback su trend, momentum confermato, inversione
+
+Apri qui: {URL_SETTORI}
+(Accedi con le tue credenziali — Area Riservata: {URL_AREA})
+
+───────────────────────────────────────────────────────────────────
+🤖 ROBOT TRADER 2026
+───────────────────────────────────────────────────────────────────
+
+Robot Trader 2026 è un servizio di screening automatico che analizza
+quotidianamente migliaia di strumenti finanziari (azioni, ETF e fondi)
+utilizzando criteri quantitativi oggettivi.
+
+Il sistema applica filtri rigorosi su metriche fondamentali e genera
+report strutturati per facilitare l'analisi e il monitoraggio del 
+mercato.
+
+Servizio sviluppato da Fuerte Venture Capital SL.
+
+───────────────────────────────────────────────────────────────────
+⚠️  IMPORTANTE - DISCLAIMER
+───────────────────────────────────────────────────────────────────
+
+I contenuti di questo report NON costituiscono consulenza finanziaria,
+raccomandazioni di investimento o sollecitazione all'acquisto/vendita
+di strumenti finanziari.
+
+I dati e le analisi sono forniti esclusivamente A SCOPO INFORMATIVO
+e sono basati su criteri di screening automatico. Le informazioni
+contenute potrebbero contenere errori o imprecisioni e non sono
+aggiornate in tempo reale.
+
+GLI INVESTIMENTI COMPORTANO RISCHI, inclusa la possibile perdita
+totale o parziale del capitale investito. Le performance passate
+non sono indicative di risultati futuri.
+
+Prima di prendere qualsiasi decisione di investimento, CONSULTA
+SEMPRE UN CONSULENTE FINANZIARIO ABILITATO che possa valutare la
+tua situazione specifica, obiettivi, esperienza e tolleranza al
+rischio.
+
+═══════════════════════════════════════════════════════════════════
+Fuerte Venture Capital SL
+Villaverde, Las Palmas, Canary Islands, Spain
+marketing@fuerteventurecapital.com · www.fuerteventurecapital.com
+
+Ricevi queste email come membro del network Fuerte Venture Capital
+═══════════════════════════════════════════════════════════════════

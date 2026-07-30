@@ -1,0 +1,422 @@
+
+# REFUND & CANCELLATION POLICY — ROBOT TRADER 2026
+
+## 📋 OFFICIAL POLICY
+
+### 30-DAY MONEY-BACK GUARANTEE
+
+**Policy Statement:**
+```
+Robot Trader offers a full 30-day money-back guarantee.
+If you're not satisfied with your subscription for any reason,
+we'll refund your payment in full.
+
+No questions asked. No hassle. Simple and fair.
+```
+
+**Scope:**
+```
+✅ APPLIES TO:
+├─ All plans (BASIC, PRO, ENTERPRISE)
+├─ New subscriptions (first 30 days)
+└─ All payment methods (credit card, bank transfer, etc)
+
+❌ DOES NOT APPLY TO:
+├─ Customers who cancel after 30 days (prorated refund below)
+├─ Customers who violated Terms of Service
+└─ Abuse of refund policy (multiple consecutive refunds)
+```
+
+---
+
+## 💳 REFUND PROCESS
+
+### Step 1: Request Cancellation
+
+**Methods:**
+```
+1. Account Dashboard:
+   Settings → Subscription → Cancel Plan → Confirm
+
+2. Email:
+   refunds@robot-trader.io
+   Subject: "Refund request - {{USERNAME}}"
+   Message: "I would like a full refund. My order: {{ORDER_ID}}"
+
+3. Support:
+   Reply to any support ticket with cancellation request
+
+4. Direct call:
+   {{LUCIANO_CALENDAR_LINK}}
+   (If customer wants to discuss before refund)
+```
+
+### Step 2: Refund Approval
+
+**Timeline:**
+```
+Within 24 hours of cancellation request:
+├─ Verify customer identity
+├─ Check: Within 30-day window?
+├─ Approve or request clarification
+└─ Send confirmation email
+
+Processing time:
+├─ Credit card: 3-5 business days
+├─ Bank transfer: 5-7 business days
+├─ PayPal: 1-2 business days
+```
+
+**Approval Email Template:**
+```
+Subject: ✅ Your Robot Trader Refund Has Been Approved
+
+Hi {{NAME}},
+
+Your refund request has been approved.
+
+Details:
+- Plan: {{PLAN}}
+- Amount: €{{AMOUNT}}
+- Refund method: {{METHOD}}
+- Expected arrival: {{DATE_RANGE}}
+
+Your account will be deactivated immediately.
+
+We're sorry to see you go! If there's anything we could have done better,
+please let us know: feedback@robot-trader.io
+
+We're always happy to have you back.
+
+Best,
+Robot Trader Team
+```
+
+### Step 3: Refund Issuance
+
+```
+Once approved:
+├─ Generate refund in Stripe
+├─ Notify customer
+├─ Update CRM (record reason for churn)
+└─ Archive account data (30-day grace period)
+
+Support tracking:
+├─ Log in support system
+├─ Tag: "refund-processed-30days"
+├─ Note: Reason for cancellation
+└─ Schedule: "Try to win back in 6 months"
+```
+
+---
+
+## 📊 REFUND POLICIES BY SCENARIO
+
+### Scenario 1: Customer Within 30-Day Window
+
+**Policy: 100% REFUND**
+
+```
+Customer signed up: May 21
+Refund request: June 15 (Day 25 of 30-day window)
+
+Refund: €49.00 (BASIC) or €99.00 (PRO)
+Processing: Approved immediately
+Timeline: 3-5 business days
+```
+
+**Process:**
+```
+1. Customer requests refund
+2. Support verifies account
+3. Confirm: "Yes, you're within 30-day window"
+4. Process refund (no questions)
+5. Deactivate account
+6. Send confirmation
+```
+
+---
+
+### Scenario 2: Customer After 30 Days (Pro-Rata)
+
+**Policy: PRO-RATA REFUND (if canceling mid-month)**
+
+```
+Customer's billing cycle: May 21 - June 20
+Cancellation request: June 5 (15 days into month)
+
+Days used: 15 / 31 days = 48.4%
+Remaining days: 16 / 31 days = 51.6%
+
+Refund: €99 × 51.6% = €51.08
+Processing: Approved
+Timeline: 3-5 business days
+```
+
+**Formula:**
+```
+Refund = (Days remaining in billing cycle / Total days in cycle) × Monthly fee
+
+Example 2:
+- Billing: €99/month
+- Canceled on: Day 20 of 30-day cycle
+- Days remaining: 10
+- Refund: (10/30) × €99 = €33
+
+Next billing: NOT charged (account deactivated)
+```
+
+---
+
+### Scenario 3: Free Trial Used Up But Still Unhappy
+
+**Policy: 100% REFUND (First month only)**
+
+```
+Customer started: May 21 (7-day free trial)
+Paid: May 28 (first charge)
+Refund request: June 2 (5 days after first payment)
+
+Status: Within 30-day money-back guarantee
+Refund: €49.00 (BASIC) or €99.00 (PRO)
+Processing: Approved immediately
+```
+
+---
+
+### Scenario 4: Customer Has Had Subscription for 6+ Months
+
+**Policy: STANDARD CANCELLATION (no refund, but pro-rata next month)**
+
+```
+Customer signed up: December 1, 2025
+Current billing: June 1 - July 1, 2026
+Cancellation: June 15, 2026
+
+Status: NO refund (outside 30-day window)
+BUT: Account deactivated immediately
+Pro-rata: €99 × (16 remaining days / 30) = €52.80 credit for next month
+
+Next billing (July 1): €99 - €52.80 credit = €46.20 charged
+```
+
+---
+
+### Scenario 5: Customer Requesting Refund for Multiple Months
+
+**Policy: 30-DAY GUARANTEE ONLY (cannot refund past months)**
+
+```
+Customer claims: "I haven't used it for 3 months, refund all 3 months"
+
+Response:
+"Our 30-day guarantee only applies to the first month of subscription.
+However, you can cancel anytime without penalty.
+
+For past months, pro-rating applies:
+- Month 1 (May): Outside 30-day window, no refund
+- Month 2 (June): Outside 30-day window, no refund  
+- Month 3 (July): We can offer pro-rata refund if canceling mid-cycle
+
+Would you like to cancel effective today?"
+```
+
+---
+
+## 🛡️ ABUSE PREVENTION
+
+### Red Flags (Possible Refund Abuse)
+
+```
+🚨 SUSPICIOUS PATTERNS:
+├─ 3+ refund requests in 6 months
+├─ User requests refund immediately after getting paid (trader)
+├─ Account shows zero activity but requests refund
+├─ User publicly claims "scam" after refund request
+└─ Chargebacks filed while requesting refund
+```
+
+**Handling Abuse:**
+
+```
+IF: User has 2+ previous refunds in 6 months
+THEN: 
+├─ Investigate usage patterns
+├─ Contact user: "We want to help. What's the issue?"
+├─ Offer: Alternative (different plan, features, training)
+├─ If still requesting refund: Process with note
+└─ Future: Require 60-day policy if pattern continues
+
+IF: User files chargeback after refund
+THEN:
+├─ Contact user immediately
+├─ Investigate: Refund processed?
+├─ Resolve: If both refund + chargeback, ask user to choose
+└─ Report to payment processor (Stripe)
+```
+
+---
+
+## 💬 REFUND CONVERSATION GUIDE
+
+### What NOT to Say
+
+```
+❌ "You have to wait 30 days"
+   (Sounds like policy > customer)
+
+❌ "You didn't use it enough"
+   (Accusatory, not helpful)
+
+❌ "Are you sure?"
+   (Pressuring, not supportive)
+
+❌ "That's our policy"
+   (Robotic, no empathy)
+```
+
+### What TO Say
+
+```
+✅ "I'm sorry Robot Trader isn't working for you right now"
+   (Empathy first)
+
+✅ "Let me help you get more value"
+   (Solution-focused)
+
+✅ "If it's not right for you, here's how to get a refund"
+   (Clear, supportive)
+
+✅ "What would have made a difference?"
+   (Learning, not judging)
+```
+
+### Example Refund Conversation
+
+```
+CUSTOMER EMAIL:
+"I'd like to cancel. Robot Trader isn't doing what I expected."
+
+SUPPORT RESPONSE:
+---
+Hi {{NAME}},
+
+Thanks for letting us know, and I'm sorry it didn't meet your expectations.
+
+A few quick questions so I can help:
+1. What specific feature were you hoping for?
+2. Did you try [feature X]? (many users find value there)
+3. Can I help you get more out of it?
+
+If Robot Trader still isn't right for you, I completely understand.
+We offer a full 30-day money-back guarantee, so you can get 100% refunded.
+
+Let me know how you'd like to proceed:
+1. I help you optimize (schedule: 15-min call)
+2. You proceed with cancellation + refund
+3. You pause subscription (restart anytime)
+
+What works best for you?
+
+Best,
+{{SUPPORT_NAME}}
+Robot Trader Support
+---
+```
+
+---
+
+## 📈 REFUND METRICS & MONITORING
+
+### Track
+
+```
+Weekly:
+├─ # refunds requested
+├─ # refunds approved
+├─ Approval rate (should be >90% within 30 days)
+├─ Average refund amount
+└─ Time from request to processing
+
+Monthly:
+├─ Refund rate (% of customers)
+├─ Revenue impact
+├─ Churn reasons (categorize)
+├─ Win-back candidates (past refunders)
+└─ Trending issues (spot patterns)
+
+Target metrics:
+├─ Refund rate: < 2% (industry avg 3-5%)
+├─ Refund approval rate: 95%+ (for <30 days)
+├─ Approval time: < 4 hours
+├─ Churn recovery rate: 10-15% (offer something 6 months later)
+└─ NPS of refunded customers: >40 (loyalty after refund)
+```
+
+### Dashboard Queries
+
+```
+SQL-style tracking:
+
+SELECT COUNT(*) as refund_requests
+WHERE date >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+GROUP BY status, plan;
+
+→ Identify spikes in refund requests
+
+SELECT AVG(days_before_refund) 
+WHERE plan = 'BASIC'
+GROUP BY subscription_month;
+
+→ Find which months have earliest refunds
+→ Indicates onboarding issues
+```
+
+---
+
+## 🎯 REDUCING REFUND RATE
+
+### Strategies
+
+```
+1. BETTER ONBOARDING (Target: -30% refunds)
+   ├─ Day 1: Welcome call with power user
+   ├─ Day 3: "Quick win" email (find 1 stock)
+   └─ Day 7: Mastery check-in
+
+2. BETTER PRODUCT (Target: -20% refunds)
+   ├─ A/B test landing page messaging
+   ├─ Improve filter relevance
+   └─ Add features users request
+
+3. BETTER PRICING (Target: -10% refunds)
+   ├─ Offer €9.99/month "test" plan
+   ├─ Lower entry barrier
+   └─ Upsell to full plan
+
+4. BETTER SUPPORT (Target: -15% refunds)
+   ├─ Proactive outreach (before refund request)
+   ├─ Resolve issues within 2 hours
+   └─ Personal touch (founder involvement)
+
+5. RETENTION CAMPAIGNS (Target: +5% win-back)
+   ├─ 6 months after refund: "We've improved"
+   ├─ Offer: €9.99/month second chance
+   └─ Personal email from Luciano
+```
+
+---
+
+## ✅ REFUND POLICY CHECKLIST (Pre-Launch)
+
+- [ ] Legal review (compliance with EU/US law)
+- [ ] Policy published on website
+- [ ] refunds@robot-trader.io email set up
+- [ ] Stripe refund process configured
+- [ ] Support team trained on refund process
+- [ ] Refund decision tree created
+- [ ] Response templates finalized
+- [ ] Abuse prevention guidelines documented
+- [ ] Metrics dashboard setup
+- [ ] Founder (Luciano) approves large refunds (>€500)
+- [ ] Customer success follow-up process documented

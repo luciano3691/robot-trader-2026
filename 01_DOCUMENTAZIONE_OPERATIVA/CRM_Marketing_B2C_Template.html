@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<!--
+════════════════════════════════════════════════════════════════════════════════
+  CRM & MARKETING B2C — Template Riutilizzabile
+  Versione: 1.0 — estratto da Robot Trader 2026 / Fuerte Venture Capital SL
+  Data: 2026-06-14
+════════════════════════════════════════════════════════════════════════════════
+
+  COME USARE QUESTO TEMPLATE
+  ──────────────────────────
+  1. Copia il blocco HTML (sezione "PANEL HTML") nel tuo pannello admin
+  2. Copia il blocco CSS nella tua sezione <style>
+  3. Copia il blocco JS nella tua sezione <script>
+  4. Adatta i placeholder marcati con ⚙️ ADATTA
+  5. Implementa le 3 API sul tuo backend (vedi sezione API CONTRACT)
+
+  API CONTRACT (endpoint che il template si aspetta)
+  ───────────────────────────────────────────────────
+  GET  /api/clienti
+       Risposta: { "tester": [...], "clienti": [...] }
+       Ogni cliente: { nome, cognome, email, stato, piano_azioni, piano_etf,
+                       piano_fondi, data_registrazione, numero_fattura,
+                       whatsapp_optin }
+
+  GET  /api/social/status
+       Risposta: { "ok": true, "drafts": [...] }
+       Ogni draft: { draft_id, date, theme, lang, channels, text_it, text_es,
+                     image_url, article_url, status, created_at }
+
+  GET  /api/social/approve?draft_id=X&action=approve|reject
+       Approva o rifiuta un draft social. Risposta: HTML o JSON (ignorato).
+
+  FUNZIONI ESTERNE CHE DEVI AVERE
+  ─────────────────────────────────
+  loadClienti()         carica i dati clienti da /api/clienti
+  mostraModalAggiungi() apre modal nuovo cliente
+  exportClienti()       esporta clienti in CSV
+  importClienti(input)  importa CSV clienti
+  showMsg(id, testo, tipo)   mostra msg 'ok' o 'err' nell'elemento #id
+
+  SOTTO-TAB DISPONIBILI
+  ─────────────────────
+  👥 Clienti        — tabella clienti + import/export CSV
+  📊 Pipeline       — KPI abbonamenti + tabella stato (Attivo/Tester/Sospeso)
+  📧 Campagne Email — stato Brevo + email automatiche
+  📱 Social Media   — draft pendenti con Approva/Rifiuta + cronologia
+  💬 WhatsApp       — opt-in clienti + stato template Meta
+
+════════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CRM &amp; Marketing B2C — Template Demo</title>
+<style>
+
+/* ════════════════════════════════
+   CSS BASE (palette dark blue/gold)
+   Colori principali:
+     Accent:   #F6AD55  (gold)
+     Success:  #68D391  (green)
+     Error:    #FC8181  (red)
+     BG:       #0F172A  (dark navy)
+     Card BG:  rgba(44,82,130,.08)
+   ════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0F172A;color:#e0e0e0;min-height:100vh;padding:1.5rem}
+
+/* PANELS */
+.panel{display:none}.panel.active{display:block}
+
+/* SECTION HEADER */
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.6rem}
+.sec-head h2{font-size:1.05rem;color:#F6AD55;font-weight:700}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem}
+.kpi{background:rgba(44,82,130,.08);border:1px solid rgba(44,82,130,.35);border-radius:10px;padding:1.2rem;text-align:center}
+.kpi-label{font-size:.72rem;opacity:.5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}
+.kpi-val{font-size:2rem;font-weight:700;color:#F6AD55;line-height:1}
+
+/* BOXES */
+.box{background:rgba(44,82,130,.08);border:1px solid rgba(44,82,130,.35);border-radius:10px;padding:1.2rem;margin-bottom:1rem}
+.box h3{color:#F6AD55;margin-bottom:.8rem;font-size:.95rem;font-weight:700}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;border:1px solid rgba(44,82,130,.4);border-radius:8px;background:rgba(0,0,0,.2)}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{padding:.7rem .6rem;text-align:left;color:#F6AD55;font-weight:600;background:#2C5282;border-bottom:2px solid #F6AD55;white-space:nowrap}
+td{padding:.52rem .6rem;border-bottom:1px solid rgba(255,255,255,.04)}
+tr:hover td{background:rgba(246,173,85,.03)}
+
+/* BUTTONS */
+.btn{padding:.45rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;font-size:.82rem;border:1px solid;transition:all .15s;background:transparent;color:#e0e0e0;border-color:rgba(255,255,255,.2)}
+.btn-gr{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.45);color:#22c55e}
+.btn-gr:hover{background:rgba(34,197,94,.25)}
+.btn-re{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.45);color:#ef4444}
+.btn-re:hover{background:rgba(239,68,68,.25)}
+
+/* MSG */
+.msg{padding:.5rem .9rem;border-radius:6px;font-size:.82rem;display:none}
+.msg-ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22c55e;display:block}
+.msg-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#ef4444;display:block}
+
+/* ── SUB-TABS CRM ──
+   Riusa la classe .db-tab già presente nel tuo progetto.
+   Se non ce l'hai, usa queste definizioni: */
+.db-tabs{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
+.db-tab{padding:.45rem 1.1rem;border-radius:6px;border:1px solid rgba(44,82,130,.5);background:transparent;color:rgba(255,255,255,.5);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .18s}
+.db-tab:hover{border-color:#F6AD55;color:#F6AD55}
+.db-tab.active{background:#2C5282;border-color:#2C5282;color:#F6AD55}
+
+/* pwd box animation */
+@keyframes pwdPulse{0%,100%{box-shadow:0 0 0 0 rgba(246,173,85,.4)}50%{box-shadow:0 0 0 12px rgba(246,173,85,0)}}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PANEL HTML — CRM & MARKETING
+     Inserisci questo blocco nel punto giusto del tuo admin HTML.
+     La tab padre che attiva questo panel deve fare:
+       onclick="switchTab(this,'crm')"
+     e nella funzione switchTab aggiungere:
+       if(id==='crm'){ if(!_clienti) loadClienti(); }
+     ══════════════════════════════════════════════════════════════ -->
+
+<div id="crm" class="panel active"> <!-- ⚙️ ADATTA: rimuovi "active" nel progetto reale (lo gestisce switchTab) -->
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.6rem">
+    <h2 style="color:#F6AD55;font-size:1.1rem;font-weight:700">🎯 CRM &amp; Marketing</h2>
+    <span id="crm-msg" class="msg"></span>
+  </div>
+
+  <!-- Sotto-tab -->
+  <div class="db-tabs" style="margin-bottom:1.4rem">
+    <button class="db-tab crm-subtab active" onclick="switchCrmTab(this,'clienti')">👥 Clienti</button>
+    <button class="db-tab crm-subtab" onclick="switchCrmTab(this,'pipeline')">📊 Pipeline</button>
+    <button class="db-tab crm-subtab" onclick="switchCrmTab(this,'campagne')">📧 Campagne Email</button>
+    <button class="db-tab crm-subtab" onclick="switchCrmTab(this,'social')">📱 Social Media</button>
+    <button class="db-tab crm-subtab" onclick="switchCrmTab(this,'whatsapp')">💬 WhatsApp</button>
+  </div>
+
+  <!-- ─── 1. CLIENTI ─── -->
+  <div id="crm-clienti" class="crm-sub">
+    <div class="sec-head">
+      <h2>👥 Gestione Clienti</h2>
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+        <span id="cl-msg" class="msg"></span>
+        <button class="btn btn-re" onclick="loadClienti()">↺ Ricarica</button>
+        <button class="btn btn-gr" onclick="mostraModalAggiungi()">+ Aggiungi</button>
+        <button class="btn" onclick="exportClienti()" style="border-color:rgba(246,173,85,.4);color:#F6AD55">⬇ Esporta CSV</button>
+        <label class="btn" style="border-color:rgba(74,144,217,.4);color:#4A90D9;cursor:pointer;margin:0">
+          ⬆ Importa CSV
+          <input type="file" id="cl-import-file" accept=".csv" onchange="importClienti(this)" style="display:none">
+        </label>
+      </div>
+    </div>
+
+    <div id="cl-stats" style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem"></div>
+
+    <!-- Box password temporanea (visibile solo dopo attivazione cliente) -->
+    <div id="cl-pwd-box" style="display:none;background:rgba(246,173,85,.08);border:2px solid #F6AD55;border-radius:10px;padding:1.2rem 1.4rem;margin-bottom:1rem;animation:pwdPulse 1s ease 2">
+      <div style="font-size:.9rem;color:#F6AD55;font-weight:700;margin-bottom:.6rem">🔑 PASSWORD TEMPORANEA — Annotala ora, non verrà mostrata di nuovo!</div>
+      <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap">
+        <code id="cl-pwd-val" style="font-size:1.3rem;font-family:monospace;color:#fff;background:rgba(0,0,0,.4);padding:.4rem 1rem;border-radius:6px;letter-spacing:2px"></code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('cl-pwd-val').textContent);this.textContent='Copiato ✓'" style="background:#68D391;color:#0a0f1e;border:none;border-radius:6px;padding:.4rem .9rem;font-weight:700;font-size:.82rem;cursor:pointer">Copia</button>
+        <button onclick="document.getElementById('cl-pwd-box').style.display='none'" style="background:transparent;border:1px solid rgba(255,255,255,.15);color:#aaa;border-radius:6px;padding:.4rem .7rem;font-size:.78rem;cursor:pointer">✕ Chiudi</button>
+      </div>
+      <!-- ⚙️ ADATTA: cambia __BASE_URL__ con la URL reale del tuo progetto -->
+      <div style="font-size:.75rem;color:#888;margin-top:.5rem">URL accesso: <a href="__BASE_URL__/client-login" target="_blank" style="color:#68D391">__BASE_URL__/client-login</a></div>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr id="cl-head"></tr></thead>
+      <tbody id="cl-body"><tr><td style="padding:2rem;opacity:.5;text-align:center">Caricamento...</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <!-- ─── 2. PIPELINE ─── -->
+  <div id="crm-pipeline" class="crm-sub" style="display:none">
+    <div id="pipeline-content">
+      <div style="opacity:.5;padding:1.5rem;text-align:center">Caricamento pipeline...</div>
+    </div>
+  </div>
+
+  <!-- ─── 3. CAMPAGNE EMAIL ─── -->
+  <div id="crm-campagne" class="crm-sub" style="display:none">
+    <div id="campagne-content">
+      <div style="opacity:.5;padding:1.5rem;text-align:center">Caricamento...</div>
+    </div>
+  </div>
+
+  <!-- ─── 4. SOCIAL MEDIA ─── -->
+  <div id="crm-social" class="crm-sub" style="display:none">
+    <div id="social-content">
+      <div style="opacity:.5;padding:1.5rem;text-align:center">Caricamento draft social...</div>
+    </div>
+  </div>
+
+  <!-- ─── 5. WHATSAPP ─── -->
+  <div id="crm-whatsapp" class="crm-sub" style="display:none">
+    <div id="whatsapp-content">
+      <div style="opacity:.5;padding:1.5rem;text-align:center">Caricamento...</div>
+    </div>
+  </div>
+
+</div>
+<!-- ══════════ FINE PANEL CRM ══════════ -->
+
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  CRM & MARKETING B2C — JavaScript
+//  Copia tutto questo blocco nella tua sezione <script>.
+//
+//  DIPENDENZE esterne (devono esistere nel tuo progetto):
+//    _clienti          — variabile globale con dati clienti
+//    loadClienti()     — carica /api/clienti → _clienti
+//    mostraModalAggiungi()
+//    exportClienti()
+//    importClienti(input)
+//    showMsg(id, testo, tipo)
+//
+//  ADATTAMENTI per nuovo progetto:
+//    ⚙️  Campagne Email: personalizza testo SMTP/provider
+//    ⚙️  WhatsApp: adatta nomi template, CIF azienda
+//    ⚙️  Pipeline: adatta colonne piani (es. togliere piano_fondi se non c'è)
+// ════════════════════════════════════════════════════════════════
+
+// Stub demo — nel progetto reale questi vengono da fuori
+var _clienti = null;
+function loadClienti() {
+  // Stub demo: dati fittizi per vedere il template in azione
+  _clienti = {
+    tester: [
+      {nome:'Luca',cognome:'Bianchi',email:'luca@test.com',stato:'TESTER',
+       piano_azioni:'BASIC',piano_etf:'NONE',piano_fondi:'NONE',
+       data_registrazione:'2026-05-10T09:00:00',numero_fattura:'',whatsapp_optin:false}
+    ],
+    clienti: [
+      {nome:'Mario',cognome:'Rossi',email:'mario@rossi.com',stato:'ATTIVO',
+       piano_azioni:'PRO',piano_etf:'BASIC',piano_fondi:'NONE',
+       data_registrazione:'2026-06-01T10:00:00',numero_fattura:'FVC-2026-0001',whatsapp_optin:true},
+      {nome:'Anna',cognome:'Verdi',email:'anna@verdi.com',stato:'ATTIVO',
+       piano_azioni:'NONE',piano_etf:'VALUE',piano_fondi:'NONE',
+       data_registrazione:'2026-06-05T14:30:00',numero_fattura:'FVC-2026-0002',whatsapp_optin:false}
+    ]
+  };
+  renderClientiStub();
+}
+function renderClientiStub(){
+  // In un progetto reale questa funzione esiste già nel tuo admin
+  var all = (_clienti.tester||[]).concat(_clienti.clienti||[]);
+  document.getElementById('cl-head').innerHTML = '<th>Nome</th><th>Email</th><th>Stato</th>';
+  document.getElementById('cl-body').innerHTML = all.map(function(c){
+    return '<tr><td>'+c.nome+' '+c.cognome+'</td><td>'+c.email+'</td><td>'+c.stato+'</td></tr>';
+  }).join('');
+}
+function mostraModalAggiungi(){ alert('Modal aggiungi cliente — da implementare nel progetto'); }
+function exportClienti(){ alert('Export CSV — da implementare nel progetto'); }
+function importClienti(input){ alert('Import CSV — da implementare nel progetto'); }
+function showMsg(id, testo, tipo){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = testo;
+  el.className = 'msg msg-' + tipo;
+  setTimeout(function(){ el.className='msg'; }, 4000);
+}
+// Fine stub demo
+
+
+// ════════════════════════════════════════
+//  SWITCH SOTTO-TAB CRM
+// ════════════════════════════════════════
+var _crmSubActive = 'clienti';
+
+function switchCrmTab(el, tab) {
+  document.querySelectorAll('.crm-subtab').forEach(function(t){ t.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.crm-sub').forEach(function(p){ p.style.display = 'none'; });
+  var sub = document.getElementById('crm-' + tab);
+  if(sub) sub.style.display = '';
+  _crmSubActive = tab;
+  if(tab === 'clienti'  && !_clienti) loadClienti();
+  if(tab === 'pipeline')  renderPipeline();
+  if(tab === 'campagne')  renderCampagne();
+  if(tab === 'social')    loadSocialDrafts();
+  if(tab === 'whatsapp')  renderWhatsappSub();
+}
+
+
+// ════════════════════════════════════════
+//  PIPELINE — KPI + tabella stato clienti
+// ════════════════════════════════════════
+function renderPipeline() {
+  if(!_clienti) { loadClienti(); return; }
+
+  var tester = (_clienti.tester||[]).map(function(c){ return Object.assign({},c,{_cat:'tester'}); });
+  var attivi = (_clienti.clienti||[]).map(function(c){ return Object.assign({},c,{_cat:'clienti'}); });
+  var all = tester.concat(attivi);
+
+  var nAttivi  = attivi.filter(function(c){ return c.stato==='ATTIVO'; }).length;
+  var nSospesi = all.filter(function(c){ return c.stato==='SOSPESO'; }).length;
+
+  var kpi = '<div class="kpi-row" style="margin-bottom:1.2rem">'
+    + '<div class="kpi"><div class="kpi-label">👥 Totale</div><div class="kpi-val">'+all.length+'</div></div>'
+    + '<div class="kpi"><div class="kpi-label">✅ Attivi</div><div class="kpi-val" style="color:#68D391">'+nAttivi+'</div></div>'
+    + '<div class="kpi"><div class="kpi-label">🧪 Tester</div><div class="kpi-val" style="color:#F6AD55">'+tester.length+'</div></div>'
+    + '<div class="kpi"><div class="kpi-label">⏸ Sospesi</div><div class="kpi-val" style="color:#FC8181">'+nSospesi+'</div></div>'
+    + '</div>';
+
+  var rows = '';
+  all.forEach(function(c) {
+    var stato    = c.stato || 'TESTER';
+    var statoCol = stato==='ATTIVO' ? '#68D391' : stato==='SOSPESO' ? '#FC8181' : '#F6AD55';
+    // ⚙️ ADATTA: cambia piano_azioni/piano_etf/piano_fondi in base ai tuoi piani
+    var piani = [c.piano_azioni, c.piano_etf, c.piano_fondi]
+                  .filter(function(p){ return p && p !== 'NONE'; }).join(' / ') || '—';
+    var data  = (c.data_registrazione||'').slice(0,10) || '—';
+    var fatt  = c.numero_fattura || '—';
+    var nome  = ((c.nome||'') + ' ' + (c.cognome||'')).trim() || '—';
+    rows += '<tr>'
+      + '<td style="font-weight:500">'+nome+'</td>'
+      + '<td style="opacity:.7;font-size:.8rem">'+c.email+'</td>'
+      + '<td style="font-size:.82rem">'+piani+'</td>'
+      + '<td><span style="background:rgba(0,0,0,.3);border-radius:4px;padding:.15rem .5rem;font-size:.75rem;color:'+statoCol+'">'+stato+'</span></td>'
+      + '<td style="font-size:.8rem;opacity:.7">'+data+'</td>'
+      + '<td style="font-size:.8rem;opacity:.65">'+fatt+'</td>'
+      + '</tr>';
+  });
+
+  var tbl = '<div class="box"><div class="tbl-wrap"><table>'
+    + '<thead><tr><th>Nome</th><th>Email</th><th>Piani</th><th>Stato</th><th>Iscritto il</th><th>Fattura</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody></table></div></div>';
+
+  document.getElementById('pipeline-content').innerHTML = kpi + tbl;
+}
+
+
+// ════════════════════════════════════════
+//  CAMPAGNE EMAIL
+//  ⚙️ ADATTA: personalizza provider, SMTP, URL report
+// ════════════════════════════════════════
+function renderCampagne() {
+  document.getElementById('campagne-content').innerHTML =
+    '<div class="box">'
+    + '<h3>📧 Campagne Email — Brevo</h3>'
+    + '<div style="background:rgba(252,129,129,.08);border:1px solid rgba(252,129,129,.3);border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem;font-size:.85rem">'
+    + '⚠️ Brevo non ancora configurato. Inserire <code>api_key</code>, <code>smtp_login</code>, <code>smtp_password</code>, <code>list_ids</code> in <code>config.json → social.brevo</code>'
+    + '</div>'
+    + '<div style="opacity:.65;font-size:.85rem;line-height:2">'
+    + 'Una volta configurato Brevo permetterà di:<br>'
+    + '• Inviare newsletter segmentate per piano (BASIC / PRO / VALUE)<br>'
+    + '• Ricevere email di approvazione per i post social prima della pubblicazione<br>'
+    + '• Tracciare aperture, click e conversioni delle campagne'
+    + '</div></div>'
+    + '<div class="box">'
+    + '<h3 style="color:#68D391">✅ Email Report Automatiche — attive</h3>'
+    + '<div style="font-size:.84rem;line-height:1.9;opacity:.75">'
+    // ⚙️ ADATTA: aggiorna orari e descrizione in base al tuo scheduler
+    + '<strong>SMTP:</strong> Gmail (newcapitalfuerte@gmail.com)<br>'
+    + '<strong>📈 Azioni:</strong> ogni notte alle 23:00 — lun/ven<br>'
+    + '<strong>📦 ETF + Fondi:</strong> ogni notte alle 23:30 — lun / mer / ven<br>'
+    + '<strong>Destinatari:</strong> automatici in base al piano abbonamento'
+    + '</div></div>';
+}
+
+
+// ════════════════════════════════════════
+//  SOCIAL MEDIA — Draft management
+// ════════════════════════════════════════
+function loadSocialDrafts() {
+  var el = document.getElementById('social-content');
+  el.innerHTML = '<div style="opacity:.5;padding:1rem;text-align:center">Caricamento...</div>';
+
+  fetch('/api/social/status').then(function(r){ return r.json(); }).then(function(data){
+    var drafts  = data.drafts || [];
+    var pending = drafts.filter(function(d){ return d.status === 'pending'; });
+    var recent  = drafts.filter(function(d){ return d.status !== 'pending'; }).slice(0,6);
+    var html    = '';
+
+    if(pending.length > 0) {
+      html += '<div class="box"><h3 style="margin-bottom:.9rem">⏳ Draft in attesa di approvazione ('+pending.length+')</h3>';
+      pending.forEach(function(d) {
+        var preview = (d.text_it || d.text_es || '').slice(0, 280);
+        html += '<div style="background:rgba(0,0,0,.3);border-radius:8px;padding:1rem;margin-bottom:.8rem;border:1px solid rgba(246,173,85,.2)">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">'
+          + '<span style="font-weight:700;color:#F6AD55">'+d.theme+' &middot; '+d.lang+' &middot; '+d.date+'</span>'
+          + '<span style="font-size:.75rem;opacity:.55">'+(d.channels||[]).join(', ')+'</span>'
+          + '</div>'
+          + '<div style="font-size:.82rem;opacity:.72;margin-bottom:.8rem;white-space:pre-wrap">'+preview+'...</div>'
+          + '<div style="display:flex;gap:.5rem">'
+          + '<button class="btn btn-gr" style="font-size:.78rem;padding:.3rem .8rem" onclick="approvaDraft(\''+d.draft_id+'\')">✅ Approva &amp; Pubblica</button>'
+          + '<button class="btn btn-re" style="font-size:.78rem;padding:.3rem .7rem" onclick="rifiutaDraft(\''+d.draft_id+'\')">✕ Rifiuta</button>'
+          + '</div></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="box" style="text-align:center;color:#68D391;padding:1.2rem">✅ Nessun draft in attesa di approvazione</div>';
+    }
+
+    if(recent.length > 0) {
+      html += '<div class="box"><h3 style="color:#aaa;margin-bottom:.8rem;font-size:.88rem">📋 Cronologia recente</h3>';
+      recent.forEach(function(d) {
+        var col = d.status === 'published' ? '#68D391' : '#FC8181';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.83rem">'
+          + '<span style="opacity:.8">'+d.theme+' &middot; '+d.lang+'</span>'
+          + '<span style="opacity:.55">'+d.date+'</span>'
+          + '<span style="color:'+col+'">'+d.status+'</span>'
+          + '</div>';
+      });
+      html += '</div>';
+    }
+
+    if(drafts.length === 0)
+      html = '<div class="box" style="text-align:center;opacity:.5">Nessun draft disponibile.</div>';
+
+    el.innerHTML = html;
+  }).catch(function(e){
+    el.innerHTML = '<div class="box" style="color:#FC8181">Errore: '+e.message+'</div>';
+  });
+}
+
+function approvaDraft(draftId) {
+  fetch('/api/social/approve?draft_id='+draftId+'&action=approve')
+    .then(function(){ showMsg('crm-msg','✅ Draft approvato e inviato per la pubblicazione','ok'); loadSocialDrafts(); })
+    .catch(function(e){ showMsg('crm-msg','❌ '+e.message,'err'); });
+}
+
+function rifiutaDraft(draftId) {
+  if(!confirm('Rifiutare questo draft?')) return;
+  fetch('/api/social/approve?draft_id='+draftId+'&action=reject')
+    .then(function(){ showMsg('crm-msg','🗑 Draft rifiutato','ok'); loadSocialDrafts(); })
+    .catch(function(e){ showMsg('crm-msg','❌ '+e.message,'err'); });
+}
+
+
+// ════════════════════════════════════════
+//  WHATSAPP — Opt-in clienti + stato template
+//  ⚙️ ADATTA: nomi template, riferimenti CIF azienda, percorso doc
+// ════════════════════════════════════════
+function renderWhatsappSub() {
+  if(!_clienti) { loadClienti(); return; }
+
+  var all   = (_clienti.tester||[]).concat(_clienti.clienti||[]);
+  var optIn = all.filter(function(c){ return c.whatsapp_optin === true; });
+  var el    = document.getElementById('whatsapp-content');
+
+  var kpi = '<div class="kpi-row" style="margin-bottom:1.2rem">'
+    + '<div class="kpi"><div class="kpi-label">📱 Opt-in WA</div><div class="kpi-val" style="color:#68D391">'+optIn.length+'</div></div>'
+    + '<div class="kpi"><div class="kpi-label">👥 Tot. clienti</div><div class="kpi-val">'+all.length+'</div></div>'
+    + '</div>';
+
+  var statoBox = '<div class="box" style="margin-bottom:1rem">'
+    + '<h3>💬 Stato WhatsApp Business</h3>'
+    + '<div style="background:rgba(252,129,129,.08);border:1px solid rgba(252,129,129,.3);border-radius:8px;padding:.8rem 1rem;font-size:.85rem;margin-bottom:.8rem">'
+    // ⚙️ ADATTA: aggiorna CIF e stato template per il tuo progetto
+    + '⚠️ In attesa: Meta Business Manager verificato + numero dedicato + template approvati'
+    + '</div>'
+    + '<div style="font-size:.83rem;line-height:1.9;opacity:.7">'
+    + '⏳ Template <strong>screener_pronto</strong> (4 parametri) — da sottomettere a Meta<br>'
+    + '⏳ Template <strong>brief_mattutino</strong> (3 parametri) — da sottomettere a Meta<br>'
+    // ⚙️ ADATTA: percorso documentazione
+    + '📄 Procedura: <code>01_DOCUMENTAZIONE_OPERATIVA/WhatsApp_Business_Setup_Procedura.md</code>'
+    + '</div></div>';
+
+  var optInTable = '';
+  if(optIn.length > 0) {
+    var rows = '';
+    optIn.forEach(function(c){
+      var nome  = ((c.nome||'')+' '+(c.cognome||'')).trim() || '—';
+      // ⚙️ ADATTA: colonna piani
+      var piani = [c.piano_azioni, c.piano_etf, c.piano_fondi]
+                    .filter(function(p){ return p && p !== 'NONE'; }).join(' / ') || '—';
+      rows += '<tr>'
+        + '<td>'+nome+'</td>'
+        + '<td style="font-size:.8rem;opacity:.7">'+c.email+'</td>'
+        + '<td style="font-size:.82rem">'+piani+'</td>'
+        + '</tr>';
+    });
+    optInTable = '<div class="box"><h4 style="opacity:.7;font-size:.85rem;margin-bottom:.7rem">Clienti con consenso WhatsApp</h4>'
+      + '<div class="tbl-wrap"><table>'
+      + '<thead><tr><th>Nome</th><th>Email</th><th>Piani</th></tr></thead>'
+      + '<tbody>'+rows+'</tbody></table></div></div>';
+  } else {
+    optInTable = '<div class="box" style="opacity:.5;font-size:.85rem">'
+      + 'Nessun cliente ha ancora attivato le notifiche WhatsApp. '
+      + 'Usa il bottone 📱 nella tab Clienti per ogni singolo cliente.'
+      + '</div>';
+  }
+
+  el.innerHTML = kpi + statoBox + optInTable;
+}
+
+
+// ════════════════════════════════════════
+//  INIT — carica Clienti all'apertura
+// ════════════════════════════════════════
+loadClienti();
+switchCrmTab(document.querySelector('.crm-subtab.active'), 'clienti');
+
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+================================================================================
+ROBOT TRADER 2026 — SETUP WINDOWS TASK SCHEDULER
+================================================================================
+
+GOAL:
+Eseguire orchestrator.py TUTTI I GIORNI alle 08:05 CEST (Canarie)
+I 3 screener partono in SEQUENZA:
+  • 08:05 → Azioni (20-30 min)
+  • 08:35 → ETF (5-10 min)
+  • 08:45 → Fondi (5-10 min)
+
+================================================================================
+STEP 1: POSIZIONARE I FILE
+================================================================================
+
+File necessari in: C:\Users\lucia\Desktop\Trading Bot\
+
+  ✅ value_screener_azioni.py
+  ✅ value_screener_etf.py
+  ✅ value_screener_fondi.py
+  ✅ email_notifier.py
+  ✅ orchestrator.py
+  ✅ robot_trader_scheduler.bat
+
+================================================================================
+STEP 2: CREARE CARTELLA LOGS
+================================================================================
+
+Crea la cartella:
+  C:\Users\lucia\Desktop\Trading Bot\logs\
+
+(Serve per salvare i log di ogni esecuzione)
+
+================================================================================
+STEP 3: CONFIGURARE TASK SCHEDULER
+================================================================================
+
+Apri Task Scheduler (digita "Task Scheduler" in Windows Search):
+
+1. Clicca "Create Task..." (a destra)
+
+2. TAB GENERALE:
+   Nome: "Robot Trader 2026 - Daily Screener"
+   Descrizione: "Esegui Value Screener Azioni/ETF/Fondi sequenzialmente"
+   ☑ Run with highest privileges
+   ☑ Run whether user is logged in or not
+
+3. TAB TRIGGERS:
+   Clicca "New..."
+   - Begin the task: "On a schedule"
+   - Daily
+   - Start: [data di oggi]
+   - Repeat every: 1 day
+   - Time: 08:05:00
+   ✅ OK
+
+4. TAB ACTIONS:
+   Clicca "New..."
+   - Action: "Start a program"
+   - Program/script: C:\Users\lucia\Desktop\Trading Bot\robot_trader_scheduler.bat
+   - Start in (optional): C:\Users\lucia\Desktop\Trading Bot
+   ✅ OK
+
+5. TAB CONDITIONS:
+   ☐ Start the task only if the computer is on AC power
+   ☑ Start the task only if the computer is on AC power (scollega se desideri)
+   ✅ OK
+
+6. TAB SETTINGS:
+   ☑ Allow task to be run on demand
+   ☑ Stop the task if it runs longer than: 2 hours
+   ☐ If the running task does not end when requested, force it to stop
+   ✅ OK
+
+7. SALVA CON PASSWORD WINDOWS
+
+================================================================================
+STEP 4: VERIFICARE CONFIGURAZIONE
+================================================================================
+
+Nel Task Scheduler:
+1. Vai a Task Scheduler Library
+2. Cerca "Robot Trader 2026"
+3. Clicca destro → Properties
+4. Verifica che tutto è configurato come sopra
+5. Clicca "Run" per fare un test manuale
+
+Log di test salvato in:
+  C:\Users\lucia\Desktop\Trading Bot\logs\robot_trader_YYYYMMDD_HHMM.log
+
+================================================================================
+STEP 5: VERIFICA TIMEOUT E TIMEZONE
+================================================================================
+
+TIMEZONE IMPORTANTE:
+Task Scheduler usa il timezone del PC.
+Se il PC è in "UTC+2 CEST" (Canarie/Europa centrale estate), Task Scheduler 
+mostrerà "08:05" come "08:05 CEST".
+
+Se il PC è in UTC+0 (UTC), devi schedulare a 07:05 (8:05 - 1 ora).
+
+Per verificare timezone: Settings → Time & Language → Date & Time
+
+================================================================================
+STEP 6: MONITORAGGIO GIORNALIERO
+================================================================================
+
+Ogni giorno alle 08:05, Task Scheduler avvierà:
+
+  robot_trader_scheduler.bat
+    ↓
+  orchestrator.py
+    ├─ value_screener_azioni.py (08:05-08:35)
+    ├─ value_screener_etf.py (08:35-08:45)
+    └─ value_screener_fondi.py (08:45-09:00)
+
+Log salvati in:
+  C:\Users\lucia\Desktop\Trading Bot\logs\
+
+Formato filename: robot_trader_YYYYMMDD_HHMM.log
+
+Esempio: robot_trader_20260504_0805.log
+
+================================================================================
+STEP 7: TROUBLESHOOTING
+================================================================================
+
+⚠️  Se Task Scheduler non esegue:
+
+1. Verifica che Python sia nel PATH:
+   Apri PowerShell e digita: python --version
+   Deve rispondere con la versione di Python
+
+2. Verifica che i file siano nel path corretto:
+   dir "C:\Users\lucia\Desktop\Trading Bot\"
+
+3. Esegui il batch manualmente da PowerShell:
+   & "C:\Users\lucia\Desktop\Trading Bot\robot_trader_scheduler.bat"
+
+4. Se genera errore, leggi il log:
+   C:\Users\lucia\Desktop\Trading Bot\logs\robot_trader_*.log
+
+5. Verifica email_notifier.py:
+   Set-Item env:GMAIL_PASSWORD "TUA_APP_PASSWORD"
+   (Vedi email_notifier.py per dettagli)
+
+================================================================================
+STEP 8: AUTOMATICO TEST (OPZIONALE)
+================================================================================
+
+Per testare subito senza aspettare le 08:05:
+
+1. Apri PowerShell come Administrator
+2. Naviga alla cartella:
+   cd "C:\Users\lucia\Desktop\Trading Bot"
+3. Esegui:
+   python orchestrator.py
+
+Vedrai output in tempo reale.
+
+================================================================================
+FINE SETUP
+================================================================================
+
+✅ Una volta configurato, Robot Trader 2026 eseguirà AUTOMATICAMENTE
+   i 3 screener OGNI GIORNO alle 08:05 in SEQUENZA.
+
+📧 Email inviate ai 5 destinatari quando ogni screener finisce.
+
+📊 Report salvati in Excel nella stessa cartella.
+
+📝 Log salvati in C:\Users\lucia\Desktop\Trading Bot\logs\
+
+================================================================================

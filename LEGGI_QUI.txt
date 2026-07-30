@@ -1,0 +1,33 @@
+================================================================
+ROBOT TRADER 2026 - AVVIO RAPIDO
+================================================================
+
+SCARICA 3 FILES:
+1. dashboard_DINAMICA.html
+2. START_SISTEMA_COMPLETO.bat
+3. AVVIO_VELOCE.bat
+
+METTILI IN: C:\Users\lucia\Desktop\ROBOT TRADER 2026\
+
+================================================================
+
+AVVIO:
+
+Doppio click su: AVVIO_VELOCE.bat
+
+Si aprono 2 finestre nere + browser
+
+================================================================
+
+LOGIN:
+
+Username: admin
+Password: RobotTrader2026!
+
+================================================================
+
+STOP:
+
+Chiudi le 2 finestre nere
+
+================================================================

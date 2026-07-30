@@ -1,0 +1,389 @@
+# LINKEDIN POST TEMPLATES — 5 LINGUE
+
+Utilizzati come base per la generazione AI tramite Claude API.
+Fallback se la generazione AI fallisce.
+
+
+
+## LINGUA: IT
+================================================================================
+
+### VALUE_INTRO
+----------------------------------------
+🎯 Value Investing Decoded
+
+Stai cercando azioni sottovalutate ma non sai da dove iniziare?
+
+La risposta: 5 filtri quantitativi hard.
+
+📊 EV/FCF, P/B, ROE, Net Debt/EBITDA, Score
+
+Niente emozioni. Niente intuizioni. Solo numeri.
+
+Qual è il tuo filtro preferito? 👇
+
+#ValueInvesting #StockScreening #FinancialAnalysis
+
+### 5_FILTRI
+----------------------------------------
+🔍 I 5 Filtri Che Usiamo Ogni Mattina
+
+Ecco come troviamo opportunità undervalue in 1.000+ azioni:
+
+1️⃣ EV/FCF < 12 — Enterprise Value vs Cash Flow
+2️⃣ P/B < 1,2 — Price vs Book Value  
+3️⃣ ROE > 0% — Return on Equity positivo
+4️⃣ ND/EBITDA < 2,5 — Debito contenuto
+5️⃣ SCORE > 80 — Composite ranking
+
+Risultato: 14 opportunità trovate il 29 aprile.
+
+Quante ne avresti trovate senza questi filtri?
+
+#DeepValue #StockScreening #InvestmentStrategy
+
+### CASE_STUDY
+----------------------------------------
+📈 Case Study: Come Abbiamo Trovato 14 Azioni Undervalue in 24 Ore
+
+Il 29 aprile, il nostro screener ha analizzato 1.091 azioni globali.
+
+Risultato: 14 opportunità di deep value selezionate.
+
+✅ Lennar (LEN) — P/B 1.04, ROE 8%, Score 86
+✅ DXC Technology — P/B 0.62, ROE 13%, Score 93
+✅ SITE Centers — P/B 0.88, ROE 42%, Score 99
+(+ 11 altre)
+
+Qual è stata la tua?
+
+#ValueInvesting #ScreenerResults #StockAnalysis
+
+### EVFCF
+----------------------------------------
+💡 EV/FCF: Perché È Il Nostro Filtro Preferito
+
+Enterprise Value vs Free Cash Flow.
+
+Cosa ti dice? La velocità con cui l'azienda GENERA liquidità.
+
+Esempio reale: Lennar (LEN)
+- EV/FCF: 5.64 (vs media mercato 15+)
+- Significato: Costa MENO per ogni euro di cash generato
+- Rischio: BASSO
+
+Un EV/FCF basso = Opportunità di valore.
+
+Perché scegliete ancora titoli al feel? 😏
+
+#InvestmentAnalysis #ValueMetrics #Screening
+
+### PB_ROE
+----------------------------------------
+⚖️ P/B vs ROE: Quale Scegliere?
+
+Non è P/B O ROE.
+È P/B AND ROE.
+
+P/B basso (< 1,0) = Prezzo scontato rispetto al valore contabile
+ROE alto (> 10%) = Azienda genera profitti dal capitale
+
+Se combini entrambi? Jackpot 🎯
+
+Esempio: DXC Tech
+- P/B: 0.62 ✅
+- ROE: 13% ✅
+- Risultato: Score 93 (top opportunità)
+
+Quale filtro usi quando screeni?
+
+#StockAnalysis #FinancialMetrics #ValueInvesting
+
+### COUNTDOWN
+----------------------------------------
+⏳ 48 ORE | Robot Trader AZIONI Vai Live!
+
+Sabato 21 maggio ore 10:00 UTC+2
+
+Lo screener automatizzato che ogni mattina alle 08:05 analizza 1.000+ azioni.
+
+🚀 Cosa ottieni:
+✅ Report Excel quotidiano (completamente automatico)
+✅ 5 filtri hard quantitativi
+✅ Copertura globale (S&P 500, FTSE 100, DAX, CAC 40, Borsa Italiana)
+✅ Zero emozioni, solo dati
+
+Sei già sulla waitlist? 👉
+
+#RobotTrader #Automation #StockScreening
+
+### TEAM
+----------------------------------------
+👥 Conoscete Il Team Dietro Robot Trader?
+
+Fuerte Venture Capital — NCF New Capital Fuerte SL
+
+3 decenni di esperienza in:
+✅ Logistics & Operations
+✅ Venture Capital & Deal-Making  
+✅ Artificial Intelligence & Automation
+✅ Financial Strategy
+
+Siamo ossessionati da:
+📊 Dati puliti
+⚡ Automazione intelligente
+🎯 Value investing puro
+
+Questo è Robot Trader.
+
+Siete curiosi? 🔗
+
+#FuerteVC #VentureCapital #TeamBehind
+
+### LAUNCH
+----------------------------------------
+🎉 AZIONI è LIVE!
+
+Il value screener automatico che stavi aspettando.
+
+Ogni mattina, 1.000+ azioni analizzate.
+Zero emozioni. Zero errori.
+
+Piani:
+💰 BASIC €49/mese — Screening standard
+💎 PRO €99/mese — API + Filtri custom
+🏢 ENTERPRISE — White-label + SLA
+
+Primo mese: 50% sconto per chi entra adesso.
+
+Scopri come: 🔗
+
+#RobotTrader #ValueInvesting #Launching
+
+### TESTIMONIALS
+----------------------------------------
+💬 Cosa Dicono I Primi 100 Utenti Di AZIONI?
+
+"Finalmente uno screener che non mi fa perdere tempo"
+"I risultati sono incredibilmente accurati"
+"Già trovato 3 opportunità in una settimana"
+
+I vostri feedback stanno guidando gli upgrade:
+- Slack integration (in sviluppo)
+- Telegram alerts (in sviluppo)
+- Backtesting tool (giugno)
+
+Siete voi che rendete AZIONI possibile.
+
+Grazie per essere qui 🙏
+
+#CommunityFeedback #RobotTrader #ValueScreener
+
+### WEEK1_RESULTS
+----------------------------------------
+📊 Screening Week 1: I Risultati
+
+21-28 maggio: Ecco cosa ha trovato AZIONI
+
+🔝 Top 3 opportunità:
+1. SITE Centers (Score 99) — P/B 0.88, ROE 42%
+2. DXC Technology (Score 93) — P/B 0.62, ROE 13%
+3. EBS (Score 98) — P/B 0.82, ROE 10%
+
+📈 Statistiche:
+- 47 azioni screened
+- 8 approvate dai filtri
+- ROE medio: 9.2%
+- P/B medio: 0.81
+
+Quante l'avreste trovate manualmente? 🤔
+
+#ScreeningResults #WeeklyReport #ValueAnalysis
+
+### FONDI_PREVIEW
+----------------------------------------
+🎯 FONDI Module — Anteprima
+
+Giugno 15, lanciamo FONDI.
+
+Lo stesso screener, per ETF e fondi indicizzati.
+
+Analizza:
+✅ 1.000+ ETF globali
+✅ TER (Total Expense Ratio) bassi
+✅ Tracking error minimo
+✅ Asset under management
+✅ Dividend yield
+
+Vuoi essere prioritario? Entra nella waitlist FONDI 👉
+
+#ETFScreening #FundsManagement #Investing
+
+
+## LINGUA: ES
+================================================================================
+
+### VALUE_INTRO
+----------------------------------------
+🎯 Value Investing Descodificado
+
+¿Buscas acciones infravaloradas pero no sabes por dónde empezar?
+
+La respuesta: 5 filtros cuantitativos duros.
+
+📊 EV/FCF, P/B, ROE, Deuda Neta/EBITDA, Score
+
+Sin emociones. Sin intuiciones. Solo números.
+
+¿Cuál es tu filtro favorito? 👇
+
+#ValueInvesting #ScreeningDeAcciones #AnalisisFinanciero
+
+### 5_FILTRI
+----------------------------------------
+🔍 Los 5 Filtros Que Usamos Cada Mañana
+
+Así encontramos oportunidades infravaloradas en 1.000+ acciones:
+
+1️⃣ EV/FCF < 12 — Valor Empresarial vs Flujo de Caja
+2️⃣ P/B < 1,2 — Precio vs Valor Contable
+3️⃣ ROE > 0% — Rentabilidad positiva
+4️⃣ ND/EBITDA < 2,5 — Deuda controlada
+5️⃣ SCORE > 80 — Ranking compuesto
+
+Resultado: 14 oportunidades encontradas el 29 de abril.
+
+¿Cuántas hubieras encontrado sin estos filtros?
+
+#ValueDeep #ScreeningAcciones #EstrategiaInversión
+
+### CASE_STUDY
+----------------------------------------
+📈 Case Study: Cómo Encontramos 14 Acciones Infravaloradas en 24 Horas
+
+El 29 de abril, nuestro screener analizó 1.091 acciones globales.
+
+Resultado: 14 oportunidades de valor profundo seleccionadas.
+
+✅ Lennar (LEN) — P/B 1.04, ROE 8%, Score 86
+✅ DXC Technology — P/B 0.62, ROE 13%, Score 93
+✅ SITE Centers — P/B 0.88, ROE 42%, Score 99
+(+ 11 más)
+
+¿Cuál fue la tuya?
+
+#ValueInvesting #ResultadosScreening #AnalisisAcciones
+
+
+## LINGUA: EN
+================================================================================
+
+### VALUE_INTRO
+----------------------------------------
+🎯 Value Investing Decoded
+
+Looking for undervalued stocks but don't know where to start?
+
+The answer: 5 hard quantitative filters.
+
+📊 EV/FCF, P/B, ROE, Net Debt/EBITDA, Score
+
+No emotions. No intuitions. Just numbers.
+
+What's your favorite filter? 👇
+
+#ValueInvesting #StockScreening #FinancialAnalysis
+
+### 5_FILTRI
+----------------------------------------
+🔍 The 5 Filters We Use Every Morning
+
+Here's how we find undervalue opportunities in 1,000+ stocks:
+
+1️⃣ EV/FCF < 12 — Enterprise Value vs Cash Flow
+2️⃣ P/B < 1.2 — Price vs Book Value
+3️⃣ ROE > 0% — Positive Return on Equity
+4️⃣ ND/EBITDA < 2.5 — Low Debt
+5️⃣ SCORE > 80 — Composite ranking
+
+Result: 14 opportunities found on April 29.
+
+How many would you have found without these filters?
+
+#DeepValue #StockScreening #InvestmentStrategy
+
+
+## LINGUA: FR
+================================================================================
+
+### VALUE_INTRO
+----------------------------------------
+🎯 Value Investing Décortiquer
+
+Vous cherchez des actions sous-évaluées mais ne savez pas par où commencer?
+
+La réponse: 5 filtres quantitatifs durs.
+
+📊 EV/FCF, P/B, ROE, Dette Nette/EBITDA, Score
+
+Sans émotions. Sans intuitions. Juste des chiffres.
+
+Quel est votre filtre préféré? 👇
+
+#ValueInvesting #ScreeningDesActions #AnalyseFinancière
+
+### 5_FILTRI
+----------------------------------------
+🔍 Les 5 Filtres Que Nous Utilisons Chaque Matin
+
+Voici comment nous trouvons des opportunités sous-évaluées parmi 1 000+ actions:
+
+1️⃣ EV/FCF < 12 — Valeur d'Entreprise vs Flux de Trésorerie
+2️⃣ P/B < 1,2 — Prix vs Valeur Comptable
+3️⃣ ROE > 0% — Rendement sur Fonds Propres positif
+4️⃣ ND/EBITDA < 2,5 — Dette maîtrisée
+5️⃣ SCORE > 80 — Classement composite
+
+Résultat: 14 opportunités trouvées le 29 avril.
+
+Combien en auriez-vous trouvé sans ces filtres?
+
+#ValeurProfonde #ScreeningDesActions #StratégieInvestissement
+
+
+## LINGUA: DE
+================================================================================
+
+### VALUE_INTRO
+----------------------------------------
+🎯 Value Investing Entschlüsselt
+
+Sie suchen unterbewertete Aktien, wissen aber nicht, wo Sie anfangen sollen?
+
+Die Antwort: 5 harte quantitative Filter.
+
+📊 EV/FCF, P/B, ROE, Nettoverschuldung/EBITDA, Score
+
+Keine Emotionen. Keine Intuition. Nur Zahlen.
+
+Was ist Ihr liebster Filter? 👇
+
+#ValueInvesting #AktienScreening #FinanzAnalyse
+
+### 5_FILTRI
+----------------------------------------
+🔍 Die 5 Filter, Die Wir Jeden Morgen Verwenden
+
+So finden wir unterbewertete Gelegenheiten in 1.000+ Aktien:
+
+1️⃣ EV/FCF < 12 — Unternehmenswert vs Cashflow
+2️⃣ P/B < 1,2 — Preis vs Buchwert
+3️⃣ ROE > 0% — Positive Eigenkapitalrendite
+4️⃣ ND/EBITDA < 2,5 — Niedrige Verschuldung
+5️⃣ SCORE > 80 — Zusammengesetztes Ranking
+
+Ergebnis: 14 Gelegenheiten gefunden am 29. April.
+
+Wie viele hätten Sie ohne diese Filter gefunden?
+
+#TieferWert #AktienScreening #InvestmentStrategie

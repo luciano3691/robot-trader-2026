@@ -1,0 +1,20 @@
+# Cloudflare Tunnel — Robot Trader 2026
+# =========================================================
+# ISTRUZIONI:
+#   1. Sostituisci TUNNEL_UUID_QUI con l'UUID ricevuto dopo
+#      "cloudflared tunnel create robot-trader"
+#   2. Copia questo file in:
+#      C:\Users\lucia\.cloudflared\config.yml
+#   3. Avvia con: cloudflared tunnel run robot-trader
+# =========================================================
+
+tunnel: TUNNEL_UUID_QUI
+credentials-file: C:\Users\lucia\.cloudflared\TUNNEL_UUID_QUI.json
+
+ingress:
+  - hostname: www.fuerteventurecapital.com
+    service: http://localhost:5000
+    originRequest:
+      connectTimeout: 30s
+      noTLSVerify: false
+  - service: http_status:404

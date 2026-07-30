@@ -1,0 +1,460 @@
+
+# SEO OPTIMIZATION GUIDE — ROBOT TRADER LANDING PAGES
+
+## 🎯 OVERVIEW
+
+Guida completa per ottimizzare le 3 landing page (AZIONI/FONDI/ETF) per motori di ricerca.
+Focus: Organic traffic lungo termine + ranking per keyword value investing.
+
+---
+
+## 🔍 TARGET KEYWORDS
+
+### TIER 1 (High Volume, High Intent)
+- "value screener" (monthly: 1.2K)
+- "stock screener value investing" (800)
+- "automated value screener" (600)
+- "find undervalued stocks" (900)
+
+### TIER 2 (Medium Volume, Specific)
+- "EV/FCF stock screener" (400)
+- "deep value stock finder" (300)
+- "P/B ratio stock screener" (350)
+- "quantitative value investing" (280)
+
+### TIER 3 (Long Tail, High Intent)
+- "how to find undervalued stocks automatically"
+- "best stock screening software for value investing"
+- "free value stock screener"
+- "robot trader azioni"
+- "etf screener automated"
+
+---
+
+## 🏗️ ON-PAGE SEO OPTIMIZATION
+
+### 1. TITLE TAGS (55-60 characters)
+
+**AZIONI Page:**
+```
+ACTUAL: "Value Screener Automatico | Robot Trader AZIONI"
+OPTIMIZED: "Stock Screener Value Investing | Robot Trader"
+                     (57 chars) ✅
+```
+
+**FONDI Page:**
+```
+OPTIMIZED: "ETF Screener - Find Best Funds | Robot Trader"
+                        (43 chars) ✅
+```
+
+**ETF Page:**
+```
+OPTIMIZED: "ETC Screener - Commodities & Metals | Robot"
+                        (42 chars) ✅
+```
+
+---
+
+### 2. META DESCRIPTIONS (150-160 characters)
+
+**AZIONI:**
+```
+Automated stock screener using 5 hard quantitative filters (EV/FCF, P/B, ROE, ND/EBITDA).
+Daily analysis of 1000+ global stocks for deep value opportunities. Get started free.
+(156 chars) ✅
+```
+
+**FONDI:**
+```
+Find the best ETF funds with our automated screener. Low TER, high tracking efficiency.
+Daily analysis of 1000+ global funds. Start your passive investing journey today.
+(157 chars) ✅
+```
+
+**ETF:**
+```
+Automated ETC screener for commodities, metals & alternative assets. Track price movements,
+analyze fundamentals. Daily screening of 500+ ETCs. Join the waitlist today.
+(158 chars) ✅
+```
+
+---
+
+### 3. HEADING HIERARCHY (H1 → H6)
+
+**Current HTML Structure (FIX THIS):**
+```html
+<!-- WRONG -->
+<h1>Value Screener Completamente Automatico</h1>
+<h2>Perché AZIONI?</h2>
+<h3>Screening Automatico</h3>
+```
+
+**OPTIMIZED Structure:**
+```html
+<!-- RIGHT -->
+<h1>Automated Stock Screener - Find Undervalued Stocks Daily</h1>
+
+<h2>How Our Quantitative Stock Screener Works</h2>
+<h3>EV/FCF Filter: Enterprise Value vs Free Cash Flow</h3>
+<h3>P/B Ratio: Price vs Book Value</h3>
+<h3>ROE Filter: Return on Equity</h3>
+
+<h2>Who Uses Stock Screeners for Value Investing?</h2>
+
+<h2>Pricing Plans for Value Investors</h2>
+<h3>BASIC Plan - €49/month</h3>
+<h3>PRO Plan - €99/month</h3>
+<h3>ENTERPRISE - Custom Pricing</h3>
+
+<h2>FAQ - Automated Stock Screening</h2>
+<h3>What is value investing?</h3>
+<h3>How often is the screening updated?</h3>
+```
+
+**Schema Markup:**
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "SoftwareApplication",
+  "name": "Robot Trader AZIONI",
+  "description": "Automated stock screener for value investing",
+  "url": "https://robot-trader.io/azioni",
+  "applicationCategory": "FinanceApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "49",
+    "priceCurrency": "EUR"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "47"
+  }
+}
+</script>
+```
+
+---
+
+### 4. BODY CONTENT OPTIMIZATION
+
+**Current Issue:** Too much Italian/Spanish, not enough English keywords
+
+**Fix:**
+- Add 300-500 word sections in English (primary language for SEO)
+- Spanish + Italian as secondary (for local traffic)
+- Keywords naturally distributed (2-3% keyword density)
+
+**Example Section (BEFORE):**
+```
+Analizza 1.000+ azioni globali ogni mattina. Identifica opportunità deep value senza sforzo.
+```
+
+**Example Section (AFTER):**
+```
+Our automated stock screener analyzes 1,000+ global stocks every morning using 5 hard quantitative filters.
+Deep value investing has never been easier. No emotions, no biases - just data-driven decisions.
+Find undervalued stocks in seconds using proven value investing metrics: EV/FCF, P/B, ROE, Net Debt/EBITDA.
+```
+
+---
+
+### 5. IMAGE OPTIMIZATION
+
+**For Landing Page Images:**
+
+1. File naming:
+   ```
+   WRONG: image1.png
+   RIGHT: automated-stock-screener-dashboard.png
+   ```
+
+2. Alt text:
+   ```html
+   <img src="..." alt="Robot Trader automated stock screener interface showing 5 value filters">
+   ```
+
+3. Compression:
+   - Use TinyPNG: https://tinypng.com/ (50-80% size reduction)
+   - Target: <100KB per image
+
+4. Format:
+   - Use WebP format (faster loading, better SEO signal)
+   - Fallback to PNG/JPG for older browsers
+
+---
+
+### 6. INTERNAL LINKING STRATEGY
+
+**Link to blog posts (build blog!):**
+```html
+<a href="/blog/how-to-find-undervalued-stocks">
+  How to Find Undervalued Stocks Using Quantitative Filters
+</a>
+
+<a href="/blog/value-investing-explained">
+  Value Investing for Beginners
+</a>
+
+<a href="/blog/ev-fcf-ratio-explained">
+  EV/FCF Ratio: What It Means and Why It Matters
+</a>
+```
+
+**Linking between product pages:**
+```html
+<!-- From AZIONI page -->
+<a href="/fondi">Interested in ETF screening? Check our FONDI module</a>
+
+<!-- From FONDI page -->
+<a href="/azioni">Also screening stocks? See our AZIONI screener</a>
+
+<!-- From ETF page -->
+<a href="/azioni">Combine commodity ETCs with stock screening</a>
+```
+
+---
+
+## 🌐 TECHNICAL SEO
+
+### 1. SITE SPEED (Page Speed Insights Score Target: 85+)
+
+**Current Issues:**
+- Logo image not optimized → Convert to WebP
+- Form inputs not optimized → Lazy load Mailchimp script
+
+**Fixes:**
+```html
+<!-- BEFORE: Mailchimp loads immediately -->
+<script id="mc-form" ...></script>
+
+<!-- AFTER: Lazy load -->
+<script defer src="mailchimp-form.js"></script>
+```
+
+**Speed Checklist:**
+- [ ] Minify CSS/JS
+- [ ] Enable GZIP compression
+- [ ] Use CDN for static assets
+- [ ] Lazy load images
+- [ ] Cache static files (30+ days)
+- [ ] Target: < 2s load time
+
+---
+
+### 2. MOBILE OPTIMIZATION
+
+**Current Status:** Responsive design ✅
+
+**Additional Checks:**
+- [ ] Mobile-friendly navigation (hamburger menu)
+- [ ] Touch-friendly buttons (min 48px height)
+- [ ] Readable font sizes (min 16px)
+- [ ] Test on Chrome DevTools Mobile View
+
+---
+
+### 3. STRUCTURED DATA / SCHEMA MARKUP
+
+Add to all pages:
+
+```html
+<!-- Organization Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Fuerte Venture Capital",
+  "url": "https://fuerteventurecapital.com",
+  "logo": "https://...logo.png",
+  "sameAs": [
+    "https://linkedin.com/company/fuerte-vc",
+    "https://twitter.com/fuertevc"
+  ]
+}
+</script>
+
+<!-- FAQPage Schema (for FAQ section) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a stock screener?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A stock screener is..."
+      }
+    }
+  ]
+}
+</script>
+```
+
+---
+
+### 4. ROBOTS.TXT & SITEMAP.XML
+
+**robots.txt:**
+```
+User-agent: *
+Disallow: /admin
+Disallow: /api
+Allow: /
+
+Sitemap: https://robot-trader.io/sitemap.xml
+```
+
+**sitemap.xml (Auto-generate):**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://robot-trader.io/azioni</loc>
+    <lastmod>2026-05-04</lastmod>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://robot-trader.io/fondi</loc>
+    <lastmod>2026-05-04</lastmod>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://robot-trader.io/etf</loc>
+    <lastmod>2026-05-04</lastmod>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+</urlset>
+```
+
+---
+
+## 🔗 OFF-PAGE SEO (Link Building)
+
+### 1. BACKLINK STRATEGY (Target: 10-15 high-quality backlinks by August)
+
+**Tier 1 Targets (DA 50+):**
+- Seeking Alpha (guest article on value investing)
+- Medium.com/@robot-trader (SEO blogging platform)
+- Value investing blogs (value.com, bogleheads.org)
+- Financial news sites (TradingView, Benzinga)
+
+**Outreach Template:**
+```
+Subject: Guest Article: "5 Filters Professional Value Investors Use"
+
+Hi [Editor],
+
+I'd love to contribute a 1.500-word article on quantitative value investing filters.
+
+Topics:
+- EV/FCF ratio explained
+- P/B filter + ROE correlation
+- Real stock examples (Lennar, DXC, etc)
+- How to automate value screening
+
+Would this fit your editorial calendar?
+
+Best,
+Luciano Manicardi
+Founder, Fuerte Venture Capital
+```
+
+### 2. SOCIAL SIGNALS (LinkedIn Focus)
+
+- 15+ posts in May (N8N automation handles this!)
+- Target: 100+ engagement per post = positive SEO signal
+- Share blog posts → backlinks from LinkedIn
+
+---
+
+## 📝 CONTENT STRATEGY
+
+### Build Blog Content (Priority: May-June)
+
+```
+Blog Posts (5-10 per month):
+├─ "How to Identify Undervalued Stocks: 5 Proven Filters"
+├─ "EV/FCF Ratio: The Professional Value Investor's Secret"
+├─ "P/B Ratio Explained: When Is a Stock Really Cheap?"
+├─ "Deep Value Investing: Case Study of 14 Stocks We Found"
+├─ "Quantitative vs Fundamental Analysis: Which Wins?"
+├─ "Best Stock Screeners for Value Investing (2026)"
+├─ "How to Avoid Value Traps: ROE + Debt Analysis"
+└─ "Automated Investing: Should You Use Robot Traders?"
+
+Each post:
+- 1.500-2.500 words (SEO sweet spot)
+- 2-3 target keywords naturally distributed
+- Internal links to landing pages
+- Beautiful featured image (WebP optimized)
+- Meta description (150 chars)
+- Call-to-action: "Try Robot Trader free"
+```
+
+---
+
+## ✅ SEO CHECKLIST (Before May 21 Launch)
+
+- [ ] Optimize title tags + meta descriptions
+- [ ] Fix heading hierarchy (H1 → H6)
+- [ ] Add schema markup (Organization + Product + FAQ)
+- [ ] Optimize all images (WebP format, alt text)
+- [ ] Minify CSS/JS files
+- [ ] Enable GZIP compression
+- [ ] Add robots.txt + sitemap.xml
+- [ ] Mobile optimization test (DevTools)
+- [ ] Page speed test (Target: 85+ PageSpeed Insights)
+- [ ] Internal linking (blog → landing pages)
+- [ ] Fix broken links (404 check)
+- [ ] Google Search Console setup
+- [ ] Google Analytics 4 setup
+- [ ] Bing Webmaster Tools setup
+
+---
+
+## 📊 SEO GOALS (By August 31, 2026)
+
+```
+✅ Organic Traffic: 5.000+ monthly visitors
+✅ Keyword Rankings:
+   - "value screener": #3-5 position
+   - "stock screener": #5-8 position
+   - "automated value investing": #2-4 position
+✅ Backlinks: 15+ high-quality (DA 40+)
+✅ Domain Authority: DA 15+ (from 0)
+✅ Blog: 20+ posts published
+✅ Blog Traffic: 2.000+ monthly organic
+```
+
+---
+
+## 🔧 TOOLS REQUIRED
+
+1. **Google Search Console** (Free) → Monitor indexing + keywords
+2. **Google Analytics 4** (Free) → Track traffic + conversions
+3. **Ahrefs / SEMrush** ($99-199/mo) → Keyword research + backlink analysis
+4. **Lighthouse** (Built-in Chrome) → Page speed testing
+5. **Screaming Frog** (Free/Paid) → Technical SEO audit
+6. **Canva + TinyPNG** (Free) → Image optimization
+7. **WordPress/Webflow** (For blog hosting)
+
+---
+
+## 📅 TIMELINE
+
+```
+May 4-10: On-page SEO optimization (titles, meta, H1s)
+May 11-17: Technical SEO setup (GA4, GSC, schema)
+May 18-21: Content optimization + blog launch
+June-July: Link building + guest posts
+August: Monitor + measure + iterate
+```

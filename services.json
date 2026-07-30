@@ -1,0 +1,62 @@
+{
+  "1": {
+    "id": 1,
+    "nome": "Value Screener AZIONI",
+    "descrizione": "Screening deep value su 1.200+ ticker USA/EU con 5 filtri hard (EV/FCF, P/B, ROE, ND/EBITDA)",
+    "prezzo": 49,
+    "valuta": "EUR",
+    "frequenza": "giornaliero",
+    "periodo": "mese",
+    "status": "attivo",
+    "asset_type": "azioni",
+    "data_lancio": "01/05/2026",
+    "clienti_attuali": 5,
+    "features": [
+      "1.200+ ticker globali",
+      "5 filtri quantitativi hard",
+      "Report giornaliero via email",
+      "Excel con risultati",
+      "Dashboard real-time"
+    ]
+  },
+  "2": {
+    "id": 2,
+    "nome": "Value Screener ETF",
+    "descrizione": "Screening ETF indicizzati con selezione su TER, AUM, Sharpe ratio",
+    "prezzo": 79,
+    "valuta": "EUR",
+    "frequenza": "giornaliero",
+    "periodo": "mese",
+    "status": "attivo",
+    "asset_type": "etf",
+    "data_lancio": "01/05/2026",
+    "clienti_attuali": 3,
+    "features": [
+      "200+ ETF internazionali",
+      "Filtri TER/Sharpe/AUM",
+      "Report giornaliero via email",
+      "Excel con risultati",
+      "Dashboard real-time"
+    ]
+  },
+  "3": {
+    "id": 3,
+    "nome": "Value Screener FONDI",
+    "descrizione": "Screening Fondi Comuni di Investimento con metriche avanzate",
+    "prezzo": 99,
+    "valuta": "EUR",
+    "frequenza": "giornaliero",
+    "periodo": "mese",
+    "status": "beta",
+    "asset_type": "fondi",
+    "data_lancio": "21/05/2026",
+    "clienti_attuali": 0,
+    "features": [
+      "500+ fondi internazionali",
+      "Filtri TER/Sharpe/Alpha",
+      "Report giornaliero via email",
+      "Excel con risultati",
+      "Dashboard real-time"
+    ]
+  }
+}

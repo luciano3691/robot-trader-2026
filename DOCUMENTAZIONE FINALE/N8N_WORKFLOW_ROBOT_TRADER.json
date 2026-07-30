@@ -1,0 +1,185 @@
+{
+  "name": "Robot Trader 2026 - Form Signup Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:5000/api/signup",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "nome",
+              "value": "={{ $json.body.nome }}"
+            },
+            {
+              "name": "piano",
+              "value": "={{ $json.body.piano }}"
+            },
+            {
+              "name": "screener",
+              "value": "={{ $json.body.screener }}"
+            }
+          ]
+        }
+      },
+      "name": "HTTP Request - API Signup",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@robottrader.com",
+        "toEmail": "={{ $json.body.email }}",
+        "subject": "✅ Benvenuto su Robot Trader 2026!",
+        "emailType": "html",
+        "htmlEmail": "<h2>Ciao {{ $json.body.nome }}!</h2>\n<p>Grazie per esserti registrato a <strong>Robot Trader 2026</strong>.</p>\n<p><strong>Piano scelto:</strong> {{ $json.body.piano }}</p>\n<p><strong>Screener:</strong> {{ $json.body.screener.join(', ') }}</p>\n<p>Il tuo primo report sarà disponibile domani mattina alle 08:05 UTC+2.</p>\n<p>Buon trading!</p>\n<p>Robot Trader Team</p>"
+      },
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSendSmtp",
+      "typeVersion": 1,
+      "position": [750, 300],
+      "credentials": {
+        "smtp": "brevo_smtp"
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/log",
+        "authentication": "headerAuth",
+        "headerAuth": {
+          "credentials": "brevo_api"
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "tipo_email",
+              "value": "BENVENUTO"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "name": "Log Email Sent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.response_from_api.webhook_url }}",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "success",
+              "value": true
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "message",
+              "value": "Registrazione completata"
+            }
+          ]
+        }
+      },
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - API Signup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - API Signup": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Log Email Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Email Sent": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {}
+}

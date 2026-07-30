@@ -1,0 +1,193 @@
+BETA SIGNUP SYSTEM — SETUP GUIDE
+════════════════════════════════════════════════════════════════
+
+OVERVIEW:
+
+Sistema automatico di iscrizione beta:
+1. Cliente clicca form sulla landing page
+2. Inserisce: email, nome, prodotto scelto
+3. Viene AUTOMATICAMENTE aggiunto a DATABASE_RECIPIENTS.json
+4. Riceve il primo report domani a 08:05 SENZA nessuna recruitment email manuale!
+
+════════════════════════════════════════════════════════════════
+INSTALLAZIONE (5 minuti)
+════════════════════════════════════════════════════════════════
+
+PASSO 1: Installa Flask
+
+Apri PowerShell e digita:
+  pip install flask
+
+PASSO 2: Aggiungi il form alla landing page
+
+Apri: C:\Users\lucia\Desktop\Robot Trader 2026\03_MARKETING_LANDING_PAGES\3A_LANDING_PAGE_AZIONI_FINAL.html
+
+Prima di </body>, aggiungi il contenuto di BETA_SIGNUP_FORM.html
+
+Salva e re-deploy su Vercel.
+
+PASSO 3: Avvia il server
+
+Apri PowerShell in PYTHON_SCRIPTS folder:
+  cd "C:\Users\lucia\Desktop\Robot Trader 2026\PYTHON_SCRIPTS"
+  python signup_handler.py
+
+Vedrai:
+  ROBOT TRADER — BETA SIGNUP HANDLER
+  Server running on: http://localhost:5000
+
+════════════════════════════════════════════════════════════════
+TESTING
+════════════════════════════════════════════════════════════════
+
+TEST 1: Registrazione manuale (senza browser)
+
+Usando curl o PostMan:
+
+POST http://localhost:5000/api/signup
+
+Body (JSON):
+{
+  "first_name": "John Doe",
+  "email": "john@example.com",
+  "product": "AZIONI",
+  "timestamp": "2026-04-30T09:00:00"
+}
+
+Risposta attesa:
+{
+  "success": true,
+  "message": "Successfully registered for beta!",
+  "customer_id": "cust_001",
+  "email": "john@example.com",
+  "first_report": "08:05 tomorrow (UTC+2)"
+}
+
+TEST 2: Verifica nel database
+
+Apri: DATABASE_RECIPIENTS.json (in PYTHON_SCRIPTS folder)
+
+Cerca "customer_recipients" sezione.
+
+Dovresti vedere il nuovo customer aggiunto:
+{
+  "id": "cust_001",
+  "customer_id": "USER_john@example.com",
+  "customer_name": "John Doe",
+  "plan": "BETA",
+  "email": "john@example.com",
+  "status": "active",
+  "markets": ["AZIONI"],
+  "created_date": "2026-04-30",
+  ...
+}
+
+TEST 3: Dal browser (form sulla landing page)
+
+1. Vai a: https://robot-trader.vercel.app/azioni
+2. Scorri fino a "Join Robot Trader Beta"
+3. Compila:
+   - First Name: Test User
+   - Email: test@example.com
+   - Product: AZIONI
+4. Clicca "Join Beta Now!"
+5. Dovresti vedere: "You're in! Check your email for next steps."
+
+Poi verifica di nuovo nel DATABASE_RECIPIENTS.json → email aggiunta!
+
+════════════════════════════════════════════════════════════════
+FLOW COMPLETO
+════════════════════════════════════════════════════════════════
+
+OGGI (30 APRILE) — BETA LAUNCH:
+
+1. Landing page con form LIVE su Vercel
+2. Server di signup RUNNING (python signup_handler.py)
+3. Clienti si iscrivono dal form
+4. Email automaticamente aggiunto a DATABASE_RECIPIENTS.json
+5. NESSUNA recruitment email manuale!
+
+DOMANI (30 APRILE) — 08:05 UTC+2:
+
+1. Scheduler automaticamente corre
+2. Legge DATABASE_RECIPIENTS.json
+3. Vede i nuovi clienti iscritti ieri
+4. Invia il primo report a TUTTI i nuovi beta users
+5. Boom! Sono automaticamente attivi!
+
+════════════════════════════════════════════════════════════════
+COMANDI UTILI
+════════════════════════════════════════════════════════════════
+
+VEDERE TUTTI I SIGNUPS:
+
+GET http://localhost:5000/api/signup/list
+
+Output:
+{
+  "total": 5,
+  "signups": [
+    {
+      "id": "cust_001",
+      "email": "john@example.com",
+      "customer_name": "John Doe",
+      "plan": "BETA",
+      "created_date": "2026-04-30",
+      ...
+    },
+    ...
+  ]
+}
+
+CONTROLLARE DATABASE IN TEMPO REALE:
+
+Apri: C:\Users\lucia\Desktop\Robot Trader 2026\PYTHON_SCRIPTS\DATABASE_RECIPIENTS.json
+
+Aggiorna il file e vedrai i nuovi signups in tempo reale!
+
+════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+════════════════════════════════════════════════════════════════
+
+PROBLEMA 1: "Connection refused"
+Significa che il server non sta girando.
+
+Soluzione: Apri PowerShell e riavvia:
+  cd "C:\Users\lucia\Desktop\Robot Trader 2026\PYTHON_SCRIPTS"
+  python signup_handler.py
+
+PROBLEMA 2: "Database not found"
+Significa che DATABASE_RECIPIENTS.json non è nel percorso giusto.
+
+Soluzione: Controlla che sia in:
+  C:\Users\lucia\Desktop\Robot Trader 2026\PYTHON_SCRIPTS\DATABASE_RECIPIENTS.json
+
+Se non c'è, copiane una da:
+  C:\Users\lucia\Desktop\Robot Trader 2026\08_EMAIL_RECIPIENTS_SYSTEM\DATABASE_RECIPIENTS.json
+
+PROBLEMA 3: "Email already registered"
+Se un cliente si iscrive 2 volte con la stessa email.
+
+Sistema risponde correttamente: "Email already registered"
+Non è aggiunto due volte! ✅
+
+PROBLEMA 4: Form non funziona sulla landing page
+1. Verifica che il form HTML sia stato aggiunto correttamente
+2. Verifica che il server sia in ascolto su http://localhost:5000
+3. Check browser console per errori (F12)
+
+════════════════════════════════════════════════════════════════
+PROSSIMO STEP
+════════════════════════════════════════════════════════════════
+
+Domani mattina (30 aprile) quando lo scheduler corre a 08:05:
+
+1. Legge DATABASE_RECIPIENTS.json
+2. Vede TUTTI i nuovi beta users iscritti ieri
+3. Invia il primo report a TUTTI loro
+4. Automaticamente attivi!
+
+NIENTE recruitment email manuale!
+TUTTO automatico! ✅
+
+════════════════════════════════════════════════════════════════

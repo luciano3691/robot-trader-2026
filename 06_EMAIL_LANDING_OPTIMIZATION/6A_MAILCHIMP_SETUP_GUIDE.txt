@@ -1,0 +1,432 @@
+
+# MAILCHIMP EMAIL AUTOMATION SETUP GUIDE
+
+## 📋 OVERVIEW
+
+Sistema di email automation per Fuerte Venture Capital usando Mailchimp.
+- Waitlist capture (landing page forms)
+- Automated email sequence (5 email pre-written)
+- Segmentazione per piano (BASIC/PRO/ENTERPRISE)
+- Analytics + tracking
+
+---
+
+## 🔧 MAILCHIMP SETUP STEP-BY-STEP
+
+### STEP 1: CREATE ACCOUNT & AUDIENCE
+
+1. Vai su mailchimp.com → Sign up
+2. Email: info@fuerteventurecapital.com
+3. Create new Audience: "Robot Trader 2026"
+4. Audience settings:
+   ```
+   ├─ Name: Robot Trader 2026
+   ├─ Default sender: Fuerte Venture Capital <info@fuerteventurecapital.com>
+   ├─ Default "From name": Luciano Manicardi, Fuerte VC
+   ├─ Reply-to: luciano.manicardi@lineexpress.it
+   └─ Default language: Italian + Spanish
+   ```
+
+---
+
+### STEP 2: CREATE MERGE FIELDS (Personalization)
+
+In Audience Settings → Manage Audience → Additional fields:
+
+```
+MERGE FIELDS:
+├─ FNAME (First Name) — Required
+├─ LNAME (Last Name) — Optional
+├─ PLAN (Piano Interesse) — Dropdown: BASIC/PRO/ENTERPRISE
+├─ COUNTRY (Paese) — Optional
+├─ SOURCE (Come ci hai scoperto) — Dropdown
+│  └─ Landing Page AZIONI
+│  └─ Landing Page FONDI
+│  └─ LinkedIn
+│  └─ Direct referral
+│  └─ Other
+├─ SIGNUPDATE — Auto-filled
+└─ LANGUAGE (Lingua Preferita) — IT/ES/EN/FR/DE
+```
+
+---
+
+### STEP 3: SETUP LANDING PAGE FORMS
+
+**Per AZIONI Landing Page:**
+
+```html
+<!-- Mailchimp Signup Form Integration -->
+<form action="https://fuerteventurecapital.us1.list-manage.com/subscribe/post?u=YOUR_USER_ID&id=YOUR_LIST_ID" 
+      method="POST">
+  
+  <input type="email" name="EMAIL" placeholder="Email" required>
+  <input type="text" name="FNAME" placeholder="Nome">
+  
+  <select name="PLAN" required>
+    <option value="">Quale piano?</option>
+    <option value="BASIC">BASIC €49/mese</option>
+    <option value="PRO">PRO €99/mese</option>
+    <option value="ENTERPRISE">ENTERPRISE (Custom)</option>
+  </select>
+
+  <select name="SOURCE">
+    <option value="">Come ci hai scoperto?</option>
+    <option value="Landing Page AZIONI">Landing Page AZIONI</option>
+    <option value="LinkedIn">LinkedIn</option>
+    <option value="Direct">Direct referral</option>
+  </select>
+
+  <select name="LANGUAGE">
+    <option value="IT" selected>Italiano</option>
+    <option value="ES">Español</option>
+    <option value="EN">English</option>
+  </select>
+
+  <input type="hidden" name="SIGNUPSOURCE" value="AZIONI">
+  <button type="submit">Aggiungi alla Waitlist</button>
+</form>
+```
+
+---
+
+### STEP 4: CREATE AUTOMATION WORKFLOWS
+
+**WORKFLOW 1: Welcome Email (triggered on signup)**
+
+Trigger: Subscribe to list
+
+**Email 1 — Welcome (sent immediately)**
+```
+Subject: 🎉 Benvenuto in Robot Trader — Ecco Come Iniziare
+
+FROM: Luciano Manicardi, Fuerte VC <luciano.manicardi@lineexpress.it>
+REPLY-TO: luciano.manicardi@lineexpress.it
+
+Ciao *|FNAME|*,
+
+Benvenuto nella waitlist di Robot Trader!
+
+Sei uno dei 500 che crediamo nel valore quantitativo.
+
+📌 QUELLO CHE SUCCEDE ORA:
+- 21 maggio: AZIONI va live
+- Riceverai accesso esclusivo al piano che hai scelto
+- 7 giorni GRATIS per provare
+- Supporto diretto dal team
+
+🔗 Nel frattempo, leggi:
+→ Guide: https://blog.robot-trader.io/value-filters
+→ Case study: https://blog.robot-trader.io/14-stocks
+
+Se hai domande: rispondi a questa email!
+
+A presto,
+Luciano Manicardi
+Founder, Fuerte Venture Capital
+
+---
+P.S. Condividi il link alla waitlist con amici. Bonus: entra nel Discord community se sei interessato.
+```
+
+---
+
+**WORKFLOW 2: Educational Email Sequence (Day 3, 7, 14, 21)**
+
+**Email 2 — Day 3: "Come Funzionano i 5 Filtri"**
+```
+Subject: I 5 Filtri Che Usiamo Ogni Giorno [Video Spiegazione]
+
+Ciao *|FNAME|*,
+
+Tre giorni fa ti sei iscritto. Perfetto!
+
+Oggi voglio spiegarti come funzionano i 5 filtri di Robot Trader.
+
+🎯 I 5 FILTRI:
+
+1️⃣ EV/FCF < 12
+   Cosa significa: Quanti euro spendi per ogni euro di cash flow generato
+   Perché: Cash flow = vera ricchezza, non earnings
+
+2️⃣ P/B < 1.2
+   Cosa significa: Paghi MENO del valore contabile dell'azienda
+   Perché: Safety margin — margin of safety
+
+3️⃣ ROE > 0%
+   Cosa significa: Azienda genera profitti dal capitale
+   Perché: Qualità dell'azienda
+
+4️⃣ ND/EBITDA < 2.5
+   Cosa significa: Debito controllato
+   Perché: Rischio downside limitato
+
+5️⃣ SCORE > 80
+   Cosa significa: Ranking composito dei 4 filtri sopra
+   Perché: Un'azione deve PASSARE TUTTI i filtri
+
+📊 ESEMPIO REALE: Lennar (LEN)
+- EV/FCF: 5.64 ✅
+- P/B: 1.04 ✅
+- ROE: 8% ✅
+- ND/EBITDA: -1.40 ✅
+- SCORE: 86 ✅
+→ Risultato: SELECTED come opportunità di valore
+
+🎥 Video spiegazione (5 min): https://youtube.com/robot-trader-filters
+
+Domande? Rispondi a questa email!
+
+A presto,
+Luciano
+```
+
+**Email 3 — Day 7: "Le 14 Azioni Che Abbiamo Trovato"**
+```
+Subject: 14 Azioni Trovate il 29 Aprile — Ecco Le Migliori
+
+[Embed una tabella con le 14 azioni + metriche]
+
+Ciao *|FNAME|*,
+
+Una settimana fa abbiamo fatto il nostro primo screening LIVE.
+
+Risultato: 14 opportunità di valore in 24 ore.
+
+🏆 TOP 5:
+
+1. SITE Centers Corp (SITC) — Score 99
+2. EBS — Score 98
+3. DXC Technology (DXC) — Score 93
+4. ICON Public (ICLR) — Score 87
+5. Lennar (LEN) — Score 86
+
+Scarica il report completo (Excel):
+https://robot-trader-reports.s3.amazonaws.com/20260429_full_report.xlsx
+
+Hai riconosciuto qualche azione che segui già?
+
+A presto,
+Luciano
+```
+
+**Email 4 — Day 14: "Cosa Ottieni Con Il Piano PRO"**
+```
+Subject: PRO vs BASIC: Quale Scegliere? [Guida Decisionale]
+
+Ciao *|FNAME|*,
+
+Tra una settimana (21 maggio) Robot Trader AZIONI va live.
+
+Se scegli *|PLAN|*, ecco esattamente cosa ottieni:
+
+*if PLAN == "BASIC":*
+  ✅ Report Excel quotidiano automatico
+  ✅ 5 filtri hard quantitativi
+  ✅ Copertura 4 mercati (USA + UK)
+  ✅ Notifiche email
+  ✅ Support via email
+  💰 €49/mese
+
+*if PLAN == "PRO":*
+  ✅ TUTTO di BASIC, PLUS:
+  ✅ Copertura 8 mercati GLOBALE
+  ✅ API access per integrazioni
+  ✅ Filtri personalizzati (modifica EV/FCF, P/B, etc)
+  ✅ Backtesting su dati storici
+  ✅ Priority support
+  ✅ Slack/Telegram alerts real-time
+  💰 €99/mese
+
+*if PLAN == "ENTERPRISE":*
+  ✅ TUTTO di PRO, PLUS:
+  ✅ Account manager dedicato
+  ✅ Custom screening logic
+  ✅ White-label solution
+  ✅ SLA 99.9%
+  ✅ Training per il team
+  💰 Custom quote
+
+Domande? Rispondi!
+
+A presto,
+Luciano
+```
+
+**Email 5 — Day 21: "AZIONI è Live — Accedi Adesso"**
+```
+Subject: 🚀 AZIONI è LIVE — Il Tuo Accesso è Pronto
+
+Ciao *|FNAME|*,
+
+Oggi è il giorno!
+
+Robot Trader AZIONI è live.
+
+🎉 IL TUO ACCESSO:
+- Username: *|EMAIL|*
+- Piano: *|PLAN|*
+- Primo mese: 50% SCONTO (se sei sulla waitlist)
+- Accesso: https://app.robot-trader.io/login
+
+🚀 PROSSIMI PASSI:
+1. Accedi con la tua email
+2. Scarica il primo report (generato stamattina alle 08:05)
+3. Leggi la guida "Getting started"
+4. Unisciti al Discord community
+
+📊 PRIMO REPORT INCLUSO:
+Questo pomeriggio riceverai il primo report Excel automatico
+con le azioni screened oggi mattina.
+
+NOTA: Se hai scelto PRO, riceverai anche accesso alle API e Slack integration.
+
+Domande? Rispondi o contattaci: support@robot-trader.io
+
+Benvenuto!
+Luciano Manicardi
+Founder, Fuerte Venture Capital
+
+P.S. Condividi il tuo link di referral nel Discord! Bonus per ogni amico che si unisce.
+```
+
+---
+
+### STEP 5: SEGMENTAZIONE
+
+Crea questi segments in Mailchimp:
+
+```
+SEGMENT 1: "BASIC Plan"
+├─ Condition: PLAN == "BASIC"
+├─ Use case: Special offers for BASIC users (upsell PRO)
+└─ Size: ~60%
+
+SEGMENT 2: "PRO Plan"
+├─ Condition: PLAN == "PRO"
+├─ Use case: Feature updates, API documentation
+└─ Size: ~30%
+
+SEGMENT 3: "ENTERPRISE Plan"
+├─ Condition: PLAN == "ENTERPRISE"
+├─ Use case: Dedicated onboarding, quarterly business reviews
+└─ Size: ~10%
+
+SEGMENT 4: "Italia"
+├─ Condition: COUNTRY == "IT"
+├─ Use case: Italian-specific content + tax info
+└─ Size: ~45%
+
+SEGMENT 5: "Spagna"
+├─ Condition: COUNTRY == "ES"
+├─ Use case: Spanish-specific content + localized support
+└─ Size: ~35%
+
+SEGMENT 6: "Engaged" (Openers + Clickers)
+├─ Condition: Opens last 30 days > 0 AND Clicks last 30 days > 0
+├─ Use case: VIP content, beta testing features
+└─ Size: ~40%
+```
+
+---
+
+### STEP 6: ANALYTICS & MONITORING
+
+**Metriche chiave (check settimanale):**
+
+```
+✅ Subscriber Growth
+   ├─ Target: +50/settimana fino a 500 (lancio 21 maggio)
+   └─ Tracking: Subscriber count dashboard
+
+✅ Email Engagement
+   ├─ Open rate target: 35%+ (vs media industria 21%)
+   ├─ Click rate target: 5%+ (vs media industria 2.5%)
+   └─ Unsubscribe rate: < 0.5%
+
+✅ Conversion Funnel
+   ├─ Email 1 (Welcome): 100% delivery
+   ├─ Email 2 (Filters): 35%+ open
+   ├─ Email 3 (Results): 30%+ click
+   ├─ Email 4 (Plan choice): 25%+ open
+   ├─ Email 5 (Launch): 40%+ open, 10%+ conversion to paid
+   └─ GOAL: 50+ paid subscribers by May 21
+
+✅ List Health
+   ├─ Bounce rate: < 2%
+   ├─ Spam reports: < 0.1%
+   └─ Hard bounces: Automatic removal
+```
+
+---
+
+### STEP 7: INTEGRATION WITH LANDING PAGES
+
+**Per ogni landing page (AZIONI/FONDI/ETF):**
+
+1. Aggiungi Mailchimp form nell'HTML (come sopra)
+2. Setup webhook: Quando qualcuno si iscrive → Auto-tag "AZIONI_Waitlist"
+3. Tracking: UTM parameters per identificare fonte traffico
+4. A/B test: Different form copy/colors
+
+---
+
+## ✉️ EMAIL SEQUENCE TIMELINE
+
+```
+Day 0: Someone signs up on landing page
+       ↓
+Day 0 (Immediate): Email 1 — Welcome
+       ↓
+Day 3: Email 2 — How Filters Work (Educational)
+       ↓
+Day 7: Email 3 — Real Results (Social Proof)
+       ↓
+Day 14: Email 4 — Plan Comparison (Upsell)
+       ↓
+Day 21: Email 5 — Launch Day (Call to Action)
+       ↓
+Day 28+: Nurture sequence (Newsletter, tips, updates)
+```
+
+---
+
+## 🎯 SUCCESS METRICS
+
+By May 21:
+- ✅ 500+ waitlist subscribers
+- ✅ 35%+ average open rate
+- ✅ 5%+ click rate
+- ✅ 50+ paid conversions (10% conversion rate)
+- ✅ $2,450+ MRR from email conversions alone
+
+---
+
+## 🔗 MAILCHIMP API INTEGRATION (Optional)
+
+Se vuoi automatizzare con N8N:
+
+```
+POST https://{{domain}}.api.mailchimp.com/3.0/lists/{{list_id}}/members
+
+BODY:
+{
+  "email_address": "{{email}}",
+  "status": "subscribed",
+  "merge_fields": {
+    "FNAME": "{{fname}}",
+    "PLAN": "{{plan}}",
+    "COUNTRY": "{{country}}",
+    "SOURCE": "{{source}}"
+  },
+  "tags": ["AZIONI_Waitlist", "{{source}}"]
+}
+```
+
+---
+
+## 📞 SUPPORT
+
+Domande su Mailchimp setup?
+→ Mailchimp Help Center: https://mailchimp.com/help/
+→ Email template best practices: https://mailchimp.com/guides/email-design/

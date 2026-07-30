@@ -1,0 +1,145 @@
+================================================================================
+  FUERTE VENTURE CAPITAL — STATO DEL PROGETTO
+  Fuerte Venture Capital SL · CIF B23881691
+  Aggiornato: 20 Giugno 2026
+================================================================================
+
+
+================================================================================
+SEZIONE 1: MODIFICHE APPLICATE IN QUESTA SESSIONE (20/06/2026)
+================================================================================
+
+1. DOMAIN RENAME — tutti i file .py/.html/.txt
+   ─────────────────────────────────────────────
+   fuertescreener.com          → www.fuerteventurecapital.com
+   hello@fuertescreener.com    → marketing@fuerteventurecapital.com
+   marketing@fuertescreener.com→ marketing@fuerteventurecapital.com
+   (23 file aggiornati con sed, in sequenza per evitare doppi rimpiazzi)
+
+2. FONDI US ESPANSI: 781 → 911 (+130 ticker)
+   ─────────────────────────────────────────────
+   FILE: ticker_lists_5000.py
+   +9 nuove famiglie aggiunte:
+     FONDI_AB            (19 ticker) — AllianceBernstein
+     FONDI_PGIM          (19 ticker) — Prudential/PGIM
+     FONDI_MORGAN_STANLEY(20 ticker) — Morgan Stanley IM
+     FONDI_STATE_STREET_MF(14 ticker)— State Street MF
+     FONDI_WILLIAM_BLAIR (14 ticker) — William Blair
+     FONDI_CAUSEWAY      (11 ticker) — Causeway Capital
+     FONDI_HOTCHKIS      (12 ticker) — Hotchkis & Wiley
+     FONDI_ALGER         (13 ticker) — Fred Alger
+     FONDI_TRANSAMERICA  (14 ticker) — Transamerica
+   ALL_FONDI aggiornato per includerli tutti.
+
+3. NUOVO SCREENER FONDI EU UCITS
+   ─────────────────────────────────────────────
+   FILE NUOVO: fetch_fondi_eu_universe.py
+     Fase 1: 71 ISIN seed → cerca ticker Yahoo Finance per ISIN
+             (38% hit rate — LU ISINs poco coperti)
+     Fase 2: 420 termini di ricerca libera
+             ("Amundi SICAV", "Pictet Water", "europe equity UCITS"...)
+             Filtra: solo ticker con suffisso borsa EU (.F .PA .MI .L .AS ...)
+   RISULTATO: 536 voci in cache, 472 pronti per lo screener
+
+   FILE NUOVO: value_screener_fondi_eu.py
+     Legge fondi_eu_universe_cache.json
+     Usa AUM (non volume) come metrica dimensione
+     TER dalla cache (più affidabile per UCITS)
+     Output: FONDI_EU_Screener_BASIC/PRO/VALUE_YYYYMMDD.xlsx
+
+   FILE MODIFICATO: orchestrator.py
+     Aggiunto 4° screener:
+       {"script": "value_screener_fondi_eu.py", "type": "FONDI_EU"}
+
+   FILE MODIFICATO: scheduler_daemon.py
+     Job ETF+FONDI ora include FONDI_EU:
+       _run_orchestrator(['ETF', 'FONDI', 'FONDI_EU'], timeout_sec=7200)
+     Timeout esteso da 5400s (90min) a 7200s (2h)
+
+   FILE CREATO: fondi_eu_universe_cache.json (generato da fetch_fondi_eu_universe.py)
+
+
+================================================================================
+SEZIONE 2: UNIVERSO STRUMENTI — RIEPILOGO QUANTITATIVO
+================================================================================
+
+  Asset           Count    Fonte dati
+  ─────────────────────────────────────
+  ALL_AZIONI      3.072    yfinance (23 mercati)
+  ALL_ETF         1.182    yfinance + justETF (Europa ACC)
+  ALL_FONDI US      911    yfinance (45 famiglie)
+  FONDI EU UCITS    472    yfinance + cache (21 paesi EU)
+  ─────────────────────────────────────
+  TOTALE          5.637
+
+  Cache Fondi EU (fondi_eu_universe_cache.json):
+    Voci totali:         536
+    Da ISIN seed:         70
+    Da discovery:        466
+    Con TER:             472  ← PRONTI per lo screener
+    Con MS rating:       385
+
+
+================================================================================
+SEZIONE 3: COMANDI UTILI
+================================================================================
+
+  # Lancia tutti e 4 gli screener
+  python orchestrator.py
+
+  # Solo fondi EU
+  python orchestrator.py FONDI_EU
+
+  # Aggiorna cache fondi EU (solo nuovi ticker mancanti)
+  python fetch_fondi_eu_universe.py --discover
+
+  # Statistiche cache fondi EU
+  python fetch_fondi_eu_universe.py --stats
+
+  # Riesegui discovery da zero
+  python fetch_fondi_eu_universe.py
+
+
+================================================================================
+SEZIONE 4: TODO PRE-LANCIO
+================================================================================
+
+CRITICO (blocca il lancio):
+  [ ] Cloudflare Tunnel — scaricare cloudflared.exe, config.yml, aggiornare base_url
+  [ ] Password admin "123" → cambiare in config.json → admin_password
+
+AZIONI MANUALI PENDENTI (da sessione 16/06):
+  [ ] Ruotare API key Anthropic (era esposta nei log debug)
+  [ ] Rigenerare App Password Gmail (era in chiaro in config.json)
+
+IN ATTESA CREDENZIALI:
+  [ ] Social Automation — Brevo api_key, LinkedIn, Meta page_id
+  [ ] WhatsApp Business — account Meta verificato + template approvati
+
+
+================================================================================
+SEZIONE 5: STORICO FIX PER SESSIONE
+================================================================================
+
+  16/06/2026 — 20 bug fix:
+    dashboard.py:        threading lock, scrittura atomica, password env,
+                         except nudi, startup makedirs, cleanup chat thread
+    chat_service.py:     _session_ts + cleanup_expired_sessions (memory leak)
+    email_notifier.py:   timeout=15 su smtplib.SMTP
+    screener_utils.py:   import math, filtro NaN, condizione ridondante
+    social_automation.py: guard try/except import circolare
+    whatsapp_service.py: _WA_API_VERSION costante
+    value_screener_azioni.py: _get_param() helper
+
+  17/06/2026 — 1 fix:
+    orchestrator.py:     retry automatico send_plan_email (3 tentativi, 30s)
+
+  20/06/2026 — espansione mercati:
+    ticker_lists_5000.py:        +130 ticker US (9 famiglie nuove)
+    fetch_fondi_eu_universe.py:  NUOVO — scraper 2 fasi UCITS EU
+    value_screener_fondi_eu.py:  NUOVO — screener UCITS EU
+    orchestrator.py:             4° screener FONDI_EU
+    scheduler_daemon.py:         FONDI_EU in job ETF+FONDI, timeout 2h
+    23 file .py/.html/.txt:      domain rename fuerteventurecapital.com
+
+================================================================================

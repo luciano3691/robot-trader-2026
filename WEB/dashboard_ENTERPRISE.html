@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader 2026 — Console Enterprise</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #0a0e27;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: #1a1f3a;
+            border-right: 1px solid #FF9500;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #FF9500 0%, #E58A00 100%);
+            color: white;
+        }
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .sidebar-header p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+        .menu {
+            padding: 10px 0;
+        }
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .menu-item:hover {
+            background: #252a45;
+            border-left-color: #FF9500;
+        }
+        .menu-item.active {
+            background: #252a45;
+            border-left-color: #FF9500;
+            color: #FF9500;
+        }
+        .menu-item-icon {
+            display: inline-block;
+            width: 20px;
+            margin-right: 10px;
+        }
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .header {
+            background: #1a1f3a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #FF9500;
+        }
+        .header h2 {
+            color: #FF9500;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .header .breadcrumb {
+            font-size: 12px;
+            color: #888;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #1a1f3a;
+            border: 1px solid #2a3050;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .card-header {
+            color: #FF9500;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        .card-subtitle {
+            font-size: 10px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .panel {
+            background: #1a1f3a;
+            border: 1px solid #2a3050;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: #252a45;
+            padding: 12px 20px;
+            border-bottom: 1px solid #FF9500;
+            color: #FF9500;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .panel-body {
+            padding: 20px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .status-success {
+            background: #00ff8844;
+            color: #00ff88;
+        }
+        .status-error {
+            background: #ff003344;
+            color: #ff5555;
+        }
+        .status-warning {
+            background: #FF950044;
+            color: #FF9500;
+        }
+        .log-line {
+            font-size: 11px;
+            padding: 5px 10px;
+            border-left: 2px solid #333;
+            margin-bottom: 5px;
+        }
+        .log-line.success { border-left-color: #00ff88; }
+        .log-line.error { border-left-color: #ff5555; }
+        .log-line.info { border-left-color: #4499ff; }
+        .btn {
+            background: #FF9500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background: #E58A00;
+        }
+        .btn-secondary {
+            background: #2a3050;
+        }
+        .btn-secondary:hover {
+            background: #3a4060;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        th {
+            background: #252a45;
+            padding: 10px;
+            text-align: left;
+            color: #FF9500;
+            font-weight: 600;
+            border-bottom: 1px solid #FF9500;
+        }
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #2a3050;
+        }
+        tr:hover {
+            background: #252a45;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .terminal {
+            background: #000;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #0f0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🤖 ROBOT TRADER 2026</h1>
+                <p>Enterprise Console v2.0</p>
+            </div>
+            <div class="menu">
+                <div class="menu-item active" onclick="showSection('dashboard')">
+                    <span class="menu-item-icon">📊</span> Dashboard
+                </div>
+                <div class="menu-item" onclick="showSection('azioni')">
+                    <span class="menu-item-icon">📈</span> Azioni
+                </div>
+                <div class="menu-item" onclick="showSection('etf')">
+                    <span class="menu-item-icon">💼</span> ETF
+                </div>
+                <div class="menu-item" onclick="showSection('fondi')">
+                    <span class="menu-item-icon">🏦</span> Fondi
+                </div>
+                <div class="menu-item" onclick="showSection('orchestrator')">
+                    <span class="menu-item-icon">⚙️</span> Orchestrator
+                </div>
+                <div class="menu-item" onclick="showSection('scheduler')">
+                    <span class="menu-item-icon">⏰</span> Task Scheduler
+                </div>
+                <div class="menu-item" onclick="showSection('logs')">
+                    <span class="menu-item-icon">📋</span> Execution Logs
+                </div>
+                <div class="menu-item" onclick="showSection('config')">
+                    <span class="menu-item-icon">🔧</span> Configurazione
+                </div>
+                <div class="menu-item" onclick="showSection('system')">
+                    <span class="menu-item-icon">💻</span> System Status
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <div class="header">
+                    <h2>Dashboard</h2>
+                    <div class="breadcrumb">Home > Dashboard</div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">Azioni Selezionate</div>
+                        <div class="card-value" id="stat-azioni">-</div>
+                        <div class="card-subtitle">Ultimo report</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">ETF Selezionati</div>
+                        <div class="card-value" id="stat-etf">-</div>
+                        <div class="card-subtitle">Ultimo report</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Fondi Selezionati</div>
+                        <div class="card-value" id="stat-fondi">-</div>
+                        <div class="card-subtitle">Ultimo report</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">Ultimo Aggiornamento</div>
+                        <div class="card-value" id="stat-time" style="font-size: 16px;">-</div>
+                        <div class="card-subtitle">Ora esecuzione</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">⚡ Quick Actions</div>
+                    <div class="panel-body">
+                        <button class="btn" onclick="loadDashboard()">🔄 Aggiorna Dati</button>
+                        <button class="btn btn-secondary">▶️ Esegui Orchestrator</button>
+                        <button class="btn btn-secondary">📧 Invia Email Report</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">📊 Report Files</div>
+                    <div class="panel-body">
+                        <div id="files-list">Caricamento...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AZIONI -->
+            <div id="azioni" class="section">
+                <div class="header">
+                    <h2>Azioni Selezionate</h2>
+                    <div class="breadcrumb">Home > Screener > Azioni</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">📈 Azioni Value</div>
+                    <div class="panel-body" id="azioni-table">Caricamento...</div>
+                </div>
+            </div>
+
+            <!-- ETF -->
+            <div id="etf" class="section">
+                <div class="header">
+                    <h2>ETF Selezionati</h2>
+                    <div class="breadcrumb">Home > Screener > ETF</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">💼 ETF</div>
+                    <div class="panel-body" id="etf-table">Caricamento...</div>
+                </div>
+            </div>
+
+            <!-- FONDI -->
+            <div id="fondi" class="section">
+                <div class="header">
+                    <h2>Fondi Selezionati</h2>
+                    <div class="breadcrumb">Home > Screener > Fondi</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">🏦 Fondi</div>
+                    <div class="panel-body" id="fondi-table">Caricamento...</div>
+                </div>
+            </div>
+
+            <!-- ORCHESTRATOR -->
+            <div id="orchestrator" class="section">
+                <div class="header">
+                    <h2>Orchestrator Status</h2>
+                    <div class="breadcrumb">Home > System > Orchestrator</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">⚙️ Execution Pipeline</div>
+                    <div class="panel-body">
+                        <p><strong>Step 1:</strong> value_screener_azioni.py <span class="status status-success">READY</span></p>
+                        <p><strong>Step 2:</strong> value_screener_etf.py <span class="status status-success">READY</span></p>
+                        <p><strong>Step 3:</strong> value_screener_fondi.py <span class="status status-success">READY</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCHEDULER -->
+            <div id="scheduler" class="section">
+                <div class="header">
+                    <h2>Task Scheduler</h2>
+                    <div class="breadcrumb">Home > System > Scheduler</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">⏰ Scheduled Tasks</div>
+                    <div class="panel-body">
+                        <p><strong>Task Name:</strong> Robot Trader 2026 - Daily Screener</p>
+                        <p><strong>Schedule:</strong> Ogni giorno alle 08:05 CEST</p>
+                        <p><strong>Status:</strong> <span class="status status-success">ACTIVE</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOGS -->
+            <div id="logs" class="section">
+                <div class="header">
+                    <h2>Execution Logs</h2>
+                    <div class="breadcrumb">Home > System > Logs</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">📋 Log Output</div>
+                    <div class="panel-body">
+                        <div class="terminal" id="log-terminal">
+                            <div>[INFO] Sistema avviato</div>
+                            <div>[INFO] Caricamento dati in corso...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONFIG -->
+            <div id="config" class="section">
+                <div class="header">
+                    <h2>Configurazione</h2>
+                    <div class="breadcrumb">Home > System > Config</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">🔧 Settings</div>
+                    <div class="panel-body">
+                        <p><strong>REPORTS_DIR:</strong> C:\Users\lucia\Desktop\ROBOT TRADER 2026\PYTHON_SCRIPTS\REPORTS_DAILY</p>
+                        <p><strong>Python:</strong> 3.14</p>
+                        <p><strong>yfinance:</strong> 1.3.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM -->
+            <div id="system" class="section">
+                <div class="header">
+                    <h2>System Status</h2>
+                    <div class="breadcrumb">Home > System > Status</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">💻 System Info</div>
+                    <div class="panel-body">
+                        <p><strong>Backend:</strong> <span class="status status-success">RUNNING</span></p>
+                        <p><strong>API:</strong> http://localhost:5000/api/dashboard</p>
+                        <p><strong>Dashboard:</strong> http://localhost:5000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.closest('.menu-item').classList.add('active');
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('http://localhost:5000/api/dashboard');
+                const data = await response.json();
+
+                // Stats
+                document.getElementById('stat-azioni').textContent = data.azioni?.count || 0;
+                document.getElementById('stat-etf').textContent = data.etf?.count || 0;
+                document.getElementById('stat-fondi').textContent = data.fondi?.count || 0;
+                document.getElementById('stat-time').textContent = new Date(data.timestamp).toLocaleTimeString('it-IT');
+
+                // Tables
+                document.getElementById('azioni-table').innerHTML = renderTable(data.azioni?.data);
+                document.getElementById('etf-table').innerHTML = renderTable(data.etf?.data);
+                document.getElementById('fondi-table').innerHTML = renderTable(data.fondi?.data);
+
+                // Files
+                let filesList = '';
+                if (data.azioni) filesList += `<div>✅ ${data.azioni.file}</div>`;
+                if (data.etf) filesList += `<div>✅ ${data.etf.file}</div>`;
+                if (data.fondi) filesList += `<div>✅ ${data.fondi.file}</div>`;
+                document.getElementById('files-list').innerHTML = filesList || 'Nessun file';
+
+            } catch (error) {
+                console.error('Errore:', error);
+            }
+        }
+
+        function renderTable(data) {
+            if (!data || data.length === 0) return '<p>Nessun dato disponibile</p>';
+
+            const keys = Object.keys(data[0]);
+            let html = '<table><thead><tr>';
+            keys.forEach(key => html += `<th>${key}</th>`);
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                keys.forEach(key => html += `<td>${row[key] || '-'}</td>`);
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        loadDashboard();
+        setInterval(loadDashboard, 60000);
+    </script>
+</body>
+</html>

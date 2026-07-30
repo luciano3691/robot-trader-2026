@@ -1,0 +1,59 @@
+# === SEGRETI — MAI su GitHub ===
+.env
+CREDENTIALS/
+
+# === DATI CLIENTI E ORDINI ===
+clienti.json
+clienti.json.bak
+clients.json
+prospect.json
+invoices.json
+sessions.json
+ORDINI/
+apollo-contacts-export*.csv
+
+# === CACHE E REPORT (grandi, cambiano ogni giorno) ===
+REPORTS_DAILY/
+BACKUPS/
+PARAMETRI_BACKUP/
+LOGS/
+PYTHON_SCRIPTS/BACKUPS/
+PYTHON_SCRIPTS/KNOWLEDGE_BASE/
+PYTHON_SCRIPTS/SOCIAL_LOGS/
+PYTHON_SCRIPTS/SOCIAL_DRAFTS/
+PYTHON_SCRIPTS/ORDINI/
+prices_cache.json
+etf_universe_cache.json
+fondi_eu_universe_cache.json
+PYTHON_SCRIPTS/prices_cache.json
+PYTHON_SCRIPTS/etf_universe_cache.json
+PYTHON_SCRIPTS/fondi_eu_universe_cache.json
+PYTHON_SCRIPTS/sessions.json
+PYTHON_SCRIPTS/clienti.json
+PYTHON_SCRIPTS/clienti.json.bak
+PYTHON_SCRIPTS/prospect.json
+PYTHON_SCRIPTS/fatture_counter.json
+PYTHON_SCRIPTS/parametri_bk_*.json
+PYTHON_SCRIPTS/social_calendar.json
+
+# === PYTHON ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+
+# === CARTELLA GITHUB LOCALE (repo embedded) ===
+Github/
+
+# === WINDOWS ===
+*.lnk
+Thumbs.db
+desktop.ini
+*.tmp
+
+# === NGROK ESEGUIBILE ===
+PYTHON_SCRIPTS/ngrok.exe
+ngrok.exe

@@ -1,0 +1,301 @@
+================================================================================
+  FUERTE SCREENER — STATO DEL PROGETTO
+  Fuerte Venture Capital SL · CIF B23881691
+  Aggiornato: 3 Giugno 2026 (sera — sistema 9-file completato)
+================================================================================
+
+
+================================================================================
+SEZIONE 1: ARCHITETTURA ATTUALE
+================================================================================
+
+TUTTO GIRA IN UN UNICO FILE: dashboard.py
+─────────────────────────────────────────
+  • Server HTTP puro Python (BaseHTTPRequestHandler) — NO Flask, NO N8N
+  • Porta: 5000
+  • Avvio: python dashboard.py  oppure  AVVIO_VELOCE.bat
+  • Accesso admin: http://localhost:5000  → password in config.json
+  • Accesso cliente: http://localhost:5000/client-login
+
+FILE PRINCIPALI:
+  dashboard.py              → Server completo (landing, admin, area clienti, API)
+  order_builder.py          → Order Builder (email bancaria MiFID II, CSV IBKR, CSV generico)
+  value_screener_azioni.py  → Screener azioni (3072 ticker, 23 mercati, output 3 Excel BASIC/PRO/VALUE)
+  value_screener_etf.py     → Screener ETF (678 ETF, output 3 Excel BASIC/PRO/VALUE)
+  value_screener_fondi.py   → Screener Fondi (1087 fondi, 36 famiglie, output 3 Excel BASIC/PRO/VALUE)
+  ticker_lists_5000.py      → Lista ticker completa
+  scheduler_daemon.py       → Esegue screener ogni notte alle 23:00
+  orchestrator.py           → Coordina esecuzione screener + notifiche email
+  email_notifier.py         → Notifiche email post-screener (Gmail SMTP)
+  servizi_config.json       → Prezzi e caratteristiche per piano (v2.1)
+  parametri.json            → Parametri screener editabili da admin panel
+  clienti.json              → Database clienti (piani, dati fiscali, GDPR)
+
+
+================================================================================
+SEZIONE 2: SISTEMA 9-FILE (IMPLEMENTATO 03/06/2026 SERA)
+================================================================================
+
+CONCETTO:
+  Un singolo giro screener produce 9 file Excel (3 asset × 3 piani).
+  Il cliente scarica solo il file del suo piano.
+  L'admin vede sempre i dati PRO.
+
+ARCHITETTURA 2-FASE (tutti e 3 gli screener):
+  Phase 1 → 1 sola passata yfinance su tutto l'universo → raccoglie tutti i dati
+  Phase 2 → per ciascun piano: filtra + scrive Excel separato (stessa passata dati)
+  Vantaggio: nessun triplo fetch → tempo totale invariato rispetto a prima
+
+OUTPUT PER RUN:
+  REPORTS_DAILY/
+    Azioni_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    Azioni_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    Azioni_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+
+STRUTTURA EXCEL PER PIANO:
+  BASIC  → Dashboard + Top 20
+  PRO    → Dashboard + Top 50 + Foglio Selezionati
+  VALUE  → Dashboard + Top 50 + Foglio Selezionati + Scartati (per motivo) + Non Validi
+
+
+================================================================================
+SEZIONE 3: SOGLIE FILTRI PER PIANO
+================================================================================
+
+── AZIONI ──────────────────────────────────────────────────────────────────────
+
+  BASIC:
+    Universe:  solo indici principali (~702 ticker)
+               SP500 + FTSE100 + DAX + CAC40 + FTSE MIB + IBEX35 + SMI + AEX + Nikkei225
+    EV/FCF:    ≤ 12
+    P/B:       ≤ 1.2
+    ROE:       ≥ 0%
+    ND/EBITDA: ≤ 2.5
+    Top N:     20
+
+  PRO:
+    Universe:  universo completo 3072 ticker
+    EV/FCF:    ≤ 12
+    P/B:       ≤ 1.2
+    ROE:       ≥ 0%
+    ND/EBITDA: ≤ 2.5
+    Top N:     50
+
+  VALUE:
+    Universe:  universo completo 3072 ticker
+    EV/FCF:    ≤ 15  (più permissivo — cattura più opportunità)
+    P/B:       ≤ 1.5
+    ROE:       ≥ -5% (include turnaround stories)
+    ND/EBITDA: ≤ 3.0
+    Top N:     50
+
+  LOGICA: BASIC = blue chip sicuri (top 20) | PRO = universo standard | VALUE = rete più larga
+
+── ETF ─────────────────────────────────────────────────────────────────────────
+
+  BASIC:   TER ≤ 0.35% | Sharpe ≥ 0.8 | Volume ≥ 500k | Perf1Y ≥ -10% | Età ≥ 5y | Top 20
+  PRO:     TER ≤ 0.50% | Sharpe ≥ 0.5 | Volume ≥ 100k | Perf1Y ≥ -20% | Età ≥ 3y | Top 50
+  VALUE:   TER ≤ 0.75% | Sharpe ≥ 0.3 | Volume ≥  50k | Perf1Y ≥ -30% | Età ≥ 2y | Top 50
+  Tutti:   only_accumulating=True, only_physical=True
+
+── FONDI ───────────────────────────────────────────────────────────────────────
+
+  BASIC:   TER ≤ 0.75% | Sharpe ≥ 0.6 | Dim ≥ 200k | Perf1Y ≥ -10% | Top 20
+  PRO:     TER ≤ 1.00% | Sharpe ≥ 0.3 | Dim ≥  50k | Perf1Y ≥ -30% | Top 50
+  VALUE:   TER ≤ 1.50% | Sharpe ≥ 0.1 | Dim ≥  10k | Perf1Y ≥ -50% | Top 50
+
+  NOTA TER FONDI: yfinance restituisce decimale (0.0035 = 0.35%)
+                  il filtro usa  ter > cfg['ter_max'] / 100
+                  (diverso dagli ETF dove il TER è già in %)
+
+
+================================================================================
+SEZIONE 4: UNIVERSO TICKER
+================================================================================
+
+AZIONI — 3072 ticker, 23 mercati:
+  USA:       SP500 (503) + Russell 1000 extra + NASDAQ extra
+  UK:        FTSE100 + FTSE250
+  Europa:    DAX (40) + CAC40 + FTSE MIB + IBEX35 + AEX + SMI + OMX + altri
+  Asia:      Nikkei225 + HK (Hang Seng) + India NIFTY500 + Taiwan TWSE
+  Altri:     Australia ASX200 + Canada TSX60
+
+ETF — 678 ticker:
+  USA:       394 (iShares, Vanguard, SPDR, Invesco, Schwab, ARK…)
+  Europa:    284 (su .DE / .L / .MI / .PA / .AS — ACC, replica fisica)
+  Scraping TER da justETF per ETF europei via ISIN map
+
+FONDI — 1087 ticker, 36 famiglie:
+  Vanguard, Fidelity, T.Rowe Price, American Funds, Schwab, PIMCO, DFA,
+  Dodge & Cox, Franklin Templeton, BlackRock MF, Invesco MF, MFS, Putnam,
+  Columbia, JPMorgan MF, Goldman Sachs MF, Lord Abbett, Neuberger Berman,
+  Nuveen, TIAA-CREF, Harbor, Eaton Vance/Calvert, Hartford, John Hancock,
+  Artisan, Parnassus, Wasatch, Royce, Thornburg, First Eagle, Manning & Napier,
+  Ariel, Brown Advisory, Meridian, Baird
+
+
+================================================================================
+SEZIONE 5: COLONNE REPORT EXCEL
+================================================================================
+
+AZIONI Top 20/50 — PRO/VALUE (18 colonne):
+  Ticker | Nome | Valuta | Mercato | Indice | Prezzo | Score |
+  Perf 1M% | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  P/B | ROE | EV/FCF | Net Debt/EBITDA | Market Cap | Settore
+
+AZIONI Top 20 — BASIC (10 colonne, no Prezzo né performance):
+  Ticker | Nome | Valuta | Mercato | Indice | Score | P/B | ROE | EV/FCF | Settore
+
+ETF Top 20/50 (12 colonne, tutti i piani):
+  Ticker | Nome | Score | Prezzo | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  TER | Sharpe | Volume | Net Assets
+
+FONDI Top 20/50 (12 colonne, tutti i piani):
+  Ticker | Nome | Score | Prezzo | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  TER | Sharpe | Net Assets | Categoria
+
+Performance azioni calcolata da history(period='1y'):
+  1M=22gg | 3M=63gg | 6M=126gg | YTD=1gen | 1Y=prima data
+
+Performance ETF: Perf 1Y è fraction (0.12=12%) → ×100 in output
+Performance azioni/fondi: già in % (12.34=12.34%)
+
+
+================================================================================
+SEZIONE 6: DASHBOARD.PY — MODIFICHE PLAN-AWARE
+================================================================================
+
+_latest_plan(tipo, piano):
+  Nuova funzione aggiunta — cerca Azioni_Screener_{PIANO}_*.xlsx
+  Fallback su qualsiasi file del tipo se il piano non esiste ancora
+
+get_table_data(tipo):
+  Admin console → sempre file PRO (il più rappresentativo)
+
+get_mercati():
+  Legge Dashboard sheet dal file PRO azioni
+
+_build_area_clienti → report_row():
+  Cliente BASIC  → scarica Azioni_Screener_BASIC_*.xlsx
+  Cliente PRO    → scarica Azioni_Screener_PRO_*.xlsx
+  Cliente VALUE  → scarica Azioni_Screener_VALUE_*.xlsx
+
+/api/report/{asset}:
+  Serve _latest_plan(asset, piano_cliente)
+  → ogni cliente scarica esattamente il file del suo piano
+
+
+================================================================================
+SEZIONE 7: FLUSSO COMMERCIALE B2C
+================================================================================
+
+Gmail SMTP attivo: rioluc63@gmail.com (App Password in config.json)
+
+  1. Cliente → landing page → form registrazione → salvato come TESTER
+  2. Admin → Attiva cliente → seleziona piani → invia email credenziali
+  3. Cliente → client-login → area-clienti
+       - Download report Excel del proprio piano
+       - Order Builder (se piano_ordini != NONE)
+       - Storico ordini (ultimi 20)
+
+Pricing ordini: Basic €19 | Pro €29 | Value €49
+Piani screener: NONE / BASIC / PRO / VALUE (per azioni, etf, fondi, ordini)
+
+
+================================================================================
+SEZIONE 8: ORDER BUILDER
+================================================================================
+
+  Pre-fill:   /api/ordine/prefill → top 10 ticker per piano attivo
+  Email:      header MiFID II, footer "Robot Trader 2026", NO logo Fuerte
+  SL/TP:      per-ticker (non globale), solo azioni, tabella dismissable
+  CSV:        IBKR Basket Trader (PRO/VALUE) + CSV generico (tutti)
+  Archivio:   ORDINI/{email_safe}/ORD-YYYYMMDD-HHMMSS.json
+
+
+================================================================================
+SEZIONE 9: SCHEDULING
+================================================================================
+
+  Windows Task Scheduler → 23:00 ogni giorno
+  Esegue: scheduler_daemon.py → orchestrator.py
+  Orchestrator lancia in sequenza:
+    1. value_screener_azioni.py  → 3 Excel azioni
+    2. value_screener_etf.py     → 3 Excel ETF
+    3. value_screener_fondi.py   → 3 Excel Fondi
+    4. email_notifier.py         → notifica admin
+
+
+================================================================================
+SEZIONE 10: NOTE TECNICHE CRITICHE
+================================================================================
+
+TER ETF USA:    netExpenseRatio → già in % (0.0945 = 0.0945%)
+TER ETF EU:     nessun campo yfinance → scraping justETF via ISIN map
+TER Fondi:      annualReportExpenseRatio → decimale (0.0035 = 0.35%)
+                → filtro: ter > cfg['ter_max'] / 100
+
+Categoria Fondi: info.get('category') → fallback funds_data.fund_overview
+                 → fallback fundFamily
+
+HTML dashboard: raw string r"""...""" — { e } in JS singole
+                per iniettare Python vars: .replace('__VAR__', valore)
+_build_area_clienti(): funzione Python normale (f-string OK)
+Sheet Excel: caratteri vietati / \ ? * [ ] : → usare -
+
+Admin sessions: in-memory → reset a ogni riavvio → re-login necessario
+
+_latest_plan() precedenza:
+  1. {Tipo}_Screener_{PIANO}_*.xlsx  ← file nuovo sistema
+  2. {Tipo}_Screener_*.xlsx          ← fallback file vecchio formato
+
+
+================================================================================
+SEZIONE 11: BRAND & GDPR
+================================================================================
+
+Blu istituzionale: #2C5282 | Oro accento: #F6AD55 | Sfondo: #0F172A
+Logo FVC: fuerte_venture_logo_0526.png (base64) — in: nav, footer, login, email credenziali
+Email ordini: NO logo FVC — solo "Robot Trader 2026" nel footer
+
+GDPR implementato in: landing form (5 lingue) | thank-you card |
+  email credenziali | area riservata | client login
+Dati salvati: gdpr_consent:true + gdpr_consent_date
+
+
+================================================================================
+SEZIONE 12: TODO PRE-LANCIO
+================================================================================
+
+CRITICO (blocca il lancio):
+  [ ] fuertescreener.com da pubblicare online
+      → set CLIENT_LOGIN_URL=https://fuertescreener.com/area-clienti
+      → verifica hello@fuertescreener.com
+      → grep link statici in dashboard.py
+  [ ] Pagina /privacy mancante (link GDPR punta a /privacy)
+  [ ] Password admin "123" → cambiare ADMIN_PASSWORD in dashboard.py
+  [ ] Stripe → chiavi vuote → bottoni acquisto non funzionano
+  [ ] HTTPS → necessario per login clienti su dominio pubblico
+
+IMPORTANTE (migliora qualità):
+  [ ] Sessioni admin non scadono automaticamente
+  [ ] Score ETF negativo per TER alto (cosmetic — ranking corretto)
+  [ ] Deduplicazione ETF stesso ISIN su più exchange
+  [ ] Universo ETF EU ACC troppo piccolo (12-13 selezionati)
+  [ ] Reset password clienti non implementato
+  [ ] Fattura PDF da integrare con Stripe
+  [ ] CIF B23881691 da verificare Registro Mercantil spagnolo
+
+FUTURO (post-lancio):
+  [ ] Scheduling separato: Azioni giornaliero, ETF/Fondi giorno dopo
+  [ ] Integrazione CRM Console CRM & Marketing
+  [ ] Gestione abbonamenti automatica (rinnovo, downgrade)
+  [ ] IBKR API diretta (piano VALUE)
+
+================================================================================

@@ -1,0 +1,434 @@
+# N8N IMPLEMENTATION GUIDE — LINKEDIN AUTOMATION
+
+## ⚠️ PREREQUISITI
+
+```
+✅ N8N Cloud account (gratuito fino a 100 esecuzioni/mese)
+✅ Anthropic API Key (Claude)
+✅ OpenAI API Key (DALL-E 3)
+✅ LinkedIn Developer account + API credentials
+✅ Google Cloud Service Account (Sheets + Drive)
+✅ Gmail App Password (2FA enabled)
+```
+
+---
+
+## 🔧 STEP-BY-STEP WORKFLOW 1: DAILY TRIGGER + CONTENT GENERATION
+
+### 1.1 — CRON TRIGGER NODE
+
+**Node Type:** Cron
+
+**Settings:**
+```json
+{
+  "mode": "Every day",
+  "hour": 8,
+  "minute": 5,
+  "timezone": "Europe/Canary"
+}
+```
+
+**Output:** Trigger eseguito a 08:05 UTC+2
+
+---
+
+### 1.2 — GOOGLE SHEETS READER (Content Calendar)
+
+**Node Type:** Google Sheets
+
+**Setup:**
+1. Connetti Google account (usa Service Account)
+2. Seleziona Spreadsheet: "5B_CONTENT_CALENDAR_MAGGIO_2026"
+3. Seleziona foglio: "Content Calendar"
+4. Query: Leggi tutte le righe
+
+**Node Configuration:**
+```
+Operation: Read
+Range: A2:J100
+First Row as Headers: YES
+```
+
+**Output:** Array di tutti i post programmati
+
+---
+
+### 1.3 — FILTER NODE (Check Today's Post)
+
+**Node Type:** Set / Filter
+
+**Logica:**
+```javascript
+// Controlla se oggi c'è un post programmato
+const today = new Date().toISOString().split('T')[0]; // "2026-05-04"
+
+return $input.all().map(post => {
+  const postDate = post.json.Data; // "2026-05-04"
+  return postDate === today;
+}).some(x => x);
+
+// Se TRUE: continua
+// Se FALSE: stop workflow (no post today)
+```
+
+**Output:** Boolean (continue o skip)
+
+---
+
+### 1.4 — CLAUDE API NODE (Post Generation)
+
+**Node Type:** HTTP Request
+
+**Method:** POST
+**URL:** `https://api.anthropic.com/v1/messages`
+
+**Headers:**
+```json
+{
+  "x-api-key": "{{ $env.ANTHROPIC_API_KEY }}",
+  "anthropic-version": "2023-06-01",
+  "content-type": "application/json"
+}
+```
+
+**Body:**
+```json
+{
+  "model": "claude-opus-4-20250514",
+  "max_tokens": 500,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Tu sei un content creator per Fuerte Venture Capital.
+
+Crea un post LinkedIn in italiano su: {{ $node['Google Sheets'].json.Tema }}
+
+Requisiti:
+- Tono: Professionale ma accessible
+- Lunghezza: 250 max caratteri
+- Hook: Prima 30 caratteri devono attrarre
+- Hashtag: 3-5
+- Emojis: Max 2
+
+Rispondi SOLO con il post, senza prefissi."
+    }
+  ]
+}
+```
+
+**Response Processing:**
+```javascript
+// Estrai il testo dal response Claude
+const response = $node['Claude API'].json;
+return {
+  post_text: response.content[0].text,
+  generated_at: new Date().toISOString()
+};
+```
+
+---
+
+### 1.5 — IMAGE PROMPT BUILDER
+
+**Node Type:** Set
+
+**JavaScript:**
+```javascript
+return {
+  prompt: `Create a professional LinkedIn infographic about ${$node['Google Sheets'].json.Tema}.
+Style: Modern, clean, Fuerte Venture Capital brand colors (orange #F5A623, navy #1E3A5F).
+Text overlay: ${$node['Claude API'].json.content[0].text.substring(0, 50)}...
+Aspect ratio: 1200x628px
+Quality: High
+No faces.`
+};
+```
+
+---
+
+### 1.6 — DALL-E 3 API NODE (Image Generation)
+
+**Node Type:** HTTP Request
+
+**Method:** POST
+**URL:** `https://api.openai.com/v1/images/generations`
+
+**Headers:**
+```json
+{
+  "Authorization": "Bearer {{ $env.OPENAI_API_KEY }}",
+  "Content-Type": "application/json"
+}
+```
+
+**Body:**
+```json
+{
+  "model": "dall-e-3",
+  "prompt": "{{ $node['Image Prompt Builder'].json.prompt }}",
+  "n": 1,
+  "size": "1024x1024",
+  "quality": "hd"
+}
+```
+
+---
+
+### 1.7 — GOOGLE DRIVE UPLOAD (Save Image)
+
+**Node Type:** Google Drive
+
+**Operation:** Create File
+**Name:** `AZIONI_{{ $now.format('YYYY-MM-DD_HHmmss') }}_{{ $node['Google Sheets'].json.Tema }}.png`
+**Folder:** "/N8N LinkedIn Automation/Generated Images"
+**File Content:** Binary (da DALL-E)
+
+**Output:** File URL
+
+---
+
+### 1.8 — GMAIL APPROVAL EMAIL
+
+**Node Type:** Gmail
+
+**To:** `{{ $env.APPROVAL_EMAIL }}`
+**Subject:** `🔗 LinkedIn Post Approval — {{ $now.format('DD/MM/YYYY') }}`
+
+**Body (HTML):**
+```html
+<h2>LinkedIn Post Approval</h2>
+
+<p><strong>Data:</strong> {{ $now.format('DD/MM/YYYY HH:mm') }}</p>
+<p><strong>Tema:</strong> {{ $node['Google Sheets'].json.Tema }}</p>
+
+<h3>Post Text:</h3>
+<blockquote>
+{{ $node['Claude API'].json.content[0].text }}
+</blockquote>
+
+<h3>Generated Image:</h3>
+<img src="{{ $node['Google Drive'].json.webViewLink }}" style="max-width: 500px;">
+
+<h2>Opzioni:</h2>
+<p>
+  <a href="https://your-n8n-domain.com/webhook/linkedin_post_approval?post_id={{ $node['Google Sheets'].json.Data }}&action=approve" 
+     style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+    ✅ APPROVA & PUBBLICA
+  </a>
+  
+  <a href="https://your-n8n-domain.com/webhook/linkedin_post_approval?post_id={{ $node['Google Sheets'].json.Data }}&action=edit" 
+     style="background-color: #FF9800; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+    ✏️ MODIFICA
+  </a>
+  
+  <a href="https://your-n8n-domain.com/webhook/linkedin_post_approval?post_id={{ $node['Google Sheets'].json.Data }}&action=reject" 
+     style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+    ❌ RIFIUTA
+  </a>
+</p>
+
+<p><strong>Webhook scade tra:</strong> 24 ore</p>
+```
+
+---
+
+## 🔐 WORKFLOW 2: WEBHOOK APPROVAL + PUBLISH
+
+### 2.1 — WEBHOOK TRIGGER NODE
+
+**Node Type:** Webhook
+
+**Method:** POST
+**URL:** `https://your-n8n.cloud/webhook/linkedin_post_approval`
+
+**Expected Payload:**
+```json
+{
+  "post_id": "2026-05-04",
+  "action": "approve",
+  "edited_text": "(optional) testo modificato",
+  "timestamp": "2026-05-04T10:00:00Z"
+}
+```
+
+---
+
+### 2.2 — CONDITIONAL LOGIC
+
+**Node Type:** Switch
+
+**Condition:**
+```
+IF action == "approve" → branch PUBLISH
+IF action == "edit" → branch SAVE_DRAFT
+IF action == "reject" → branch LOG_REJECTION
+```
+
+---
+
+### 2.3 — LINKEDIN API PUBLISH
+
+**Node Type:** HTTP Request (POST)
+
+**Setup (per BRANCH PUBLISH):**
+
+```
+URL: https://api.linkedin.com/rest/posts
+Method: POST
+Auth: Bearer {{ $env.LINKEDIN_ACCESS_TOKEN }}
+
+Body:
+{
+  "author": "urn:li:person:{{ $env.LINKEDIN_PERSON_ID }}",
+  "commentary": "{{ $node['Webhook'].json.edited_text OR $node['Claude API'].json.content[0].text }}",
+  "visibility": "PUBLIC",
+  "distribution": {
+    "feedDistribution": "MAIN_FEED",
+    "targetEntities": [],
+    "thirdPartyDistributionChannels": []
+  },
+  "content": {
+    "media": {
+      "id": "{{ $node['LinkedIn Image Upload'].json.media_id }}"
+    }
+  }
+}
+```
+
+**Success Response:**
+```json
+{
+  "id": "linkedin_post_id_xxxxx",
+  "published_at": "2026-05-04T10:15:00Z",
+  "status": "PUBLISHED"
+}
+```
+
+---
+
+### 2.4 — LOG TO GOOGLE SHEETS (Analytics)
+
+**Node Type:** Google Sheets
+
+**Operation:** Append Row
+**Spreadsheet:** "5B_CONTENT_CALENDAR_MAGGIO_2026"
+**Sheet:** "Analytics"
+
+**Row Data:**
+```json
+{
+  "Data": "{{ $now.format('YYYY-MM-DD') }}",
+  "Post_ID": "{{ $node['LinkedIn API'].json.id }}",
+  "Title": "{{ $node['Google Sheets'].json.Tema }}",
+  "Link": "https://linkedin.com/feed/update/{{ $node['LinkedIn API'].json.id }}",
+  "Status": "PUBLISHED",
+  "Publish_Time": "{{ $now.format('HH:mm:ss') }}",
+  "Image_URL": "{{ $node['Google Drive'].json.webViewLink }}"
+}
+```
+
+---
+
+### 2.5 — SUCCESS EMAIL
+
+**Node Type:** Gmail
+
+**To:** luciano.manicardi@lineexpress.it
+
+**Subject:** `✅ Post Pubblicato — {{ $node['Google Sheets'].json.Data }}`
+
+**Body:**
+```
+Ciao Luciano,
+
+Il tuo post è stato pubblicato con successo!
+
+📊 Dettagli:
+- Tema: {{ $node['Google Sheets'].json.Tema }}
+- Data: {{ $now.format('DD/MM/YYYY HH:mm') }}
+- Link: https://linkedin.com/feed/update/{{ $node['LinkedIn API'].json.id }}
+
+Monitora le metriche nel foglio Analytics.
+```
+
+---
+
+## 📊 WORKFLOW 3: WEEKLY ANALYTICS REPORT
+
+**Node Type:** Cron
+
+**Trigger:** Lunedì 09:00 UTC+2
+
+**Steps:**
+1. Leggi tutte le righe da "Analytics" sheet (ultima settimana)
+2. Calcola: Total impressioni, Engagement rate, Top 3 posts
+3. Crea report Excel
+4. Invia email con allegato
+
+---
+
+## 🔑 VARIABILI AMBIENTE (N8N Settings)
+
+Crea queste variabili in N8N:
+
+```
+ANTHROPIC_API_KEY = sk-ant-v0-xxxxx
+OPENAI_API_KEY = sk-proj-xxxxx
+LINKEDIN_ACCESS_TOKEN = AQXxxxxxyyyyyyy
+LINKEDIN_PERSON_ID = 123456789
+APPROVAL_EMAIL = luciano.manicardi@lineexpress.it
+GOOGLE_SERVICE_ACCOUNT_EMAIL = xxxx@xxxx.iam.gserviceaccount.com
+GMAIL_APP_PASSWORD = xxxx xxxx xxxx xxxx
+N8N_WEBHOOK_URL = https://your-n8n.cloud/webhook
+```
+
+---
+
+## ✅ TESTING CHECKLIST
+
+- [ ] Cron trigger eseguito correttamente
+- [ ] Google Sheets reader legge i dati
+- [ ] Claude API genera testo coerente
+- [ ] DALL-E genera immagini
+- [ ] Google Drive salva immagini
+- [ ] Email di approvazione arriva
+- [ ] Webhook endpoint risponde
+- [ ] Post pubblicato su LinkedIn
+- [ ] Analytics sheet aggiornato
+- [ ] Metriche settimanali calcolate
+
+---
+
+## 🚀 GO-LIVE CHECKLIST
+
+- [ ] Tutte le API keys configurate e testate
+- [ ] Content Calendar compilato (maggio completo)
+- [ ] Post template validati
+- [ ] Approval email template personalizzato
+- [ ] LinkedIn account collegato
+- [ ] Google Drive folder creato
+- [ ] Webhook URL pubblico
+- [ ] Error notifications configurate
+- [ ] Analytics sheet preparato
+- [ ] Fallback post template in place
+
+---
+
+## 📞 SUPPORT
+
+Se il workflow fallisce:
+1. Controlla N8N Execution history
+2. Verifica API keys (scadenza, rate limits)
+3. Vedi email di error notification
+4. Fallback: post manual via LinkedIn + log su Analytics
+
+---
+
+## 🎯 SUCCESS METRICS (Fine Maggio)
+
+- ✅ 100% automazione post generation
+- ✅ 15+ post pubblicati
+- ✅ < 2 ore approval time medio
+- ✅ 0 broken webhooks
+- ✅ 1.000+ impressioni medie per post

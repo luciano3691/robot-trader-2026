@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader 2026 - Iscrizione</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #999;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .service-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .service-card {
+            border: 2px solid #eee;
+            border-radius: 5px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .service-card:hover {
+            border-color: #667eea;
+            background: #f9f9f9;
+        }
+        
+        .service-card input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .service-card.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .service-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .service-price {
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .service-desc {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        #card-element {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+            display: block;
+        }
+        
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+            display: block;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background: #764ba2;
+        }
+        
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+        
+        .terms {
+            font-size: 12px;
+            color: #999;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Robot Trader 2026</h1>
+        <p class="subtitle">Iscrizione - Scegli il tuo piano</p>
+        
+        <div id="alert" class="alert"></div>
+        
+        <form id="signup-form">
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" id="nome" name="nome" required placeholder="Mario Rossi">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" name="email" required placeholder="mario@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Telefono (opzionale)</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="+39 XXX XXX XXXX">
+            </div>
+            
+            <div class="form-group">
+                <label>Azienda (opzionale)</label>
+                <input type="text" id="azienda" name="azienda" placeholder="Nome Azienda">
+            </div>
+            
+            <div class="form-group">
+                <label>Scegli il tuo piano</label>
+                <div class="service-options">
+                    <label class="service-card">
+                        <div style="display: flex; align-items: flex-start;">
+                            <input type="radio" name="servizio" value="1" required onchange="updatePrice()">
+                            <div style="flex: 1;">
+                                <div class="service-name">📈 Value Screener AZIONI</div>
+                                <div class="service-price">€49/mese</div>
+                                <div class="service-desc">1.200+ ticker con 5 filtri hard</div>
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <label class="service-card">
+                        <div style="display: flex; align-items: flex-start;">
+                            <input type="radio" name="servizio" value="2" onchange="updatePrice()">
+                            <div style="flex: 1;">
+                                <div class="service-name">🎯 Value Screener ETF</div>
+                                <div class="service-price">€79/mese</div>
+                                <div class="service-desc">ETF indicizzati con filtri avanzati</div>
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <label class="service-card">
+                        <div style="display: flex; align-items: flex-start;">
+                            <input type="radio" name="servizio" value="3" onchange="updatePrice()">
+                            <div style="flex: 1;">
+                                <div class="service-name">💰 Value Screener FONDI</div>
+                                <div class="service-price">€99/mese</div>
+                                <div class="service-desc">Fondi comuni con analisi avanzata</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Dettagli Pagamento</label>
+                <div id="card-element"></div>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="btn-submit">
+                Completa Iscrizione - <span id="price-display">€0</span>
+            </button>
+            
+            <div class="loading" id="loading">
+                ⏳ Elaborazione pagamento in corso...
+            </div>
+            
+            <p class="terms">
+                Cliccando su "Completa Iscrizione" accetti i nostri <a href="#" style="color: #667eea;">termini di servizio</a>
+            </p>
+        </form>
+    </div>
+    
+    <script>
+        const stripe = Stripe('pk_test_51234567890abcdef'); // Sostituire con chiave vera
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        const prices = {
+            '1': 4900,  // €49 in centesimi
+            '2': 7900,  // €79 in centesimi
+            '3': 9900   // €99 in centesimi
+        };
+        
+        function updatePrice() {
+            const selected = document.querySelector('input[name="servizio"]:checked');
+            if (selected) {
+                const price = parseInt(prices[selected.value]) / 100;
+                document.getElementById('price-display').textContent = `€${price.toFixed(2)}`;
+            }
+        }
+        
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const azienda = document.getElementById('azienda').value;
+            const servizio = document.querySelector('input[name="servizio"]:checked').value;
+            const importo = prices[servizio];
+            
+            // Disabilita bottone
+            document.getElementById('btn-submit').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                // 1. Crea payment intent via backend
+                const paymentResponse = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome, email, telefono, azienda,
+                        servizio: parseInt(servizio),
+                        importo: importo
+                    })
+                });
+                
+                const paymentData = await paymentResponse.json();
+                
+                if (!paymentData.client_secret) {
+                    throw new Error(paymentData.error || 'Errore creazione iscrizione');
+                }
+                
+                // 2. Processa pagamento con Stripe
+                const result = await stripe.confirmCardPayment(paymentData.client_secret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: { name: nome, email: email }
+                    }
+                });
+                
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+                
+                // 3. Pagamento riuscito
+                showAlert('✅ Iscrizione completata! Controlla la tua email per il primo report.', 'success');
+                document.getElementById('signup-form').reset();
+                updatePrice();
+                
+            } catch (error) {
+                showAlert('❌ Errore: ' + error.message, 'error');
+            } finally {
+                document.getElementById('btn-submit').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+        
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = 'alert ' + type;
+        }
+        
+        // Aggiorna prezzo al caricamento
+        updatePrice();
+    </script>
+</body>
+</html>

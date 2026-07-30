@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader 2026 - Dashboard Dinamica</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ffa726 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .header h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .header .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+        .user-info {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 1rem;
+            font-size: 0.85rem;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 8rem auto;
+            background: #2a2a3e;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .login-container h2 {
+            color: #ff8c42;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a1a2e;
+            border: 1px solid #404060;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff8c42;
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-right: 2.5rem;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #808080;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+        .password-toggle:hover {
+            color: #ff8c42;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #ff8c42 0%, #ffa726 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff7a2e 0%, #ff9512 100%);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .alert {
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .alert-error {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #ff6b6b;
+        }
+        .alert-success {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #66bb6a;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #404060;
+        }
+        .nav-tab {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #b0b0b0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .nav-tab.active {
+            color: #ff8c42;
+            border-bottom-color: #ff8c42;
+        }
+        .nav-tab:hover {
+            color: #ffa726;
+        }
+        .card {
+            background: #2a2a3e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .card h3 {
+            color: #ff8c42;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .param-item {
+            background: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #404060;
+        }
+        .param-item label {
+            display: block;
+            color: #b0b0b0;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .param-item input {
+            width: 100%;
+            padding: 0.6rem;
+            background: #2a2a3e;
+            border: 1px solid #505070;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+        .param-item input:focus {
+            outline: none;
+            border-color: #ff8c42;
+        }
+        .param-item .range-info {
+            font-size: 0.75rem;
+            color: #808080;
+            margin-top: 0.3rem;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+        }
+        .btn-save:hover {
+            background: linear-gradient(135deg, #45a049 0%, #5cb85f 100%);
+        }
+        .btn-reset {
+            background: #505070;
+            color: white;
+        }
+        .btn-reset:hover {
+            background: #606080;
+        }
+        .btn-run {
+            background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+            color: white;
+        }
+        .btn-run:hover {
+            background: linear-gradient(135deg, #1e88e5 0%, #3a9be0 100%);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 0.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-running {
+            background: rgba(76, 175, 80, 0.2);
+            color: #66bb6a;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .status-idle {
+            background: rgba(158, 158, 158, 0.2);
+            color: #b0b0b0;
+            border: 1px solid rgba(158, 158, 158, 0.3);
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN FORM -->
+    <div id="loginSection" class="login-container">
+        <h2>🔐 Robot Trader 2026</h2>
+        <div id="loginError" class="alert alert-error hidden"></div>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" required autocomplete="current-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Mostra password">
+                        <span id="passwordIcon">👁️</span>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" id="loginBtn">
+                Accedi
+            </button>
+        </form>
+    </div>
+
+    <!-- DASHBOARD (nascosta fino a login) -->
+    <div id="dashboardSection" class="hidden">
+        <div class="header">
+            <h1>🤖 Robot Trader 2026 - Dashboard Dinamica</h1>
+            <div class="subtitle">Gestione Parametri e Esecuzione Screener</div>
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div id="alertContainer"></div>
+
+            <!-- TABS -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('parametri')">📊 Parametri</button>
+                <button class="nav-tab" onclick="switchTab('esecuzione')">▶️ Esecuzione</button>
+                <button class="nav-tab" onclick="switchTab('clienti')">👥 Clienti</button>
+            </div>
+
+            <!-- TAB: PARAMETRI -->
+            <div id="tabParametri" class="tab-content active">
+                <div class="card">
+                    <h3>📈 AZIONI - Parametri Filtro</h3>
+                    <div class="param-grid" id="azioniParams"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 ETF - Parametri Filtro</h3>
+                    <div class="param-grid" id="etfParams"></div>
+                </div>
+
+                <div class="card">
+                    <h3>💼 FONDI - Parametri Filtro</h3>
+                    <div class="param-grid" id="fondiParams"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-save" onclick="saveParametri()" id="saveBtn">
+                        💾 Salva Parametri
+                    </button>
+                    <button class="btn btn-reset" onclick="resetParametri()" id="resetBtn">
+                        🔄 Reset Default
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: ESECUZIONE -->
+            <div id="tabEsecuzione" class="tab-content">
+                <div class="card">
+                    <h3>▶️ Esecuzione Orchestrator</h3>
+                    <p style="color: #b0b0b0; margin-bottom: 1.5rem;">
+                        Esegui manualmente tutti e 3 gli screener (Azioni, ETF, Fondi) senza aspettare lo schedulatore.
+                    </p>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Stato Orchestrator:</strong>
+                        <span id="orchestratorStatus" class="status-badge status-idle">⏸ Fermo</span>
+                    </div>
+                    <button class="btn btn-run" onclick="runOrchestrator()" id="runBtn">
+                        ▶️ Esegui Orchestrator Ora
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: CLIENTI -->
+            <div id="tabClienti" class="tab-content">
+                <div class="card">
+                    <h3>👥 Database Clienti</h3>
+                    <div id="clientiTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000/api';
+        let currentParams = {};
+
+        // ===== PASSWORD TOGGLE =====
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.textContent = '👁️';
+            }
+        }
+
+        // ===== AUTENTICAZIONE =====
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API_BASE}/check_auth`, { credentials: 'include' });
+                const data = await res.json();
+                if (data.authenticated) {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    document.getElementById('usernameDisplay').textContent = data.username;
+                    await loadParametri();
+                    await loadClienti();
+                }
+            } catch (err) {
+                console.error('Errore check auth:', err);
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Accesso in corso...';
+
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+                console.log('Login response:', data);
+
+                if (res.ok && data.success) {
+                    // Login riuscito
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('dashboardSection').classList.remove('hidden');
+                    document.getElementById('usernameDisplay').textContent = username;
+                    await loadParametri();
+                    await loadClienti();
+                } else {
+                    showLoginError(data.message || 'Credenziali non valide');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Accedi';
+                }
+            } catch (err) {
+                console.error('Errore login:', err);
+                showLoginError('Errore di connessione al server');
+                btn.disabled = false;
+                btn.innerHTML = 'Accedi';
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch(`${API_BASE}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                location.reload();
+            } catch (err) {
+                console.error('Errore logout:', err);
+            }
+        }
+
+        function showLoginError(msg) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+        }
+
+        // ===== PARAMETRI =====
+        async function loadParametri() {
+            try {
+                const res = await fetch(`${API_BASE}/parametri`, { credentials: 'include' });
+                const data = await res.json();
+                currentParams = data;
+                renderParametri('azioni', data.azioni, 'azioniParams');
+                renderParametri('etf', data.etf, 'etfParams');
+                renderParametri('fondi', data.fondi, 'fondiParams');
+            } catch (err) {
+                showAlert('Errore caricamento parametri', 'error');
+            }
+        }
+
+        function renderParametri(categoria, params, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            for (const [key, data] of Object.entries(params)) {
+                const div = document.createElement('div');
+                div.className = 'param-item';
+                
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                const isPercent = key.includes('ter') || key.includes('roe') || key.includes('performance');
+                const displayValue = isPercent ? (data.value * 100).toFixed(2) : data.value;
+                
+                div.innerHTML = `
+                    <label>${label}</label>
+                    <input 
+                        type="number" 
+                        step="${isPercent ? '0.01' : '1'}" 
+                        value="${displayValue}"
+                        data-categoria="${categoria}"
+                        data-param="${key}"
+                        onchange="updateParam(this)"
+                    >
+                    <div class="range-info">
+                        Range: ${isPercent ? (data.min*100).toFixed(2) : data.min} - ${isPercent ? (data.max*100).toFixed(2) : data.max}
+                        ${isPercent ? '%' : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function updateParam(input) {
+            const categoria = input.dataset.categoria;
+            const param = input.dataset.param;
+            const isPercent = param.includes('ter') || param.includes('roe') || param.includes('performance');
+            const value = isPercent ? parseFloat(input.value) / 100 : parseFloat(input.value);
+            
+            currentParams[categoria][param].value = value;
+        }
+
+        async function saveParametri() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = '💾 Salvataggio... <span class="loading"></span>';
+
+            try {
+                const res = await fetch(`${API_BASE}/parametri`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(currentParams)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('✅ Parametri salvati con successo! Backup: ' + data.backup_file, 'success');
+                } else {
+                    showAlert('❌ Errore: ' + (data.errors ? data.errors.join(', ') : 'Errore sconosciuto'), 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Errore di connessione', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '💾 Salva Parametri';
+            }
+        }
+
+        async function resetParametri() {
+            if (!confirm('Resettare tutti i parametri ai valori di default?')) return;
+
+            const btn = document.getElementById('resetBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 Reset... <span class="loading"></span>';
+
+            try {
+                const res = await fetch(`${API_BASE}/parametri/reset`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('✅ Parametri resettati ai valori di default!', 'success');
+                    await loadParametri();
+                } else {
+                    showAlert('❌ Errore durante il reset', 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Errore di connessione', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔄 Reset Default';
+            }
+        }
+
+        // ===== ORCHESTRATOR =====
+        async function runOrchestrator() {
+            if (!confirm('Eseguire orchestrator manualmente? L\'operazione richiede circa 20-25 minuti.')) return;
+
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true;
+            btn.innerHTML = '▶️ Avvio in corso... <span class="loading"></span>';
+
+            try {
+                const res = await fetch(`${API_BASE}/run_orchestrator`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showAlert('✅ Orchestrator avviato! PID: ' + data.pid, 'success');
+                    updateOrchestratorStatus();
+                } else {
+                    showAlert('❌ Errore: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Errore di connessione', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '▶️ Esegui Orchestrator Ora';
+            }
+        }
+
+        async function updateOrchestratorStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/orchestrator_status`, { credentials: 'include' });
+                const data = await res.json();
+                const badge = document.getElementById('orchestratorStatus');
+                
+                if (data.running) {
+                    badge.className = 'status-badge status-running';
+                    badge.textContent = '▶️ In Esecuzione';
+                } else {
+                    badge.className = 'status-badge status-idle';
+                    badge.textContent = '⏸ Fermo';
+                }
+            } catch (err) {
+                console.error('Errore status orchestrator:', err);
+            }
+        }
+
+        // ===== CLIENTI =====
+        async function loadClienti() {
+            try {
+                const res = await fetch(`${API_BASE}/clienti`, { credentials: 'include' });
+                const data = await res.json();
+                renderClienti(data.clienti);
+            } catch (err) {
+                console.error('Errore caricamento clienti:', err);
+            }
+        }
+
+        function renderClienti(clienti) {
+            const container = document.getElementById('clientiTable');
+            
+            let html = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #1a1a2e; border-bottom: 2px solid #404060;">
+                            <th style="padding: 1rem; text-align: left;">Nome</th>
+                            <th style="padding: 1rem; text-align: left;">Email</th>
+                            <th style="padding: 1rem; text-align: center;">Azioni</th>
+                            <th style="padding: 1rem; text-align: center;">ETF</th>
+                            <th style="padding: 1rem; text-align: center;">Fondi</th>
+                            <th style="padding: 1rem; text-align: center;">Stato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            clienti.forEach(c => {
+                html += `
+                    <tr style="border-bottom: 1px solid #404060;">
+                        <td style="padding: 0.8rem;">${c.nome}</td>
+                        <td style="padding: 0.8rem; color: #b0b0b0;">${c.email}</td>
+                        <td style="padding: 0.8rem; text-align: center;">
+                            <span class="badge-${c.piano.azioni}">${c.piano.azioni}</span>
+                        </td>
+                        <td style="padding: 0.8rem; text-align: center;">
+                            <span class="badge-${c.piano.etf}">${c.piano.etf}</span>
+                        </td>
+                        <td style="padding: 0.8rem; text-align: center;">
+                            <span class="badge-${c.piano.fondi}">${c.piano.fondi}</span>
+                        </td>
+                        <td style="padding: 0.8rem; text-align: center;">
+                            <span class="badge-${c.stato}">${c.stato}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        // ===== UTILITÀ =====
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+            if (tab === 'esecuzione') {
+                updateOrchestratorStatus();
+            }
+        }
+
+        function showAlert(msg, type) {
+            const container = document.getElementById('alertContainer');
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = msg;
+            container.appendChild(div);
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // INIT
+        checkAuth();
+        setInterval(updateOrchestratorStatus, 10000); // Aggiorna status ogni 10s
+    </script>
+</body>
+</html>

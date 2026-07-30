@@ -1,0 +1,71 @@
+================================================================
+🤖 ROBOT TRADER 2026 - DASHBOARD DINAMICA
+ISTRUZIONI FINALI - 2 MINUTI
+================================================================
+
+✅ HAI GIÀ FATTO:
+- Backend installato
+- Screeners corretti installati
+- parametri.json presente
+
+================================================================
+INSTALLAZIONE FINALE (1 MINUTO)
+================================================================
+
+1. SCARICA QUESTI 2 FILES:
+   
+   ✅ dashboard_DINAMICA.html
+   ✅ START_SISTEMA_COMPLETO.bat
+   
+   Mettili in: C:\Users\lucia\Desktop\ROBOT TRADER 2026\
+
+
+2. STRUTTURA FINALE:
+
+   C:\Users\lucia\Desktop\ROBOT TRADER 2026\
+   │
+   ├── dashboard_DINAMICA.html           ← FILE 1
+   ├── START_SISTEMA_COMPLETO.bat        ← FILE 2
+   │
+   └── PYTHON_SCRIPTS\
+       ├── parametri.json
+       ├── dashboard_backend.py
+       ├── value_screener_azioni.py
+       ├── value_screener_etf.py
+       ├── value_screener_fondi.py
+       └── orchestrator.py
+
+================================================================
+AVVIO SISTEMA (10 SECONDI)
+================================================================
+
+DOPPIO CLICK SU: START_SISTEMA_COMPLETO.bat
+
+Fatto. Si aprono:
+- 2 finestre CMD (non chiuderle!)
+- 1 browser con dashboard
+
+================================================================
+LOGIN
+================================================================
+
+Username: admin
+Password: RobotTrader2026!
+
+================================================================
+STOP SISTEMA
+================================================================
+
+Chiudi le 2 finestre CMD nere
+
+================================================================
+DOMANI E OGNI GIORNO
+================================================================
+
+Doppio click su START_SISTEMA_COMPLETO.bat
+
+================================================================
+FATTO!
+================================================================
+
+Nessun'altra configurazione necessaria.

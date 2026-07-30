@@ -1,0 +1,32 @@
+{
+  "filtri_azioni": {
+    "ev_fcf_max": 12.0,
+    "pb_max": 1.2,
+    "roe_min": 0.0,
+    "net_debt_ebitda_max": 2.5,
+    "market_cap_min": 100,
+    "exclude_financial": true
+  },
+  "filtri_etf": {
+    "ter_max": 0.50,
+    "aum_min": 100,
+    "sharpe_min": 0.5
+  },
+  "filtri_fondi": {
+    "ter_max": 1.00,
+    "aum_min": 500,
+    "sharpe_min": 0.3
+  },
+  "scheduler": {
+    "enabled": true,
+    "time": "08:05",
+    "timezone": "Europe/Rome",
+    "days": ["MON", "TUE", "WED", "THU", "FRI"]
+  },
+  "email": {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "from_email": "newcapitalfuerte@gmail.com",
+    "subject_template": "Robot Trader 2026 - Report {asset_type} {date}"
+  }
+}

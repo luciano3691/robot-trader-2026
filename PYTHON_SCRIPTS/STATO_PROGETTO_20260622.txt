@@ -1,0 +1,277 @@
+================================================================================
+  FUERTE VENTURE CAPITAL — STATO DEL PROGETTO
+  Fuerte Venture Capital SL · CIF B23881691
+  Aggiornato: 22 Giugno 2026
+================================================================================
+
+
+================================================================================
+SEZIONE 1: MODIFICHE APPLICATE IN QUESTA SESSIONE (22/06/2026)
+================================================================================
+
+1. KNOWLEDGE BASE ASSISTENTE AI — RISCRITTA COMPLETAMENTE
+   ─────────────────────────────────────────────────────────
+   Cartella: PYTHON_SCRIPTS/KNOWLEDGE_BASE/
+
+   FILE: kb_azienda.md
+     Riscritta da zero in 5 lingue: IT / ES / EN / FR / DE
+     Contenuto: identità aziendale, cosa facciamo/non facciamo,
+                disclaimer legale MiFID II, contatti, tempi risposta.
+     Aggiornamento chiave: universo aggiornato a 5.637 strumenti totali.
+
+   FILE: kb_prodotto.md
+     Riscritta da zero in 5 lingue: IT / ES / EN / FR / DE
+     Contenuto:
+       - Tabella universo analizzato (Azioni/ETF/Fondi US/Fondi EU/Totale)
+       - Tabella prezzi tutti i piani (5 asset × 3 tier + Order Builder)
+       - Tabelle filtri per piano con valori esatti da codice:
+           Azioni (EV/FCF, P/B, ROE, Net Debt/EBITDA, Market Cap)
+           ETF (TER, Sharpe, Volume, Perf 1Y, solo ACC fisica età ≥ 3aa)
+           Fondi US (TER, Sharpe, Volume, Perf 1Y)
+           Fondi EU UCITS (TER, Sharpe, AUM, Perf 1Y) ← NUOVO
+       - Pesi Score per ogni piano (da screener_utils.py _DEFAULT_WEIGHTS)
+       - Descrizioni profilo investitore per ogni piano
+       - Order Builder: caratteristiche BASIC/PRO/VALUE
+       - Sistema Score 0–100: spiegazione percentile in 5 lingue
+     Novità principale: aggiunto blocco completo FONDI EU UCITS
+       BASIC €29/mese: TER ≤ 1%, Sharpe ≥ 0,4, AUM ≥ 50M, Perf1Y ≥ -10%
+       PRO   €39/mese: TER ≤ 1,5%, Sharpe ≥ 0,2, AUM ≥ 10M, Perf1Y ≥ -30%
+       VALUE €59/mese: TER ≤ 2%, Sharpe ≥ 0,1, AUM ≥ 1M, Perf1Y ≥ -50%
+       (Nota: VALUE = accesso all'universo UCITS completo, filtri più ampi)
+
+   FILE: kb_faq.md
+     Riscritta da zero in 5 lingue: IT / ES / EN / FR / DE
+     Sezioni: Accesso/Account, Report, Pagamenti, Order Builder,
+              Dati/Metodologia/Score, Privacy/GDPR
+     Aggiornamenti chiave:
+       - Orario aggiornamento corretto: ETF+Fondi = Lun/Mer/Ven (non tutti i giorni)
+       - Spiegazione fogli Excel (Dashboard, Top N, Selezionati, Scartati, Non Validi)
+       - Numerazione fatture: FVC-2026-XXXX
+
+   FILE: kb_glossario.md
+     Riscritta da zero in 5 lingue: IT / ES / EN / FR / DE
+     Nuovi termini aggiunti: AUM, UCITS, NAV, Var 1D%
+     Per ogni metrica: definizione + direzione (alto=meglio / basso=meglio)
+     Pesi Score per ogni piano inclusi come riferimento
+
+
+2. CHAT_SERVICE.PY — SYSTEM PROMPT POTENZIATO
+   ─────────────────────────────────────────────
+   FILE: chat_service.py
+
+   A) Variabile _kb_loaded_at: traccia orario di caricamento KB (strftime "%H:%M:%S")
+
+   B) Funzione get_kb_info() NUOVA:
+      Ritorna {"chars": N, "files": N, "loaded_at": "HH:MM:SS"}
+      Usata dall'endpoint admin /api/kb-status e /api/reload-kb
+
+   C) reload_kb() aggiornata:
+      Ora aggiorna anche _kb_loaded_at al momento del reload
+
+   D) System prompt riscritto (struttura):
+        SYSTEM_PROMPT = regole (8 punti) + _EXAMPLES + "KNOWLEDGE BASE:" + KB_CONTENT
+      Dimensione totale: ~55.500 caratteri (cacheable con prompt caching Anthropic)
+
+   E) _EXAMPLES — 8 dialoghi modello inseriti nel system prompt:
+      ESEMPIO 1: Raccomandazione piano (IT) — investitore dividendi → Azioni BASIC
+      ESEMPIO 2: Domanda prezzi (ES) — piani ETF con descrizioni
+      ESEMPIO 3: Spiegazione Score (EN) — percentile 0-100
+      ESEMPIO 4: Fuori tema (IT) — "compro Tesla?" → rimanda a marketing@
+      ESEMPIO 5: Obiezione prezzo (FR) — "troppo caro" → controproposta BASIC
+      ESEMPIO 6: Password dimenticata (DE) — rimanda a email
+      ESEMPIO 7: Confronto piani (IT) — Azioni PRO vs Azioni VALUE
+      ESEMPIO 8: Fondi US vs EU (EN) — differenze tra le due categorie
+
+   F) Regole riscritte (8 punti):
+      1. Rispondi SEMPRE nella lingua del cliente (IT/ES/EN/FR/DE/altro)
+      2. Conciso ma MAI tagliare risposte su piani/prodotti
+      3. No promesse rendimento (MiFID II)
+      4. Solo info da KB, non inventare
+      5. No consigli su singoli titoli → rimanda a marketing@
+      6. Fuori tema → marketing@fuerteventurecapital.com
+      7. Tono professionale, diretto, amichevole. Grassetto per prezzi/piani
+      8. Consiglio piano basato su profilo investitore (orizzonte, asset, esperienza)
+
+
+3. DASHBOARD ADMIN — BOTTONE RICARICA KB
+   ─────────────────────────────────────────────
+   FILE: dashboard.py
+
+   A) HTML — box nuovo nel tab "Home" (sotto il box Scheduler):
+      ┌─────────────────────────────────────────────────────────────┐
+      │ 🤖 Assistente AI — Knowledge Base                           │
+      │ ✓ Attiva · 55.518 caratteri · 4 file · caricata alle HH:MM │
+      │                                        [↺ Ricarica KB]     │
+      └─────────────────────────────────────────────────────────────┘
+
+   B) JavaScript — due funzioni nuove:
+      loadKBStatus() — chiama /api/kb-status, mostra chars/files/orario
+      reloadKB()     — chiama /api/reload-kb, aggiorna il box con il risultato
+      Chiamata automatica: loadKBStatus() aggiunta all'INIT della pagina
+
+   C) Endpoint GET /api/kb-status (richiede sessione admin):
+      Risposta: {"chars": N, "files": N, "loaded_at": "HH:MM:SS"}
+
+   D) Endpoint GET /api/reload-kb (richiede sessione admin):
+      Chiama _chat.reload_kb() → rilegge i 4 file .md da disco
+      Risposta ok:    {"ok": true, "chars": N, "files": N, "loaded_at": "HH:MM:SS"}
+      Risposta errore:{"ok": false, "error": "messaggio"}
+      ZERO downtime: le sessioni clienti in corso non vengono interrotte
+
+
+================================================================================
+SEZIONE 2: ARCHITETTURA ASSISTENTE AI
+================================================================================
+
+COME FUNZIONA IL CHATBOT (flusso completo)
+─────────────────────────────────────────────
+
+  Avvio server (una sola volta):
+    1. Python importa chat_service.py
+    2. _load_kb() legge i 4 file .md in ordine fisso:
+       kb_azienda.md → kb_prodotto.md → kb_faq.md → kb_glossario.md
+    3. I 4 file vengono uniti in KB_CONTENT (separati da "---")
+    4. SYSTEM_PROMPT = regole + 8 esempi + "KNOWLEDGE BASE:" + KB_CONTENT
+    5. _kb_loaded_at = orario di caricamento (per la dashboard)
+
+  Per ogni messaggio cliente:
+    1. POST /api/chat  →  dashboard.py  →  chat_service.chat()
+    2. Verifica rate limit (max 30 msg/ora per IP)
+    3. Recupera o crea sessione (dict in RAM, TTL 24h)
+    4. Aggiunge messaggio alla history (max 10 messaggi = 5 turni)
+    5. Chiama API Anthropic:
+         model: claude-haiku-4-5-20251001
+         max_tokens: 800
+         system: [SYSTEM_PROMPT, cache_control: ephemeral]
+         messages: [ultimi 10 msg della sessione]
+    6. Risposta restituita come {"ok": true, "reply": "..."}
+
+  Cosa vede Claude in ogni chiamata:
+    [SYSTEM — cacheable]
+      • 8 regole di comportamento
+      • 8 dialoghi modello (IT/ES/EN/FR/DE)
+      • kb_azienda.md  — chi siamo/non siamo, contatti (5 lingue)
+      • kb_prodotto.md — piani, filtri, prezzi, score (5 lingue)
+      • kb_faq.md      — FAQ accesso/report/pagamenti (5 lingue)
+      • kb_glossario.md — EV/FCF, TER, Sharpe, UCITS… (5 lingue)
+    [MESSAGES]
+      • Ultimi 10 messaggi della sessione corrente
+
+  Cosa NON sa Claude:
+    • Chi è il cliente loggato
+    • Il contenuto dei report Excel
+    • Dati di mercato in tempo reale
+    • Qualsiasi cosa non sia nella KB
+
+PROMPT CACHING:
+  Il system prompt (~55.500 chars) viene inviato ad ogni chiamata
+  ma è cacheable lato Anthropic (cache_control: ephemeral, TTL 5 min).
+  Con traffico sostenuto il risparmio è ~10x sui token di input.
+
+COME AGGIORNARE LA KB SENZA RIAVVIARE:
+  1. Modifica/aggiungi file .md in KNOWLEDGE_BASE/
+  2. Vai nella dashboard admin → tab Home
+  3. Clicca "↺ Ricarica KB"
+  4. Il chatbot usa la nuova KB da quel momento in poi
+
+PARAMETRI SESSIONE:
+  RATE_LIMIT  = 30 messaggi / ora / IP
+  MAX_HISTORY = 10 messaggi per sessione (5 turni)
+  MAX_MSG_LEN = 600 caratteri per messaggio
+  SESSION_TTL = 24 ore (pulizia automatica sessioni inattive)
+  Pulizia:    thread cleanup ogni 1h (avviato da dashboard.py al boot)
+
+FILE KB (KNOWLEDGE_BASE/):
+  kb_azienda.md   — identità, contatti, disclaimer
+  kb_prodotto.md  — tutti i piani con filtri e prezzi
+  kb_faq.md       — domande frequenti
+  kb_glossario.md — termini finanziari e tecnici
+
+
+================================================================================
+SEZIONE 3: UNIVERSO STRUMENTI — RIEPILOGO AGGIORNATO
+================================================================================
+
+  Asset             Count    Aggiornamento    Filtro chiave per piano VALUE
+  ────────────────────────────────────────────────────────────────────────
+  Azioni            3.072    Lun–Ven 23:00    EV/FCF ≤ 12x, P/B ≤ 1x
+  ETF EU ACC        1.182    Lun/Mer/Ven      TER ≤ 0,20%, Sharpe ≥ 0,5
+  Fondi US            911    Lun/Mer/Ven      TER ≤ 1%, Sharpe ≥ 0,3
+  Fondi EU UCITS      472    Lun/Mer/Ven      TER ≤ 2%, AUM ≥ 1M (universo completo)
+  ────────────────────────────────────────────────────────────────────────
+  TOTALE            5.637
+
+
+================================================================================
+SEZIONE 4: PREZZI ATTIVI (tutti i piani)
+================================================================================
+
+  Piano               BASIC     PRO      VALUE
+  ─────────────────────────────────────────────
+  Azioni              €29/mese  €39/mese  €59/mese
+  ETF                 €29/mese  €39/mese  €59/mese
+  Fondi US            €29/mese  €39/mese  €59/mese
+  Fondi EU UCITS      €29/mese  €39/mese  €59/mese   ← ATTIVO
+  Order Builder       €19/mese  €29/mese  €49/mese
+
+  NOTA: servizi_config.json non ancora aggiornato con Fondi EU UCITS.
+        I piani sono attivi nello screener e nella KB ma non nella
+        dashboard admin sezione "Catalogo Servizi". Da fare.
+
+
+================================================================================
+SEZIONE 5: TODO
+================================================================================
+
+CRITICO (blocca lancio pubblico):
+  [ ] Cloudflare Tunnel — cloudflared.exe, config.yml, aggiornare base_url
+  [ ] Password admin — cambiare "123" in config.json → admin_password
+
+AZIONI MANUALI PENDENTI (da sessione 16/06):
+  [ ] Ruotare API key Anthropic
+  [ ] Rigenerare App Password Gmail
+
+PENDENTE (da questa sessione):
+  [ ] servizi_config.json — aggiungere sezione "fondi_eu" con BASIC/PRO/VALUE
+      (i piani sono attivi nello screener ma mancano nel catalogo admin)
+
+IN ATTESA CREDENZIALI:
+  [ ] Social Automation — Brevo api_key, LinkedIn client_id/secret, Meta page_id
+  [ ] WhatsApp Business — account Meta verificato + numero + template approvati
+
+
+================================================================================
+SEZIONE 6: STORICO SESSIONI
+================================================================================
+
+  16/06/2026 — 20 bug fix sicurezza e stabilità:
+    dashboard.py:        threading lock, scrittura atomica, password env,
+                         except nudi, startup makedirs, cleanup chat thread
+    chat_service.py:     _session_ts + cleanup_expired_sessions (memory leak fix)
+    email_notifier.py:   timeout=15 su smtplib.SMTP
+    screener_utils.py:   import math, filtro NaN
+    social_automation.py: guard try/except import circolare
+    whatsapp_service.py: _WA_API_VERSION costante
+    value_screener_azioni.py: _get_param() helper
+
+  17/06/2026 — 1 fix:
+    orchestrator.py:     retry automatico send_plan_email (3 tentativi, 30s)
+
+  20/06/2026 — espansione mercati:
+    ticker_lists_5000.py:        +130 ticker US (9 famiglie nuove) → 911 fondi
+    fetch_fondi_eu_universe.py:  NUOVO — scraper 2 fasi UCITS EU (472 pronti)
+    value_screener_fondi_eu.py:  NUOVO — screener UCITS EU
+    orchestrator.py:             4° screener FONDI_EU
+    scheduler_daemon.py:         FONDI_EU in job, timeout 90min → 2h
+    23 file .py/.html/.txt:      domain rename → www.fuerteventurecapital.com
+
+  22/06/2026 — Knowledge Base e Assistente AI:
+    KNOWLEDGE_BASE/kb_azienda.md:   riscritto — 5 lingue, dati aggiornati
+    KNOWLEDGE_BASE/kb_prodotto.md:  riscritto — Fondi EU UCITS, filtri reali, 5 lingue
+    KNOWLEDGE_BASE/kb_faq.md:       riscritto — orari corretti, Excel spiegato, 5 lingue
+    KNOWLEDGE_BASE/kb_glossario.md: riscritto — AUM/UCITS/NAV aggiunti, 5 lingue
+    chat_service.py:                system prompt + 8 esempi modello + _kb_loaded_at
+                                    + get_kb_info() + reload_kb() aggiornata
+    dashboard.py:                   bottone "Ricarica KB", /api/kb-status, /api/reload-kb
+
+================================================================================

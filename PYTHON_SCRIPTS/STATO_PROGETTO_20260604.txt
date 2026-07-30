@@ -1,0 +1,533 @@
+================================================================================
+  FUERTE SCREENER — STATO DEL PROGETTO
+  Fuerte Venture Capital SL · CIF B23881691
+  Aggiornato: 4 Giugno 2026 (sessione pomeriggio — DATABASE tab + UX admin)
+================================================================================
+
+
+================================================================================
+SEZIONE 1: ARCHITETTURA ATTUALE
+================================================================================
+
+TUTTO GIRA IN UN UNICO FILE: dashboard.py
+─────────────────────────────────────────
+  • Server HTTP puro Python (BaseHTTPRequestHandler) — NO Flask, NO N8N
+  • Porta: 5000
+  • Avvio: python dashboard.py  oppure  AVVIO_VELOCE.bat
+  • Accesso admin: http://localhost:5000  → password in config.json
+  • Accesso cliente: http://localhost:5000/client-login
+
+FILE PRINCIPALI:
+  dashboard.py              → Server completo (landing, admin, area clienti, API, social webhook)
+  order_builder.py          → Order Builder (email bancaria MiFID II, CSV IBKR, CSV generico)
+  value_screener_azioni.py  → Screener azioni (3072 ticker, 23 mercati, output 3 Excel BASIC/PRO/VALUE)
+  value_screener_etf.py     → Screener ETF (678 ETF, output 3 Excel BASIC/PRO/VALUE)
+  value_screener_fondi.py   → Screener Fondi (1087 fondi, 36 famiglie, output 3 Excel BASIC/PRO/VALUE)
+  ticker_lists_5000.py      → Lista ticker completa
+  scheduler_daemon.py       → Esegue screener ogni notte alle 23:00
+  orchestrator.py           → Coordina esecuzione screener + notifiche email
+  email_notifier.py         → Notifiche email post-screener (Gmail SMTP)
+  servizi_config.json       → Prezzi e caratteristiche per piano (v2.1)
+  parametri.json            → Parametri screener editabili da admin panel
+  clienti.json              → Database clienti (piani, dati fiscali, GDPR)
+  config.json               → Config globale: filtri screener + email Gmail + social credentials
+
+FILE SOCIAL AUTOMATION (nuovi — 04/06/2026 mattina):
+  social_publisher.py       → Servizi Brevo SMTP + LinkedIn API + Meta Graph API (sync)
+  content_generator.py      → Genera testo post via Claude API, fallback 9 template IT+ES
+  social_automation.py      → Orchestratore: calendario → genera → draft → email approvazione
+  social_calendar.json      → 24 post pianificati: 8 giugno → 31 luglio 2026 (lun/mer/ven)
+
+FILE RUNTIME (creati automaticamente):
+  social_tokens.json        → Token OAuth LinkedIn + Meta (page token, ig_user_id)
+  SOCIAL_DRAFTS/            → Draft JSON in attesa di approvazione + published.json
+  prices_cache.json         → Cache prezzi+variazioni da ultima esecuzione screener (per tab DATABASE)
+  ORDINI/{email}/           → Archivio ordini bancari JSON per cliente
+  ORDINI/{email}/conti_bancari.json  → Conti bancari memorizzati per Order Builder
+
+
+================================================================================
+SEZIONE 2: SISTEMA 9-FILE (IMPLEMENTATO 03/06/2026 SERA)
+================================================================================
+
+CONCETTO:
+  Un singolo giro screener produce 9 file Excel (3 asset × 3 piani).
+  Il cliente scarica solo il file del suo piano.
+  L'admin vede sempre i dati PRO.
+
+ARCHITETTURA 2-FASE (tutti e 3 gli screener):
+  Phase 1 → 1 sola passata yfinance su tutto l'universo → raccoglie tutti i dati
+  Phase 2 → per ciascun piano: filtra + scrive Excel separato (stessa passata dati)
+  Vantaggio: nessun triplo fetch → tempo totale invariato rispetto a prima
+
+OUTPUT PER RUN — PATH CORRETTO:
+  C:\Users\lucia\Desktop\Robot Trader 2026\REPORTS_DAILY\    ← UN LIVELLO SOPRA PYTHON_SCRIPTS
+    Azioni_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    Azioni_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    Azioni_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    ETF_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_BASIC_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_PRO_YYYYMMDD_HHMMSS.xlsx
+    FONDI_Screener_VALUE_YYYYMMDD_HHMMSS.xlsx
+
+STRUTTURA EXCEL PER PIANO:
+  BASIC  → Dashboard + Top 20
+  PRO    → Dashboard + Top 50 + Foglio Selezionati
+  VALUE  → Dashboard + Top 50 + Foglio Selezionati + Scartati (per motivo) + Non Validi
+
+
+================================================================================
+SEZIONE 3: SOGLIE FILTRI PER PIANO
+================================================================================
+
+── AZIONI ──────────────────────────────────────────────────────────────────────
+
+  BASIC:
+    Universe:  solo indici principali (~702 ticker)
+               SP500 + FTSE100 + DAX + CAC40 + FTSE MIB + IBEX35 + SMI + AEX + Nikkei225
+    EV/FCF:    ≤ 12  |  P/B: ≤ 1.2  |  ROE: ≥ 0%  |  ND/EBITDA: ≤ 2.5  |  Top N: 20
+
+  PRO:
+    Universe:  universo completo 3072 ticker
+    EV/FCF:    ≤ 12  |  P/B: ≤ 1.2  |  ROE: ≥ 0%  |  ND/EBITDA: ≤ 2.5  |  Top N: 50
+
+  VALUE:
+    Universe:  universo completo 3072 ticker
+    EV/FCF:    ≤ 15  |  P/B: ≤ 1.5  |  ROE: ≥ -5%  |  ND/EBITDA: ≤ 3.0  |  Top N: 50
+
+── ETF ─────────────────────────────────────────────────────────────────────────
+
+  BASIC:   TER ≤ 0.35% | Sharpe ≥ 0.8 | Volume ≥ 500k | Perf1Y ≥ -10% | Età ≥ 5y | Top 20
+  PRO:     TER ≤ 0.50% | Sharpe ≥ 0.5 | Volume ≥ 100k | Perf1Y ≥ -20% | Età ≥ 3y | Top 50
+  VALUE:   TER ≤ 0.75% | Sharpe ≥ 0.3 | Volume ≥  50k | Perf1Y ≥ -30% | Età ≥ 2y | Top 50
+  Tutti:   only_accumulating=True, only_physical=True
+
+── FONDI ───────────────────────────────────────────────────────────────────────
+
+  BASIC:   TER ≤ 0.75% | Sharpe ≥ 0.6 | Dim ≥ 200k | Perf1Y ≥ -10% | Top 20
+  PRO:     TER ≤ 1.00% | Sharpe ≥ 0.3 | Dim ≥  50k | Perf1Y ≥ -30% | Top 50
+  VALUE:   TER ≤ 1.50% | Sharpe ≥ 0.1 | Dim ≥  10k | Perf1Y ≥ -50% | Top 50
+
+
+================================================================================
+SEZIONE 4: UNIVERSO TICKER
+================================================================================
+
+AZIONI — 3072 ticker, 23 mercati:
+  USA:       SP500 (503) + Russell 1000 extra + NASDAQ extra
+  UK:        FTSE100 + FTSE250
+  Europa:    DAX (40) + CAC40 + FTSE MIB + IBEX35 + AEX + SMI + OMX + altri
+  Asia:      Nikkei225 + HK (Hang Seng) + India NIFTY500 + Taiwan TWSE
+  Altri:     Australia ASX200 + Canada TSX60
+
+ETF — 678 ticker:
+  USA:       394 (iShares, Vanguard, SPDR, Invesco, Schwab, ARK…)
+  Europa:    284 (su .DE / .L / .MI / .PA / .AS — ACC, replica fisica)
+  Scraping TER da justETF per ETF europei via ISIN map
+
+FONDI — 1087 ticker, 36 famiglie:
+  Vanguard, Fidelity, T.Rowe Price, American Funds, Schwab, PIMCO, DFA,
+  Dodge & Cox, Franklin Templeton, BlackRock MF, Invesco MF, MFS, Putnam,
+  Columbia, JPMorgan MF, Goldman Sachs MF, Lord Abbett, Neuberger Berman,
+  Nuveen, TIAA-CREF, Harbor, Eaton Vance/Calvert, Hartford, John Hancock,
+  Artisan, Parnassus, Wasatch, Royce, Thornburg, First Eagle, Manning & Napier,
+  Ariel, Brown Advisory, Meridian, Baird
+
+
+================================================================================
+SEZIONE 5: COLONNE REPORT EXCEL
+================================================================================
+
+AZIONI Top 20/50 — PRO/VALUE (19 colonne, aggiornato 04/06/2026):
+  Ticker | Nome | Valuta | Mercato | Indice | Prezzo | Var 1D % | Score |
+  Perf 1M% | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  P/B | ROE | EV/FCF | Net Debt/EBITDA | Market Cap | Settore
+
+  ★ NUOVO: colonna "Var 1D %" — variazione % vs giorno precedente (da hist[-1]/hist[-2])
+
+AZIONI Top 20 — BASIC (10 colonne, no Prezzo né variazione né performance):
+  Ticker | Nome | Valuta | Mercato | Indice | Score | P/B | ROE | EV/FCF | Settore
+
+ETF Top 20/50 (aggiornato 04/06/2026):
+  Ticker | Nome | Score | Prezzo | Var 1D % | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  TER | Sharpe | Volume | Net Assets
+
+  ★ NUOVO: colonna "Var_1D_%" — calcolata da hist
+
+FONDI Top 20/50 (aggiornato 04/06/2026):
+  Ticker | Nome | Score | Prezzo | Var 1D % | Perf 3M% | Perf 6M% | Perf YTD% | Perf 1Y% |
+  TER | Sharpe | Net Assets | Categoria
+
+  ★ NUOVO: colonna "Var_1D_%" — calcolata da hist
+
+Performance azioni calcolata da history(period='1y'):
+  1M=22gg | 3M=63gg | 6M=126gg | YTD=1gen | 1Y=prima data
+
+Performance ETF: Perf 1Y è fraction (0.12=12%) → ×100 in output
+Performance azioni/fondi: già in % (12.34=12.34%)
+
+
+================================================================================
+SEZIONE 6: DASHBOARD.PY — ROUTE COMPLETE
+================================================================================
+
+── Rotte pubbliche (no auth) ───────────────────────────────────────────────────
+  GET  /                         Landing page (form registrazione)
+  GET  /api/servizi              Prezzi piani (JSON)
+  GET  /login                    Pagina login admin
+  GET  /logout                   Logout admin
+  GET  /grazie                   Thank-you page post-registrazione
+  GET  /client-login             Login cliente
+  GET  /api/client-logout        Logout cliente
+  POST /login                    Autentica admin
+  POST /api/registrazione        Self-registrazione cliente → TESTER in clienti.json
+
+── Rotte cliente (auth cliente) ────────────────────────────────────────────────
+  GET  /area-clienti             Area riservata cliente
+  GET  /cambia-password          Pagina cambio password
+  GET  /api/ordine/prefill       Top 10 ticker per piano attivo (pre-fill Order Builder)
+  GET  /api/report/{asset}       Download Excel del piano cliente (BASIC/PRO/VALUE)
+  GET  /ordine-bancario          Pagina Order Builder
+  GET  /api/ordine/conti         ★ NUOVO: lista conti bancari salvati per il cliente
+  POST /api/ordine/prezzi        Prezzi live per lista ticker (+ change_pct★)
+  POST /api/ordine/invia         Genera email bancaria MiFID II + archivia JSON + salva conto★
+  POST /api/ordine/csv           Scarica CSV IBKR o Generico
+  POST /api/ordine/conti/delete  ★ NUOVO: elimina un conto bancario salvato
+  POST /api/cambia-password      Salva nuova password cliente
+  POST /api/client-login         Autentica cliente
+
+── Rotte admin (auth admin) ────────────────────────────────────────────────────
+  GET  /admin                    Console admin
+  GET  /api/status               KPI dashboard (BASIC/PRO/VALUE per asset)
+  GET  /api/data/{tipo}          Dati tabella (sempre file PRO) — azione/etf/fondi
+  GET  /api/mercati              Lista mercati da file PRO azioni
+  GET  /api/clienti              Lista clienti JSON
+  GET  /api/clienti/export       Export CSV clienti
+  GET  /api/fattura/{numero}     Download fattura PDF
+  GET  /api/log/{tipo}           Log run screener in corso
+  GET  /api/database             ★ NUOVO: universo ticker + cache prezzi (Azioni/ETF/Fondi)
+  GET  /api/database/lookup      ★ NUOVO: fetch live nome+prezzo+var% per lista ticker (max 30)
+  GET  /api/social/status        Lista draft social (JSON)
+  GET  /api/social/approve       Webhook approvazione draft social
+  GET  /api/linkedin/connect     Redirect a OAuth LinkedIn
+  GET  /api/linkedin/callback    Riceve code OAuth → salva token LinkedIn
+  GET  /api/meta/connect         Redirect a OAuth Meta
+  GET  /api/meta/callback        Riceve code OAuth → salva token Meta + page token
+  POST /api/clienti/aggiungi     Aggiunge cliente manualmente
+  POST /api/clienti/attiva       Attiva cliente + genera password + invia email credenziali
+  POST /api/clienti/anagrafica   Aggiorna dati fiscali cliente
+  POST /api/clienti/import       Importa CSV clienti
+  POST /api/parametri            Salva parametri screener in parametri.json
+  POST /api/servizi              Salva config servizi/prezzi
+  POST /api/run/{tipo}           Avvia screener manualmente (azioni/etf/fondi)
+
+
+================================================================================
+SEZIONE 7: SOCIAL AUTOMATION (IMPLEMENTATO 04/06/2026 MATTINA)
+================================================================================
+
+FLUSSO OPERATIVO:
+  1. [08:00] social_automation.py → legge social_calendar.json → trova entry del giorno
+  2. Chiama content_generator.py → genera testo IT + ES (Claude API o template statico)
+  3. Salva draft JSON in SOCIAL_DRAFTS/draft_YYYYMMDD_HHMMSS.json (status: "pending")
+  4. Invia email approvazione via Brevo SMTP → link APPROVA/MODIFICA/RIFIUTA
+  5. Admin clicca APPROVA → GET /api/social/approve?draft_id=XXX&action=approve
+  6. dashboard.py chiama social_automation.approve_and_publish()
+  7. Pubblica su tutti i canali configurati → aggiorna status draft a "published"
+
+CANALI SUPPORTATI:
+  brevo     → Campagna email newsletter (lista abbonati Robot Trader)
+  linkedin  → Company Page Fuerte Venture Capital (POST /rest/posts)
+  facebook  → Facebook Page FVC (Graph API /feed o /photos)
+  instagram → Instagram Business collegato alla FB Page (2-step: container → publish)
+
+CONTENT CALENDAR (social_calendar.json):
+  24 post pianificati: 8 giugno 2026 → 31 luglio 2026
+  Cadenza: Lunedì (Educational) | Mercoledì (Tecnico/Case Study) | Venerdì (Prodotto/Team)
+  Lingue: IT (16 post) + ES (8 post) — rotazione
+  Temi: VALUE_INTRO, 5_FILTRI, EVFCF, PB_ROE, CASE_STUDY, ETF_SCREENING,
+        FONDI_SCREENING, TEAM, LAUNCH (9 temi, ognuno con template IT+ES)
+
+CREDENZIALI — config.json → sezione "social":
+  social.brevo.*         ← placeholder (smtp_login, smtp_password, api_key, list_ids)
+  social.linkedin.*      ← placeholder (client_id, client_secret, org_id)
+  social.meta.*          ← placeholder (app_id, app_secret, page_id, ig_user_id)
+  social.anthropic.*     ← placeholder (api_key)
+
+PROCEDURA ATTIVAZIONE:
+  1. Compila config.json → social.brevo
+  2. http://localhost:5000/api/linkedin/connect → autorizza → token salvato
+  3. http://localhost:5000/api/meta/connect → autorizza → token salvato
+  4. Aggiungi in scheduler_daemon.py alle 08:00: social_automation.run()
+
+ESECUZIONE MANUALE:
+  python social_automation.py                        → post del giorno (da calendario)
+  python social_automation.py --theme VALUE_INTRO    → forza tema specifico
+  python social_automation.py --date 2026-06-15      → forza data specifica
+  python social_automation.py --list                 → mostra draft in attesa
+
+
+================================================================================
+SEZIONE 8: DATABASE TAB ADMIN CONSOLE (IMPLEMENTATO 04/06/2026 POMERIGGIO)
+================================================================================
+
+FUNZIONE:
+  Tab "🗃️ Database" nella console admin — mostra l'universo completo di tutti
+  i ticker esaminati (Azioni + ETF + Fondi) con prezzi e variazioni giornaliere.
+
+STRUTTURA TABELLA (6 colonne — stessa per tutti e 3 gli asset):
+  # | Ticker (link YF) | Nome | Prezzo | Var % | Gruppo / Mercato
+
+  ★ Ticker = link giallo btn-yf → apre Yahoo Finance direttamente
+    (non esiste più la colonna "Web" separata — risparmiata una colonna)
+
+DATI FONTE:
+  1. AUTO (da screener) — prices_cache.json:
+     → Ogni screener (azioni/etf/fondi) al termine salva automaticamente:
+        PYTHON_SCRIPTS/prices_cache.json
+        { "azioni":    {TICKER: {name, price, change_pct, currency}},
+          "azioni_at": "ISO datetime",
+          "etf":       {...},
+          "fondi":     {...} }
+     → Quando si apre la tab DATABASE, i dati cached sono già presenti
+        senza nessun click aggiuntivo (auto-load da /api/database)
+
+  2. MANUALE (live) — "📊 Carica dati (N visibili)":
+     → Prende i ticker visibili dopo il filtro (max 30 alla volta)
+     → Chiama /api/database/lookup con ThreadPoolExecutor (10 workers, timeout 40s)
+     → Popola Nome / Prezzo / Var% in tempo reale
+     → Usare DOPO aver filtrato per ridurre il batch
+
+RICERCA:
+  Barra di ricerca full-text su Ticker e Gruppo — filtra righe in tempo reale
+  Il contatore mostra "N di TOT risultati per 'query'" durante la ricerca
+  Il bottone "Carica dati" si aggiorna con il conteggio visibile
+
+SUB-TAB: Azioni (3072) | ETF (678) | Fondi (1087)
+
+DRAG & DROP COLONNE (stesso sistema delle tab Azioni/ETF/Fondi):
+  → Trascina intestazione di colonna su un'altra per spostare
+  → Colonna evidenziata in arancione durante drag
+  → Ordine persiste in localStorage per sessione (per asset separato)
+  → Bottone "↺ Reset colonne" ripristina ordine originale
+  Colonne draggabili: Nome | Prezzo | Var % | Gruppo/Mercato
+  Colonne fisse (non spostabili): # | Ticker
+
+API BACKEND:
+  GET /api/database             → {azioni:[...], etf:[...], fondi:[...], totali:{},
+                                   cache:{azioni:{}, etf:{}, fondi:{}},
+                                   cache_azioni_at, cache_etf_at, cache_fondi_at}
+  GET /api/database/lookup?t=   → {TICKER: {name, price, currency, change_pct}, ...}
+                                   (max 30 ticker, yfinance ThreadPoolExecutor)
+
+FUNZIONI PYTHON DASHBOARD.PY:
+  load_prices_cache()           → legge prices_cache.json
+  get_database_data()           → assembla dati universo + cache
+  get_database_lookup(tickers)  → fetch live yfinance + change_pct (max 30)
+
+
+================================================================================
+SEZIONE 9: UX TABELLE ADMIN — DRAG & DROP COLONNE
+================================================================================
+
+IMPLEMENTATO SU: tab Azioni, ETF, Fondi (tabelle screener risultati)
+                 tab Database (universo ticker)
+
+FUNZIONAMENTO:
+  → Clicca intestazione colonna = ORDINA (▲ / ▼, come prima)
+  → Trascina intestazione su un'altra colonna = SPOSTA
+  → Cursor "grab" sulle intestazioni draggabili
+  → Colonna di destinazione si evidenzia in arancione (#F6AD55)
+  → Il click non si attiva dopo un drag (flag _skipNextClick)
+  → L'ordine è salvato in localStorage per tab e asset separati
+
+CHIAVI localStorage:
+  "cols_azioni"    → ordine colonne tab Azioni
+  "cols_etf"       → ordine colonne tab ETF
+  "cols_fondi"     → ordine colonne tab Fondi
+  "dbcols_azioni"  → ordine colonne DATABASE sub-tab Azioni
+  "dbcols_etf"     → ordine colonne DATABASE sub-tab ETF
+  "dbcols_fondi"   → ordine colonne DATABASE sub-tab Fondi
+
+RESET:
+  Screener: bottone "↺ Reset colonne" nella barra info di ogni tabella
+  Database: bottone "↺ Reset colonne" nella barra toolbar del DATABASE panel
+
+FUNZIONI JS:
+  _colDragStart(tipo, idx, el)  → segna colonna trascinata, opacità .45
+  _colDragEnd(el)               → ripristina opacità
+  _colDragOver(event, el)       → aggiunge classe col-drag-over
+  _colDragLeave(el)             → rimuove classe col-drag-over
+  _colDrop(tipo, targetIdx, e)  → sposta colonna in _tableCols[tipo], re-render, salva LS
+  _resetCols(tipo)              → elimina LS, ripristina ordine originale
+  _dbColDragStart(asset, i, el) → versione DATABASE
+  _dbColDrop(asset, i, e)       → versione DATABASE (aggiorna _dbCols[asset])
+  _resetDbCols(asset)           → versione DATABASE
+
+
+================================================================================
+SEZIONE 10: ORDER BUILDER
+================================================================================
+
+  Pre-fill:      /api/ordine/prefill → top 10 ticker per piano attivo
+  Prezzi live:   /api/ordine/prezzi → {price, currency, name, exchange, change_pct★, change_abs★}
+  Email:         header MiFID II, footer "Robot Trader 2026", NO logo Fuerte
+  SL/TP:         per-ticker (non globale), solo azioni, tabella dismissable
+  CSV:           IBKR Basket Trader (PRO/VALUE) + CSV generico (tutti)
+  Archivio:      ORDINI/{email_safe}/ORD-YYYYMMDD-HHMMSS.json
+
+  ★ NUOVO — Conto di Appoggio con memoria automatica:
+     Campo input con dropdown autocomplete
+     → Al primo ordine: se il conto è valorizzato, viene salvato automaticamente
+       in ORDINI/{email_safe}/conti_bancari.json (max 20 conti, più recente in testa)
+     → Dalla seconda volta: dropdown mostra tutti i conti salvati
+     → Filtra mentre si digita (casuale search)
+     → Pulsante ✕ per eliminare singolo conto dalla lista
+     → API: GET /api/ordine/conti     → {ok, conti:[...]}
+            POST /api/ordine/conti/delete → {conto: "..."} → {ok}
+
+  ★ NUOVO — order_builder.get_live_prices() restituisce anche:
+     change_pct: variazione % giornaliera (da fast_info.previous_close o regularMarketChangePercent)
+     change_abs: variazione assoluta giornaliera
+
+
+================================================================================
+SEZIONE 11: FLUSSO COMMERCIALE B2C
+================================================================================
+
+Gmail SMTP attivo: rioluc63@gmail.com (App Password in config.json)
+
+  1. Cliente → landing page → form registrazione → salvato come TESTER
+  2. Admin → Attiva cliente → seleziona piani → invia email credenziali
+  3. Cliente → client-login → area-clienti
+       - Download report Excel del proprio piano
+       - Order Builder (se piano_ordini != NONE) con conto bancario memorizzato
+       - Storico ordini (ultimi 20)
+
+Pricing ordini: Basic €19 | Pro €29 | Value €49
+Piani screener: NONE / BASIC / PRO / VALUE (per azioni, etf, fondi, ordini)
+
+
+================================================================================
+SEZIONE 12: SCHEDULING
+================================================================================
+
+  Windows Task Scheduler — schedule attuale:
+    23:00 ogni giorno → scheduler_daemon.py → orchestrator.py
+      1. value_screener_azioni.py  → 3 Excel azioni + aggiorna prices_cache.json★
+      2. value_screener_etf.py     → 3 Excel ETF  + aggiorna prices_cache.json★
+      3. value_screener_fondi.py   → 3 Excel Fondi + aggiorna prices_cache.json★
+      4. email_notifier.py         → notifica admin
+
+    ★ NUOVO: ogni screener al termine aggiorna la propria sezione in prices_cache.json
+      → La mattina dopo, il tab DATABASE ha già prezzi e variazioni pre-caricati
+
+  DA AGGIUNGERE (dopo attivazione social):
+    08:00 ogni giorno → social_automation.py
+
+
+================================================================================
+SEZIONE 13: NOTE TECNICHE CRITICHE
+================================================================================
+
+TER ETF USA:    netExpenseRatio → già in % (0.0945 = 0.0945%)
+TER ETF EU:     nessun campo yfinance → scraping justETF via ISIN map
+TER Fondi:      annualReportExpenseRatio → decimale (0.0035 = 0.35%)
+                → filtro: ter > cfg['ter_max'] / 100
+
+Categoria Fondi: info.get('category') → fallback funds_data.fund_overview
+                 → fallback fundFamily
+
+HTML dashboard: raw string r"""...""" — { e } in JS singole
+                per iniettare Python vars: .replace('__VAR__', valore)
+_build_area_clienti(): funzione Python normale (f-string OK)
+Sheet Excel: caratteri vietati / \ ? * [ ] : → usare -
+
+Admin sessions: in-memory → reset a ogni riavvio → re-login necessario
+
+_latest_plan() precedenza:
+  1. {Tipo}_Screener_{PIANO}_*.xlsx  ← file nuovo sistema
+  2. {Tipo}_Screener_*.xlsx          ← fallback file vecchio formato
+
+prices_cache.json: aggiornato da ciascuno screener separatamente.
+  Ogni screener legge il file esistente, aggiorna solo la propria sezione
+  (chiave "azioni" / "etf" / "fondi") e riscrive il file completo.
+  Struttura: {"azioni":{TICKER:{name,price,change_pct,currency}}, "azioni_at":"ISO",
+              "etf":{...}, "etf_at":"ISO", "fondi":{...}, "fondi_at":"ISO"}
+
+DATABASE lookup (get_database_lookup):
+  Usa yfinance fast_info (price, previous_close) per calcolo change_pct
+  Fallback su info.get('regularMarketChangePercent') se fast_info non ha previous_close
+  ThreadPoolExecutor: 10 workers, timeout 40s, max 30 ticker per chiamata
+
+Social Instagram: richiede image_url pubblico accessibile da internet
+  → Se image_url è null nel draft, Instagram viene skippato con log
+
+Social LinkedIn token: scade dopo 60 giorni
+  → Rinnovare via /api/linkedin/connect ogni ~55 giorni
+
+Social Meta page token: permanente (non scade se account attivo)
+
+
+================================================================================
+SEZIONE 14: BRAND & GDPR
+================================================================================
+
+Blu istituzionale: #2C5282 | Oro accento: #F6AD55 | Sfondo: #0F172A
+Logo FVC: fuerte_venture_logo_0526.png (base64) — in: nav, footer, login, email credenziali
+Email ordini: NO logo FVC — solo "Robot Trader 2026" nel footer
+Email social approvazione: tono admin, link tre azioni (Approva/Modifica/Rifiuta)
+
+GDPR implementato in: landing form (5 lingue) | thank-you card |
+  email credenziali | area riservata | client login
+Dati salvati: gdpr_consent:true + gdpr_consent_date
+
+Btn-yf (link Yahoo Finance): stile #F6AD55 (oro), bordo trasparente, hover bianco
+  Usato in: tab DATABASE ticker | bottonini Web nelle tabelle
+  Classe CSS: .btn-yf
+
+
+================================================================================
+SEZIONE 15: TODO PRE-LANCIO
+================================================================================
+
+CRITICO (blocca il lancio):
+  [ ] fuertescreener.com da pubblicare online
+      → set CLIENT_LOGIN_URL=https://fuertescreener.com/area-clienti
+      → set social.brevo.base_url=https://fuertescreener.com in config.json
+      → verifica hello@fuertescreener.com
+      → grep link statici in dashboard.py
+  [ ] Pagina /privacy mancante (link GDPR punta a /privacy)
+  [ ] Password admin "123" → cambiare ADMIN_PASSWORD in dashboard.py
+  [ ] Stripe → chiavi vuote → bottoni acquisto non funzionano
+  [ ] HTTPS → necessario per login clienti su dominio pubblico
+
+IMPORTANTE (migliora qualità):
+  [ ] Sessioni admin non scadono automaticamente
+  [ ] Score ETF negativo per TER alto (cosmetic — ranking corretto)
+  [ ] Deduplicazione ETF stesso ISIN su più exchange
+  [ ] Universo ETF EU ACC troppo piccolo (12-13 selezionati)
+  [ ] Reset password clienti non implementato
+  [ ] Fattura PDF da integrare con Stripe
+  [ ] CIF B23881691 da verificare Registro Mercantil spagnolo
+
+SOCIAL AUTOMATION — DA CONFIGURARE (non blocca lancio):
+  [ ] Creare account Brevo → configurare social.brevo in config.json
+  [ ] Creare LinkedIn Company Page FVC → Developer App → configurare social.linkedin
+  [ ] Creare Facebook Page FVC + Instagram Business → Meta App → configurare social.meta
+  [ ] Aggiungere social_automation.run() a scheduler_daemon.py alle 08:00
+  [ ] Aggiornare social.brevo.base_url da localhost a fuertescreener.com prima del go-live
+  [ ] LinkedIn token scade ogni 60 giorni → calendario reminder rinnovo
+
+FUTURO (post-lancio):
+  [ ] Scheduling separato: Azioni giornaliero, ETF/Fondi giorno dopo
+  [ ] Gestione abbonamenti automatica (rinnovo, downgrade)
+  [ ] IBKR API diretta (piano VALUE)
+  [ ] Analytics social settimanali (metriche LinkedIn + Meta → email report)
+  [ ] Generazione immagine post con DALL-E 3 (sblocca Instagram)
+  [ ] Integrazione CRM Console CRM & Marketing (progetto separato)
+  [ ] Variazione giornaliera visibile nel pre-fill Order Builder (change_pct già presente)
+
+================================================================================

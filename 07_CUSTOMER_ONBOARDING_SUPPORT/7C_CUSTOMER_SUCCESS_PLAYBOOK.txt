@@ -1,0 +1,436 @@
+
+# CUSTOMER SUCCESS PLAYBOOK — ROBOT TRADER 2026
+
+## 🎯 OVERVIEW
+
+Strategie, processi e automazioni per massimizzare la retention e l'expansion revenue.
+Target: 95%+ NRR (Net Revenue Retention), <5% churn, 30% ARPU lift.
+
+---
+
+## 📊 CUSTOMER SUCCESS METRICS
+
+### Primary Metrics
+
+```
+RETENTION (MoM)
+├─ Monthly Churn Rate: Target < 5% (industry avg 8%)
+├─ 30-day Retention: Target > 95%
+├─ 90-day Retention: Target > 90%
+└─ 12-month Retention: Target > 80%
+
+EXPANSION
+├─ BASIC → PRO Upgrade Rate: Target 20% within 90 days
+├─ ENTERPRISE Conversion: Target 3-5% of PRO users
+├─ ARPU Growth: Target +15% YoY per customer
+└─ NRR (Net Revenue Retention): Target > 100%
+
+SATISFACTION
+├─ NPS (Net Promoter Score): Target > 50
+├─ CSAT (Customer Satisfaction): Target > 8.5/10
+├─ Support Response Time: < 4 hours average
+└─ First Contact Resolution: > 60%
+```
+
+---
+
+## 🎬 CS WORKFLOWS
+
+### WORKFLOW 1: ONBOARDING → ACTIVATION (Days 0-7)
+
+**Goal:** Get customers using the product in their first week.
+
+**Checklist:**
+```
+Day 0: ✅ Account created
+       ✅ Welcome email sent
+       ✅ Dashboard access granted
+
+Day 1: ✅ First report delivered
+       ✅ Email notification sent
+       ✅ Dashboard email sent
+
+Day 2: ✅ Education email sent
+       ✅ Video watched (target: 70%+)
+       ✅ First login tracked
+
+Day 3: ✅ Follow-up email sent
+       ✅ Onboarding checklist progress tracked
+       ✅ Support ticket response < 4 hours if needed
+
+Day 7: ✅ Activation complete (downloaded report, logged in 3+ times)
+       ✅ "You're all set" email sent
+       ✅ Success badge unlocked
+```
+
+**Activation Definition:**
+```
+✅ Email verified
+✅ Downloaded 3+ reports
+✅ Logged in 5+ times
+✅ Viewed 5+ pages in dashboard
+✅ Added 1+ stock to watchlist
+
+→ If NOT activated by Day 7: Trigger re-engagement campaign
+```
+
+---
+
+### WORKFLOW 2: ENGAGEMENT TRACKING (Days 8-30)
+
+**Goal:** Identify at-risk customers early, maximize feature adoption.
+
+**Weekly Check-in:**
+```
+Every Tuesday at 09:00 UTC+2:
+
+For each customer segment:
+1. BASIC users
+   ├─ Check: Opened last 3 reports?
+   ├─ Check: Logged in this week?
+   ├─ Check: Used any filters?
+   └─ Action: If NO to all → Send engagement email
+
+2. PRO users
+   ├─ Check: Used custom filters?
+   ├─ Check: Accessed API?
+   ├─ Check: Used backtesting?
+   └─ Action: If NO → Send "PRO features" email
+
+3. ENTERPRISE users
+   ├─ Check: Monthly usage metrics
+   ├─ Check: Support ticket response satisfaction
+   ├─ Check: Executive sponsor engagement
+   └─ Action: Schedule quarterly business review
+```
+
+**Engagement Score (0-100):**
+```
++10 points: User logged in
++15 points: Downloaded report
++10 points: Used filters
++20 points: Used PRO feature (custom filter, API, backtesting)
++5 points: Viewed knowledge base
++10 points: Attended webinar/training
+
+Scoring:
+70+: ✅ Healthy — No action
+50-69: ⚠️ At-risk — Send engagement email
+<50: 🚨 Critical — Contact user directly
+```
+
+---
+
+### WORKFLOW 3: CHURN PREDICTION & PREVENTION (Days 31+)
+
+**Early Warning Signs:**
+```
+🚨 CRITICAL CHURN SIGNALS:
+├─ No login in last 14 days
+├─ No report download in 21 days
+├─ Support ticket with negative sentiment (bug/issue)
+├─ User asking about refund/cancellation
+├─ BASIC user hasn't opened dashboard in 30 days
+└─ PRO user hasn't used any PRO feature in 45 days
+
+⚠️ MEDIUM CHURN SIGNALS:
+├─ Engagement score dropped >20 points
+├─ Lower login frequency (used to daily, now weekly)
+├─ Zero interaction with support/community
+└─ Feature request without action (frustrated user)
+```
+
+**Churn Prevention Campaigns:**
+
+**Campaign 1: "We Miss You" (14 days no login)**
+```
+Email subject: "🎯 The Best Robot Trader Report This Month"
+
+Content:
+- Highlight: Top opportunity from this month's screening
+- Stats: "We found 150+ opportunities for you"
+- Social proof: "Here's what other users did with reports like this"
+- Call-to-action: "View all reports in 30 seconds"
+
+Follow-up (if no response): Calendar invite for "15-min strategy call"
+```
+
+**Campaign 2: "Unlock PRO" (BASIC user, Day 45)**
+```
+Email subject: "✨ See What PRO Users Are Getting (And Why They Love It)"
+
+Content:
+- Case study: BASIC user upgraded to PRO, found 3 stocks
+- Feature showcase: Custom filters, API, backtesting
+- Offer: "First month 50% off (ends in 3 days)"
+- FAQ: "Why upgrade?"
+
+Result: 20%+ of BASIC users typically upgrade
+```
+
+**Campaign 3: "Let Me Help" (Negative support ticket)**
+```
+Trigger: Customer reports a bug or expresses frustration
+
+Action:
+- Founder (Luciano) personally responds within 1 hour
+- Offer: "Let me schedule a call to fix this together"
+- Resolution: 90%+ satisfaction rate when founder engages
+```
+
+**Campaign 4: "Don't Go" (Refund request)**
+```
+Trigger: Customer initiates refund request
+
+Response (within 1 hour):
+- Acknowledge their concern
+- Ask: "What would make you stay?"
+- Offer: Options to fix issue (refund, free month, upgrade to PRO)
+- Escalate to founder if needed
+
+Retention rate: 40%+ with proactive outreach
+```
+
+---
+
+## 🎁 EXPANSION PLAYBOOK
+
+### Goal: Upgrade BASIC → PRO (20% conversion by Day 90)
+
+**Timeline:**
+```
+Day 1-30: Activation phase (focus: product value)
+Day 31-45: Feature discovery phase (highlight PRO features)
+Day 46-60: Upgrade nudge phase (show ROI of PRO)
+Day 61-90: Final offer phase (exclusive deal)
+```
+
+**Upgrade Triggers:**
+
+```
+AUTOMATIC: Send upgrade email when:
+├─ User tries to create custom filter (BASIC can't)
+├─ User tries to access API docs (BASIC can't)
+├─ User tries backtesting (BASIC can't)
+├─ BASIC user has 15+ report downloads (power user signal)
+├─ BASIC user adds 10+ stocks to watchlist (power user signal)
+└─ User has received 30+ reports (proven activation)
+
+MANUAL: Sales team reaches out when:
+├─ User asks "Can I do X?" (X = PRO feature)
+├─ User has high engagement score + BASIC plan
+├─ ENTERPRISE prospect (manual outreach, custom pricing)
+```
+
+**Upgrade Email Example:**
+
+```
+Subject: "Unlock PRO: Custom Filters + API Access"
+
+Hi {{NAME}},
+
+You've been using Robot Trader for {{DAYS}} days and downloaded {{COUNT}} reports.
+That tells me you're serious about value investing.
+
+🔓 Ready to unlock the next level?
+
+PRO gives you:
+✅ Custom filters (modify thresholds to your strategy)
+✅ API access (integrate with your trading platform)
+✅ Backtesting (test filters on historical data)
+✅ Slack/Telegram alerts
+✅ Priority support
+
+💰 Special offer for loyal BASIC users:
+First 3 months just €50/month (normally €99)
+Expires in {{DAYS}} days.
+
+[UPGRADE NOW] button
+
+Or schedule a 15-min call with me to discuss:
+https://calendly.com/luciano-robot-trader
+
+Luciano
+Founder, Robot Trader
+```
+
+---
+
+## 📞 QUARTERLY BUSINESS REVIEWS (QBRs)
+
+### For ENTERPRISE Customers
+
+**Schedule:** Quarterly (30 min call)
+
+**Attendees:**
+- Customer: VP/CFO or designated sponsor
+- Us: Founder (Luciano) + Customer Success
+
+**Agenda:**
+```
+1. REVIEW: Usage metrics (last 90 days)
+   ├─ Reports analyzed
+   ├─ Top opportunities found
+   ├─ API integrations (if any)
+   └─ ROI impact (if quantifiable)
+
+2. ROADMAP: What's coming (next 90 days)
+   ├─ New filters
+   ├─ New markets
+   ├─ New integrations
+   └─ Custom feature requests
+
+3. OPTIMIZE: How we can help more
+   ├─ Training for team
+   ├─ Dedicated support tier
+   ├─ Custom screening logic
+   └─ Expansion opportunities
+
+4. EXPAND: Upsell next tier
+   ├─ Add more seats/users
+   ├─ Add custom features
+   ├─ Multi-product bundle (AZIONI + FONDI + ETF)
+   └─ Custom SLA/pricing
+
+5. NEXT STEPS
+   ├─ 2-3 action items for us
+   ├─ Feedback loop (how can we improve?)
+   └─ Schedule next QBR
+```
+
+---
+
+## 🌐 COMMUNITY & NETWORK EFFECTS
+
+### Discord Community
+
+```
+Setup: Private Discord server (invite-only)
+
+Channels:
+├─ #announcements — New features, updates
+├─ #general — Off-topic discussion
+├─ #trading-ideas — Users share opportunities
+├─ #api-dev — For developers using API
+├─ #support — Help + Q&A
+├─ #wins — User success stories
+├─ #feedback — Feature requests + voting
+└─ #events — Webinars, AMAs, etc
+
+Community Manager responsibilities:
+├─ Daily: Respond to questions, moderate
+├─ Weekly: Highlight best trading ideas
+├─ Bi-weekly: Host "Ask Me Anything" with founder
+├─ Monthly: Share community metrics
+
+Network effects:
+- Users sharing finds → Community becomes sticky
+- Competition for "best idea" → Higher engagement
+- Peer support → Reduce support ticket volume
+- User referrals → Lower CAC (cost per acquisition)
+```
+
+---
+
+## 📈 UPSELL & CROSS-SELL STRATEGY
+
+### Product Bundle Strategy
+
+```
+TIER 1: Single product
+├─ AZIONI only (€49-99/month)
+└─ FONDI only (€39-89/month) [launching June 15]
+
+TIER 2: Dual product bundle
+├─ AZIONI + FONDI (€79-159/month)
+└─ Discount: 15% vs. buying separately
+
+TIER 3: Triple product bundle
+├─ AZIONI + FONDI + ETF (€99-199/month)
+├─ Discount: 25% vs. buying separately
+└─ Enterprise: Custom pricing (€500+/month)
+```
+
+**Upsell Timing:**
+```
+Day 30: Single product active → Suggest bundle
+Day 60: Using one product heavily → Suggest others
+Day 90: Power user → Suggest ENTERPRISE tier
+```
+
+---
+
+## 🎯 SUCCESS GOALS (By August 31)
+
+```
+RETENTION
+├─ Monthly Churn: < 4% (down from industry avg 8%)
+├─ 30-day retention: 96%+
+└─ NRR: > 105%
+
+EXPANSION
+├─ BASIC → PRO: 25%+ upgrade rate
+├─ ENTERPRISE: 3-5% of customer base
+├─ Bundle revenue: 20%+ of new sales
+└─ ARPU growth: +20% per customer
+
+SATISFACTION
+├─ NPS: > 55
+├─ CSAT: > 8.7/10
+├─ Support response: < 2 hours average
+└─ Referrals: 10%+ of new customers
+
+TEAM
+├─ Support scalability: Handle 10x volume
+├─ CS team: 1 full-time (by end of May)
+├─ Founder time: <5% on support (help only critical)
+└─ Automation: 80%+ of responses automated
+```
+
+---
+
+## 📅 CS TEAM ROLES
+
+**For May 21 Launch:**
+
+1. **Founder (Luciano):** 5-10% time (critical issues only, sales)
+2. **Support Person:** Full-time (email + Discord + Calendly)
+3. **Automation:** N8N workflows (email sequences, escalations)
+
+**For August:**
+
+- Add: Customer Success Manager (FT)
+- Add: Support Assistant (PT)
+- Scaling: 20% team growth = 100% customer growth capacity
+
+---
+
+## 🚀 CS TECH STACK
+
+```
+Email: Mailchimp (sequences, automation)
+Support: Zendesk or Freshdesk (ticketing, SLA)
+Community: Discord (official, moderated)
+Feedback: Feature Upvote or Canny (roadmap voting)
+Analytics: Segment or Amplitude (user behavior)
+Automation: N8N (workflows, escalations)
+CRM: HubSpot Free (customer timeline, touch points)
+Calendar: Calendly (booking calls)
+```
+
+---
+
+## ✅ CS PLAYBOOK CHECKLIST (Pre-Launch)
+
+- [ ] Onboarding email sequence created + tested
+- [ ] Welcome video + guides published (YouTube)
+- [ ] Support ticketing system configured
+- [ ] Response templates created
+- [ ] Escalation matrix defined
+- [ ] Churn prevention campaigns drafted
+- [ ] Upgrade offers prepared
+- [ ] Discord server setup + moderated
+- [ ] NPS survey configured (post-onboarding)
+- [ ] Customer success metrics dashboard ready
+- [ ] QBR template + scheduling process ready
+- [ ] Team training on playbook completed

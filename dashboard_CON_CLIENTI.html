@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader 2026 — Console Enterprise</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #0a0e27;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: #1a1f3a;
+            border-right: 1px solid #FF9500;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #FF9500 0%, #E58A00 100%);
+            color: white;
+        }
+        .sidebar-header h1 { font-size: 18px; margin-bottom: 5px; }
+        .sidebar-header p { font-size: 11px; opacity: 0.9; }
+        .menu { padding: 10px 0; }
+        .menu-section { 
+            padding: 8px 20px;
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+        }
+        .menu-item {
+            padding: 12px 20px 12px 30px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .menu-item:hover { background: #252a45; border-left-color: #FF9500; }
+        .menu-item.active { background: #252a45; border-left-color: #FF9500; color: #FF9500; }
+        .main { flex: 1; overflow-y: auto; padding: 20px; }
+        .header {
+            background: #1a1f3a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #FF9500;
+        }
+        .header h2 { color: #FF9500; font-size: 20px; margin-bottom: 5px; }
+        .header .breadcrumb { font-size: 12px; color: #888; }
+        .panel {
+            background: #1a1f3a;
+            border: 1px solid #2a3050;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .panel-header {
+            background: #252a45;
+            padding: 12px 20px;
+            border-bottom: 1px solid #FF9500;
+            color: #FF9500;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .panel-body { padding: 20px; line-height: 1.8; }
+        .panel-body p { margin-bottom: 10px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .filter-item {
+            background: #252a45;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-left: 3px solid #00ff88;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        th {
+            background: #252a45;
+            padding: 10px;
+            text-align: left;
+            color: #FF9500;
+            font-weight: 600;
+            border-bottom: 1px solid #FF9500;
+        }
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #2a3050;
+        }
+        tr:hover { background: #252a45; }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .badge-basic { background: #4499ff44; color: #4499ff; }
+        .badge-pro { background: #FF950044; color: #FF9500; }
+        .badge-value { background: #9b59b644; color: #9b59b6; }
+        .badge-none { background: #33333344; color: #888; }
+        .badge-active { background: #00ff8844; color: #00ff88; }
+        .loading { text-align: center; padding: 40px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🤖 ROBOT TRADER 2026</h1>
+                <p>Console Enterprise v3.2</p>
+            </div>
+            <div class="menu">
+                <div class="menu-section">Overview</div>
+                <div class="menu-item active" onclick="showSection('mercati')">
+                    <span>🌍</span> Mercati
+                </div>
+                
+                <div class="menu-section">Parametri</div>
+                <div class="menu-item" onclick="showSection('param-azioni-basic')">
+                    <span>📈</span> Azioni Basic
+                </div>
+                <div class="menu-item" onclick="showSection('param-etf-basic')">
+                    <span>💼</span> ETF Basic
+                </div>
+                <div class="menu-item" onclick="showSection('param-fondi-basic')">
+                    <span>🏦</span> Fondi Basic
+                </div>
+
+                <div class="menu-section">Database</div>
+                <div class="menu-item" onclick="showSection('clienti')">
+                    <span>👥</span> Clienti
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <!-- MERCATI -->
+            <div id="mercati" class="section active">
+                <div class="header">
+                    <h2>Mercati Analizzati</h2>
+                    <div class="breadcrumb">Home > Mercati</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">🌍 Copertura Geografica</div>
+                    <div class="panel-body">
+                        <p><strong>🇺🇸 USA:</strong> S&P 500 (405 ticker) + Russell 2000 (75 ticker)</p>
+                        <p><strong>🇬🇧 UK:</strong> FTSE 100 (80 ticker)</p>
+                        <p><strong>🇩🇪 Germania:</strong> DAX 40 (36 ticker)</p>
+                        <p><strong>🇫🇷 Francia:</strong> CAC 40 (37 ticker)</p>
+                        <p><strong>🇮🇹 Italia:</strong> FTSE MIB (33 ticker)</p>
+                        <p><strong>🇪🇸 Spagna:</strong> IBEX 35 (33 ticker)</p>
+                        <p><strong>🇨🇭 Svizzera:</strong> SMI (18 ticker)</p>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>TOTALE AZIONI:</strong> 706 ticker</p>
+                        <p><strong>ETF:</strong> 22 ticker (mercati europei)</p>
+                        <p><strong>FONDI:</strong> 8 ticker (mercati europei)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMETRI AZIONI BASIC -->
+            <div id="param-azioni-basic" class="section">
+                <div class="header">
+                    <h2>Parametri Azioni Basic</h2>
+                    <div class="breadcrumb">Home > Parametri > Azioni Basic</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">⚙️ Filtri VALUE INVESTING</div>
+                    <div class="panel-body">
+                        <p><strong>Universo:</strong> 706 azioni (8 mercati)</p>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>FILTRI APPLICATI:</strong></p>
+                        <div class="filter-item">✓ EV/FCF < 12</div>
+                        <div class="filter-item">✓ P/B < 1.2</div>
+                        <div class="filter-item">✓ ROE > 0%</div>
+                        <div class="filter-item">✓ Net Debt/EBITDA < 2.5</div>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>Fonte dati:</strong> yfinance</p>
+                        <p><strong>Timeout:</strong> 10 secondi per ticker</p>
+                        <p><strong>Delay:</strong> 0.1s tra chiamate</p>
+                        <p><strong>Output:</strong> Excel con metriche VALUE</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMETRI ETF BASIC -->
+            <div id="param-etf-basic" class="section">
+                <div class="header">
+                    <h2>Parametri ETF Basic</h2>
+                    <div class="breadcrumb">Home > Parametri > ETF Basic</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">⚙️ Filtri QUANTITATIVI</div>
+                    <div class="panel-body">
+                        <p><strong>Universo:</strong> 22 ETF (mercati europei)</p>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>FILTRI APPLICATI:</strong></p>
+                        <div class="filter-item">✓ AUM > 100M EUR</div>
+                        <div class="filter-item">✓ PERF 1Y > 0%</div>
+                        <div class="filter-item">✓ SHARPE RATIO > 0.3</div>
+                        <div class="filter-item">✓ VOLATILITÀ < 25%</div>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>Nota:</strong> TER non disponibile su yfinance per ETF europei</p>
+                        <p><strong>Calcolo Sharpe:</strong> (Rend - 2%) / Vol annualizzata</p>
+                        <p><strong>Calcolo Volatilità:</strong> Std dev rendimenti × √252</p>
+                        <p><strong>Output:</strong> Excel con metriche quantitative</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PARAMETRI FONDI BASIC -->
+            <div id="param-fondi-basic" class="section">
+                <div class="header">
+                    <h2>Parametri Fondi Basic</h2>
+                    <div class="breadcrumb">Home > Parametri > Fondi Basic</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">⚙️ Filtri QUANTITATIVI</div>
+                    <div class="panel-body">
+                        <p><strong>Universo:</strong> 8 Fondi (mercati europei)</p>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>FILTRI APPLICATI:</strong></p>
+                        <div class="filter-item">✓ AUM > 500M EUR</div>
+                        <div class="filter-item">✓ PERF 1Y > -10%</div>
+                        <div class="filter-item">✓ SHARPE RATIO > 0.1</div>
+                        <div class="filter-item">✓ VOLATILITÀ < 30%</div>
+                        <p><strong>━━━━━━━━━━━━━━━━━━━━━━</strong></p>
+                        <p><strong>Nota:</strong> TER non disponibile su yfinance per fondi europei</p>
+                        <p><strong>Calcolo Sharpe:</strong> (Rend - 2%) / Vol annualizzata</p>
+                        <p><strong>Calcolo Volatilità:</strong> Std dev rendimenti × √252</p>
+                        <p><strong>Output:</strong> Excel con metriche quantitative</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLIENTI -->
+            <div id="clienti" class="section">
+                <div class="header">
+                    <h2>Database Clienti</h2>
+                    <div class="breadcrumb">Home > Database > Clienti</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">👥 Clienti Registrati (<span id="totale-clienti">0</span>)</div>
+                    <div class="panel-body" id="clienti-table">
+                        <div class="loading">Caricamento clienti...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.closest('.menu-item').classList.add('active');
+        }
+
+        async function loadClienti() {
+            try {
+                const response = await fetch('http://localhost:5000/api/clienti');
+                if (!response.ok) throw new Error('Backend non raggiungibile');
+                
+                const data = await response.json();
+                
+                // Aggiorna contatore
+                document.getElementById('totale-clienti').textContent = data.totale;
+                
+                // Genera tabella
+                let html = '<table><thead><tr>';
+                html += '<th>Nome</th><th>Email</th><th>Azioni</th><th>ETF</th><th>Fondi</th><th>Screener</th><th>Stato</th><th>Data</th>';
+                html += '</tr></thead><tbody>';
+                
+                // Tester
+                data.tester.forEach(c => {
+                    html += `<tr>
+                        <td>${c.nome}</td>
+                        <td>${c.email}</td>
+                        <td><span class="badge badge-${c.piano_azioni.toLowerCase()}">${c.piano_azioni}</span></td>
+                        <td><span class="badge badge-${c.piano_etf.toLowerCase()}">${c.piano_etf}</span></td>
+                        <td><span class="badge badge-${c.piano_fondi.toLowerCase()}">${c.piano_fondi}</span></td>
+                        <td>${c.screener_attivi ? c.screener_attivi.join(', ') : '-'}</td>
+                        <td><span class="badge badge-active">TESTER</span></td>
+                        <td>${c.data_registrazione ? new Date(c.data_registrazione).toLocaleDateString('it-IT') : '-'}</td>
+                    </tr>`;
+                });
+                
+                // Clienti
+                data.clienti.forEach(c => {
+                    html += `<tr>
+                        <td>${c.nome}</td>
+                        <td>${c.email}</td>
+                        <td><span class="badge badge-${c.piano_azioni.toLowerCase()}">${c.piano_azioni}</span></td>
+                        <td><span class="badge badge-${c.piano_etf.toLowerCase()}">${c.piano_etf}</span></td>
+                        <td><span class="badge badge-${c.piano_fondi.toLowerCase()}">${c.piano_fondi}</span></td>
+                        <td>${c.screener_attivi ? c.screener_attivi.join(', ') : '-'}</td>
+                        <td><span class="badge badge-active">ATTIVO</span></td>
+                        <td>${c.data_registrazione ? new Date(c.data_registrazione).toLocaleDateString('it-IT') : '-'}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                
+                if (data.totale === 0) {
+                    html = '<p style="text-align:center;color:#888;padding:40px;">Nessun cliente registrato</p>';
+                }
+                
+                document.getElementById('clienti-table').innerHTML = html;
+                
+            } catch (error) {
+                console.error('Errore caricamento clienti:', error);
+                document.getElementById('clienti-table').innerHTML = 
+                    '<p style="text-align:center;color:#ff5555;padding:40px;">⚠️ Backend non raggiungibile<br><small>Avvia: python clienti_backend.py</small></p>';
+            }
+        }
+
+        // Carica clienti all'avvio
+        loadClienti();
+        
+        // Ricarica ogni 30 secondi
+        setInterval(loadClienti, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-04-29T09:36:07.368444",
+  "admin_recipients": [
+    {
+      "id": "admin_001",
+      "customer_id": "SYSTEM_ADMIN",
+      "email": "luciano.manicardi@lineexpress.it",
+      "name": "Luciano Manicardi",
+      "role": "Founder",
+      "status": "active",
+      "report_format": "excel",
+      "frequency": "daily",
+      "markets": [
+        "AZIONI",
+        "FONDI",
+        "ETF"
+      ],
+      "created_date": "2026-04-29",
+      "notes": "Primary recipient - All reports"
+    },
+    {
+      "id": "admin_002",
+      "customer_id": "SYSTEM_ADMIN",
+      "email": "newfrontiers65@gmail.com",
+      "name": "Laura Manicardi",
+      "role": "Operations",
+      "status": "active",
+      "report_format": "excel",
+      "frequency": "daily",
+      "markets": [
+        "AZIONI"
+      ],
+      "created_date": "2026-04-29",
+      "notes": "Secondary recipient - AZIONI only"
+    },
+    {
+      "id": "admin_003",
+      "customer_id": "SYSTEM_ADMIN",
+      "email": "laura.manicardi65@gmail.com",
+      "name": "Laura Manicardi (Backup)",
+      "role": "Operations",
+      "status": "active",
+      "report_format": "excel",
+      "frequency": "daily",
+      "markets": [
+        "AZIONI",
+        "FONDI"
+      ],
+      "created_date": "2026-04-29",
+      "notes": "Backup recipient"
+    }
+  ],
+  "customer_recipients": [
+    {
+      "id": "cust_001",
+      "customer_id": "USER_john_doe@example.com",
+      "customer_name": "John Doe",
+      "plan": "PRO",
+      "email": "john.doe@example.com",
+      "secondary_emails": [
+        "john.work@company.com"
+      ],
+      "status": "active",
+      "report_format": "excel",
+      "frequency": "daily",
+      "markets": [
+        "AZIONI"
+      ],
+      "timezone": "UTC+2",
+      "created_date": "2026-05-21",
+      "notes": "Customer - PRO plan"
+    }
+  ],
+  "metadata": {
+    "total_admin_recipients": 3,
+    "total_customer_recipients": 0,
+    "last_report_run": null,
+    "next_scheduled_run": "2026-05-04 08:05:00 UTC+2"
+  }
+}

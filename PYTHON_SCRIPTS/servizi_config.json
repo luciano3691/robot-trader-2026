@@ -1,0 +1,270 @@
+{
+  "azioni": {
+    "basic": {
+      "prezzo": 29,
+      "status": "attivo",
+      "caratteristiche": [
+        "EV/FCF ≤ 18x",
+        "P/B ≤ 3x",
+        "ROE ≥ 0%",
+        "Net Debt/EBITDA ≤ 4x",
+        "Market Cap ≥ 100M USD",
+        "7 mercati europei + USA"
+      ],
+      "target": "L'Investitore in Dividendi — Orizzonte: 3–12 mesi\nInvestitore privato, 40–65 anni, che ha accumulato liquidità e vuole farla lavorare su società solide e riconoscibili (Enel, LVMH, Apple, Nestlé). Non legge i bilanci in profondità ma capisce cosa è un dividendo. Può essere un libero professionista, un piccolo imprenditore o un dipendente con risparmio da investire.\nCosa cerca: rendita immediata (dividendo) + qualche plusvalenza a breve. Vuole aprire il report, trovare 20 nomi sicuri, scegliere i migliori 5 e acquistare.\nScore dominato da Dividend Yield (35%) e variazione giornaliera (25%): vince chi rende di più e si muove in senso positivo oggi.",
+      "parametri": {
+        "ev_fcf_max": 18,
+        "price_book_max": 3,
+        "roe_min": 0,
+        "net_debt_ebitda_max": 4
+      }
+    },
+    "pro": {
+      "prezzo": 39,
+      "status": "attivo",
+      "caratteristiche": [
+        "EV/FCF ≤ 15x",
+        "P/B ≤ 2x",
+        "ROE ≥ 1%",
+        "Net Debt/EBITDA ≤ 3x",
+        "3072 ticker globali",
+        "Score e ranking integrati"
+      ],
+      "target": "L'Analista Fondamentale Globale — Orizzonte: 2–5 anni\nInvestitore attivo, 35–55 anni, con esperienza in analisi fondamentale. Sa leggere un conto economico, capisce cosa significa EV/FCF e perché un ROE elevato con poco debito è un segnale forte. Investe anche all'estero. Gestisce un portafoglio personale significativo (€50k–€500k).\nCosa cerca: società sottovalutate a livello globale che il mercato non ha ancora prezzato correttamente. Non gli interessa il dividendo ora — vuole comprare a sconto e aspettare la convergenza al valore intrinseco.\nScore dominato da EV/FCF (35%) e ROE (25%): vince chi genera più cassa rispetto al valore d'impresa e lo reinveste bene.",
+      "parametri": {
+        "ev_fcf_max": 15,
+        "price_book_max": 2,
+        "roe_min": 1,
+        "net_debt_ebitda_max": 3
+      }
+    },
+    "value": {
+      "prezzo": 59,
+      "status": "attivo",
+      "caratteristiche": [
+        "EV/FCF ≤ 12x",
+        "P/B ≤ 1x",
+        "ROE ≥ 2%",
+        "Net Debt/EBITDA ≤ 2x",
+        "17 mercati globali (Australia, Canada inclusi)",
+        "Report completo multi-sheet"
+      ],
+      "target": "Il Deep Value Investor Professionale — Orizzonte: 5–15 anni\nProfessionista finanziario (consulente indipendente, gestore patrimoniale, family office) o investitore istituzionale con approccio disciplinato stile Buffett/Munger. Gestisce patrimoni rilevanti (>€1M) o portafogli di terzi.\nCosa cerca: solo le migliori aziende al mondo a sconto profondo — EV/FCF < 12x, P/B < 1x, ROE ≥ 2%, ND/EBITDA ≤ 2x. Preferisce poche posizioni di grande conviction piuttosto che molte posizioni mediocri.\nScore dominato da EV/FCF (40%) + ROE (25%) + Net Debt/EBITDA (20%): nessun peso su dividendo o variazione giornaliera — irrilevante sul lungo termine.",
+      "parametri": {
+        "ev_fcf_max": 12,
+        "price_book_max": 1,
+        "roe_min": 2,
+        "net_debt_ebitda_max": 2
+      }
+    }
+  },
+  "etf": {
+    "basic": {
+      "prezzo": 29,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 0,50% (universo ampio)",
+        "Sharpe Ratio ≥ 0,3",
+        "Volume ≥ 100.000 unità/giorno",
+        "Performance 1Y ≥ +5%",
+        "Orientato al momentum di breve termine",
+        "678 ETF analizzati"
+      ],
+      "target": "Il Risparmiatore che Vuole Cavalcare il Mercato — Orizzonte: 6–18 mesi\nRisparmiatore, 25–45 anni, che ha scoperto gli ETF come strumento semplice e a basso costo. Ha un piano di accumulo mensile o una somma da investire e vuole sapere quali settori stanno andando adesso. Non ha formazione finanziaria avanzata ma è tech-savvy. Segue i mercati sui social.\nCosa cerca: ETF che stanno performando bene nell'ultimo trimestre — vuole entrare su un trend già in atto. Accetta ETF leggermente più costosi (TER ≤ 0.50%) se stanno andando bene.\nScore dominato da Perf 3M (45%): chi ha performato meglio negli ultimi tre mesi viene in cima. Performance 1Y al 20% conferma che non è un fuoco di paglia.",
+      "parametri": {
+        "ter_max": 0.5,
+        "sharpe_min": 0.3,
+        "volume_min": 100000,
+        "performance_1y_min": 5
+      }
+    },
+    "pro": {
+      "prezzo": 39,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 0,35% (equilibrio costo/qualità)",
+        "Sharpe Ratio ≥ 0,4",
+        "Volume ≥ 100.000 unità/giorno",
+        "Performance 1Y ≥ +7%",
+        "Score bilanciato Sharpe + Performance"
+      ],
+      "target": "Il Portfolio Manager Attivo — Orizzonte: 3–7 anni\nInvestitore sofisticato o gestore che costruisce portafogli ETF diversificati per sé o per clienti. Conosce il Sharpe ratio e lo usa come bussola. Sa che un ETF con Perf 3M +30% ma Sharpe 0.3 è meno interessante di uno con Perf 1Y +20% e Sharpe 1.8. Seleziona 8–15 ETF per costruire un portafoglio bilanciato.\nCosa cerca: ETF con il miglior rapporto rendimento/rischio nel medio periodo. Attenzione ai costi (TER ≤ 0.35%) perché su 3-7 anni la differenza è significativa.\nScore dominato da Sharpe (40%) + Performance 1Y (30%): premia la consistenza risk-adjusted.",
+      "parametri": {
+        "ter_max": 0.35,
+        "sharpe_min": 0.4,
+        "volume_min": 100000,
+        "performance_1y_min": 7
+      }
+    },
+    "value": {
+      "prezzo": 59,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 0,20% (costo minimo — capitale a lungo termine)",
+        "Sharpe Ratio ≥ 0,5",
+        "Volume ≥ 100.000 unità/giorno",
+        "Performance 1Y ≥ +10%",
+        "Solo i migliori per efficienza e rischio/rendimento"
+      ],
+      "target": "Il Wealth Manager Istituzionale — Orizzonte: 10–30 anni\nWealth manager, gestore di fondi pensione, family office o istituzionale che gestisce patrimoni di lungo periodo. Pensa in decenni, non in trimestri. Sa che 0.30% di TER annuo su €10M per 20 anni significa €600.000+ di costi aggiuntivi rispetto a 0.10% TER. Ogni basis point conta.\nCosa cerca: i 5–10 ETF più efficienti del mercato per Sharpe ratio e costo. TER ≤ 0.20%, Sharpe ≥ 0.5. Costruisce allocazioni strategiche che dureranno anni.\nScore dominato da Sharpe (45%) + TER (25%) + Perf 1Y (25%): tripletta perfetta per gestione patrimoniale di lungo termine.",
+      "parametri": {
+        "ter_max": 0.2,
+        "sharpe_min": 0.5,
+        "volume_min": 100000,
+        "performance_1y_min": 10
+      }
+    }
+  },
+  "fondi": {
+    "basic": {
+      "prezzo": 29,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 2,0% (accetta gestione attiva)",
+        "Sharpe Ratio ≥ 0,1",
+        "Volume ≥ 50.000 unità",
+        "Performance 1Y ≥ +5%",
+        "Orientato al rendimento a breve termine",
+        "1087 fondi analizzati"
+      ],
+      "target": "Il Cliente della Banca che Vuole Risultati Rapidi — Orizzonte: 6–24 mesi\nInvestitore retail, 45–70 anni, tipicamente cliente di una banca tradizionale o rete di consulenza (Mediolanum, Fineco, Azimut). Non ha un background tecnico — si fida del nome del gestore e guarda prima di tutto cosa ha fatto il fondo nell'ultimo anno. Tollera costi più alti (TER fino al 2%) se il fondo performa.\nCosa cerca: i fondi che stanno rendendo di più adesso, nell'ultimo trimestre e nell'ultimo anno. Vuole portare a casa risultati prima che il mercato cambi.\nScore bilanciato tra Perf 3M (30%) e Perf 1Y (30%): doppio segnale di performance recente.",
+      "parametri": {
+        "ter_max": 2,
+        "sharpe_min": 0.1,
+        "volume_min": 50000,
+        "performance_1y_min": 5
+      }
+    },
+    "pro": {
+      "prezzo": 39,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 1,5% (equilibrio costo/rendimento)",
+        "Sharpe Ratio ≥ 0,2",
+        "Volume ≥ 50.000 unità",
+        "Performance 1Y ≥ +7%",
+        "Score bilanciato Sharpe + TER + Performance"
+      ],
+      "target": "Il Consulente Finanziario Indipendente — Orizzonte: 3–7 anni\nConsulente finanziario indipendente (CFI), private banker o advisor che seleziona fondi per i portafogli dei propri clienti. Sa spiegare il Sharpe ratio a un cliente, capisce la differenza tra un fondo con alfa reale e uno che performa solo perché il mercato sale. Gestisce portafogli da €500k a €5M.\nCosa cerca: fondi con il miglior rapporto rischio/rendimento e costo contenuto (TER ≤ 1.5%). Non vuole fondi che hanno performato bene per caso — vuole gestori che dimostrano disciplina e consistenza nel tempo.\nScore dominato da Sharpe (40%) + TER (30%): efficienza risk-adjusted + controllo dei costi.",
+      "parametri": {
+        "ter_max": 1.5,
+        "sharpe_min": 0.2,
+        "volume_min": 50000,
+        "performance_1y_min": 7
+      }
+    },
+    "value": {
+      "prezzo": 59,
+      "status": "attivo",
+      "caratteristiche": [
+        "TER ≤ 1,0% (efficienza costi sul lungo periodo)",
+        "Sharpe Ratio ≥ 0,3",
+        "Volume ≥ 50.000 unità",
+        "Performance 1Y ≥ +10%",
+        "Score dominato da Sharpe e TER — qualità sul lungo termine"
+      ],
+      "target": "Il Family Office o l'Istituzionale — Orizzonte: 10–30 anni\nFamily office, fondazione, fondo pensione o gestore patrimoniale istituzionale. Gestisce patrimoni da €5M in su. Sa che su 20 anni, 0.50% di TER in più su €10M vale oltre €1M di costi aggiuntivi. Vuole solo i fondi più efficienti con track record solido.\nCosa cerca: i fondi con il massimo Sharpe e il TER più basso possibile (≤ 1.0%). Perf 1Y ≥ +10% come soglia minima. Non si preoccupa dell'ultimo trimestre — guarda la qualità del processo di investimento nel lungo periodo.\nScore dominato da Sharpe (45%) + TER (35%): su 10-30 anni il costo è il fattore di rischio più certo e controllabile.",
+      "parametri": {
+        "ter_max": 1,
+        "sharpe_min": 0.3,
+        "volume_min": 50000,
+        "performance_1y_min": 10
+      }
+    }
+  },
+  "fondi_eu": {
+    "basic": {
+      "prezzo": 29,
+      "status": "attivo",
+      "caratteristiche": [
+        "Solo fondi domiciliati UE (UCITS)",
+        "TER ≤ 2,0%",
+        "Sharpe Ratio ≥ 0,1",
+        "Performance 1Y ≥ +5%",
+        "Orientato al rendimento a breve termine"
+      ],
+      "target": "Investitore retail europeo che privilegia fondi UCITS regolamentati e fiscalmente ottimizzati per l'Italia/Spagna.",
+      "parametri": {
+        "ter_max": 2,
+        "sharpe_min": 0.1,
+        "volume_min": 50000,
+        "performance_1y_min": 5
+      }
+    },
+    "pro": {
+      "prezzo": 39,
+      "status": "attivo",
+      "caratteristiche": [
+        "Solo fondi domiciliati UE (UCITS)",
+        "TER ≤ 1,5%",
+        "Sharpe Ratio ≥ 0,2",
+        "Performance 1Y ≥ +7%",
+        "Score bilanciato Sharpe + TER + Performance"
+      ],
+      "target": "Consulente finanziario o private banker europeo che seleziona fondi UCITS per portafogli di clienti italiani/spagnoli.",
+      "parametri": {
+        "ter_max": 1.5,
+        "sharpe_min": 0.2,
+        "volume_min": 50000,
+        "performance_1y_min": 7
+      }
+    },
+    "value": {
+      "prezzo": 59,
+      "status": "attivo",
+      "caratteristiche": [
+        "Solo fondi domiciliati UE (UCITS)",
+        "TER ≤ 1,0%",
+        "Sharpe Ratio ≥ 0,3",
+        "Performance 1Y ≥ +10%",
+        "Massima efficienza costo/rischio nel lungo termine"
+      ],
+      "target": "Family office o istituzionale europeo. Selezione rigorosa su fondi UCITS con massimo Sharpe e TER minimo.",
+      "parametri": {
+        "ter_max": 1,
+        "sharpe_min": 0.3,
+        "volume_min": 50000,
+        "performance_1y_min": 10
+      }
+    }
+  },
+  "ordini": {
+    "basic": {
+      "prezzo": 19,
+      "status": "attivo",
+      "caratteristiche": [
+        "Email bancaria professionale MiFID II",
+        "CSV Generico (Fineco, Directa, Trade Republic...)",
+        "Prezzi live auto-fetch da mercato",
+        "Fino a 10 titoli per ordine"
+      ],
+      "target": "Investitore con banca tradizionale o piattaforma senza API"
+    },
+    "pro": {
+      "prezzo": 29,
+      "status": "attivo",
+      "caratteristiche": [
+        "Tutto Basic",
+        "CSV IBKR Basket Trader (import TWS in 3 click)",
+        "Ordini e titoli illimitati",
+        "Riferimento ordine tracciabile"
+      ],
+      "target": "Trader attivo su Interactive Brokers o piattaforma professionale"
+    },
+    "value": {
+      "prezzo": 49,
+      "status": "attivo",
+      "caratteristiche": [
+        "Tutto Pro",
+        "Integrazione IBKR API diretta (coming soon)",
+        "Archivio ordini storico (coming soon)",
+        "Supporto prioritario"
+      ],
+      "target": "Professionista o gestore con workflow di esecuzione automatizzato"
+    }
+  },
+  "_meta": {
+    "last_modified": "2026-07-19T00:00:00.000000",
+    "version": "2.2"
+  }
+}

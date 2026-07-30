@@ -1,0 +1,89 @@
+{
+  "auth": {
+    "username": "admin",
+    "password": "6b57a42eb436b983a109fcdeeaaeb221ae2eb27e2b6fe4e1b293cb14702ad83d",
+    "session_timeout_minutes": 120
+  },
+  "azioni": {
+    "ev_fcf_max": {
+      "value": 12,
+      "min": 5,
+      "max": 30
+    },
+    "price_book_max": {
+      "value": 1.2,
+      "min": 0.5,
+      "max": 3
+    },
+    "roe_min": {
+      "value": 0,
+      "min": -0.5,
+      "max": 0.5
+    },
+    "net_debt_ebitda_max": {
+      "value": 2.5,
+      "min": 0.5,
+      "max": 10
+    }
+  },
+  "etf": {
+    "ter_max": {
+      "value": 0.5,
+      "min": 0.1,
+      "max": 2
+    },
+    "sharpe_min": {
+      "value": 0.5,
+      "min": 0,
+      "max": 3
+    },
+    "volume_min": {
+      "value": 100000,
+      "min": 10000,
+      "max": 10000000
+    },
+    "performance_1y_min": {
+      "value": -0.2,
+      "min": -1,
+      "max": 0.5
+    },
+    "min_age_years": {
+      "value": 3,
+      "min": 0,
+      "max": 20
+    },
+    "only_accumulating": {
+      "value": true
+    },
+    "only_physical": {
+      "value": true
+    }
+  },
+  "fondi": {
+    "ter_max": {
+      "value": 1,
+      "min": 0.2,
+      "max": 3
+    },
+    "sharpe_min": {
+      "value": 0.3,
+      "min": 0,
+      "max": 3
+    },
+    "volume_min": {
+      "value": 50000,
+      "min": 5000,
+      "max": 5000000
+    },
+    "performance_1y_min": {
+      "value": -0.3,
+      "min": -1,
+      "max": 0.5
+    }
+  },
+  "meta": {
+    "last_modified": "2026-06-04T05:52:06.440Z",
+    "modified_by": "admin",
+    "version": "1.0"
+  }
+}

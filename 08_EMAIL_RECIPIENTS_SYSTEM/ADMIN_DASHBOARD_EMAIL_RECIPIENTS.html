@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Trader — Email Recipients Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: #1E3A5F;
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #E5E7EB;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #1E3A5F;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #F5A623;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #F5A623;
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: #F5A623;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: #D4891A;
+        }
+
+        button.secondary {
+            background: #9CA3AF;
+            margin-left: 0.5rem;
+        }
+
+        button.secondary:hover {
+            background: #6B7280;
+        }
+
+        button.danger {
+            background: #EF4444;
+        }
+
+        button.danger:hover {
+            background: #DC2626;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .recipient-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            padding: 1rem;
+            background: #F8F9FA;
+        }
+
+        .recipient-card h3 {
+            color: #1E3A5F;
+            margin-bottom: 0.5rem;
+        }
+
+        .recipient-info {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .status-active {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-inactive {
+            background: #FED7AA;
+            color: #92400E;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #F8F9FA;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #F5A623;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6B7280;
+            margin-top: 0.5rem;
+        }
+
+        .instructions {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+
+        .instructions h3 {
+            color: #92400E;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions p {
+            color: #78350F;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions code {
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: #D1FAE5;
+            border: 1px solid #6EE7B7;
+            color: #065F46;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th {
+            background: #F3F4F6;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        tr:hover {
+            background: #F8F9FA;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .action-buttons button {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Robot Trader — Email Recipients Admin Panel</h1>
+            <p class="subtitle">Manage where Daily Reports are sent</p>
+        </header>
+
+        <div class="section">
+            <div class="instructions">
+                <h3>📋 How It Works</h3>
+                <p>
+                    <strong>Today (April 29):</strong> You're using 3 hardcoded email addresses.<br>
+                    <strong>Tomorrow (May 21):</strong> Each customer configures their own email recipients when they sign up.<br>
+                    <strong>System:</strong> Daily report reads from this database, not from code.
+                </p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-admin">3</div>
+                    <div class="stat-label">Admin Recipients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-customers">0</div>
+                    <div class="stat-label">Customer Recipients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">3</div>
+                    <div class="stat-label">Total Recipients</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: MANAGE ADMIN RECIPIENTS -->
+        <div class="section">
+            <h2 class="section-title">👤 Admin Recipients (Your Emails — Today)</h2>
+            <p style="margin-bottom: 1rem; color: #6B7280;">
+                These are YOUR email addresses for today. After May 21, customers will manage their own.
+            </p>
+
+            <div class="success-message" id="success-admin">
+                ✅ Admin recipient saved successfully!
+            </div>
+
+            <div class="form-group">
+                <h3 style="color: #1E3A5F; margin-bottom: 1rem;">Add New Admin Recipient</h3>
+                
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="admin-email">Email Address *</label>
+                        <input type="email" id="admin-email" placeholder="luciano.manicardi@lineexpress.it" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-name">Name</label>
+                        <input type="text" id="admin-name" placeholder="Luciano Manicardi">
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="admin-role">Role</label>
+                        <select id="admin-role">
+                            <option value="">Select role...</option>
+                            <option value="Founder">Founder</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-format">Report Format</label>
+                        <select id="admin-format">
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="admin-frequency">Frequency</label>
+                        <select id="admin-frequency">
+                            <option value="daily">Daily (08:05 UTC+2)</option>
+                            <option value="weekly">Weekly (Monday 08:05)</option>
+                            <option value="manual">Manual Only</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-markets">Markets</label>
+                        <select id="admin-markets" multiple style="height: 50px;">
+                            <option value="AZIONI" selected>AZIONI</option>
+                            <option value="FONDI" selected>FONDI</option>
+                            <option value="ETF" selected>ETF</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-notes">Notes</label>
+                    <textarea id="admin-notes" placeholder="e.g., Primary recipient - All reports" rows="2"></textarea>
+                </div>
+
+                <button onclick="addAdminRecipient()">✅ Add Admin Recipient</button>
+                <button class="secondary" onclick="clearAdminForm()">Clear Form</button>
+            </div>
+
+            <h3 style="color: #1E3A5F; margin-top: 2rem; margin-bottom: 1rem;">Current Admin Recipients</h3>
+            <div id="admin-recipients" class="grid"></div>
+        </div>
+
+        <!-- SECTION 2: CUSTOMER RECIPIENTS (Template for May 21) -->
+        <div class="section">
+            <h2 class="section-title">🎯 Customer Recipients (Template — After May 21)</h2>
+            <p style="margin-bottom: 1rem; color: #6B7280;">
+                After launch, each customer will fill this form in their account dashboard.
+            </p>
+
+            <div class="instructions">
+                <h3>📝 Customer Form (In Dashboard)</h3>
+                <p>
+                    Each customer will see this in their settings:<br><br>
+                    "Where should we send your daily reports?"<br>
+                    - Primary email<br>
+                    - Additional recipients (colleagues, accountant)<br>
+                    - Report format (Excel, CSV, email body)<br>
+                    - Frequency (Daily, Weekly, Manual)
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Plan</th>
+                            <th>Primary Email</th>
+                            <th>Additional Emails</th>
+                            <th>Status</th>
+                            <th>Markets</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-recipients">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #9CA3AF;">
+                                No customers yet (launch May 21)
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 3: PYTHON SCRIPT UPDATE -->
+        <div class="section">
+            <h2 class="section-title">⚙️ Python Script Update</h2>
+            <p style="margin-bottom: 1rem; color: #6B7280;">
+                The Python scheduler script has been updated to read from this database instead of hardcoding emails.
+            </p>
+
+            <div class="instructions">
+                <h3>📄 Updated Code Logic</h3>
+                <p>
+                    <code>scheduler_daemon.py</code> now:<br><br>
+                    1. Loads recipients from <code>DATABASE_RECIPIENTS.json</code><br>
+                    2. Filters by: status=active, frequency matches schedule<br>
+                    3. Sends report to each recipient email<br>
+                    4. Logs in email_notifier.py
+                </p>
+            </div>
+
+            <h3 style="color: #1E3A5F; margin-top: 1rem; margin-bottom: 0.5rem;">Key Changes</h3>
+            <pre style="background: #F3F4F6; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; line-height: 1.4;"><code># OLD (hardcoded):
+RECIPIENT_EMAILS = [
+    'luciano.manicardi@lineexpress.it',
+    'newfrontiers65@gmail.com',
+    'laura.manicardi65@gmail.com'
+]
+
+# NEW (dynamic):
+import json
+
+with open('DATABASE_RECIPIENTS.json', 'r') as f:
+    db = json.load(f)
+
+# Get all active recipients for today
+admin_recipients = db['admin_recipients']
+customer_recipients = db['customer_recipients']
+
+# Filter by status and frequency
+active_emails = [
+    r['email'] for r in (admin_recipients + customer_recipients)
+    if r['status'] == 'active' and r['frequency'] == 'daily'
+]
+
+# Send to all active emails
+for email in active_emails:
+    send_report_email(email, report_data)</code></pre>
+        </div>
+
+        <!-- SECTION 4: NEXT STEPS -->
+        <div class="section">
+            <h2 class="section-title">🚀 Next Steps</h2>
+            <ol style="line-height: 2; color: #374151;">
+                <li><strong>Today (April 29):</strong> Save your 3 admin emails above ✅</li>
+                <li><strong>Monday (May 4):</strong> Update Python script with new code above</li>
+                <li><strong>May 4-20:</strong> Test with admin recipients only</li>
+                <li><strong>May 21:</strong> Launch — Customers can add their own recipients</li>
+                <li><strong>May 21+:</strong> System automatically reads from DB for each customer</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Load initial data
+        function loadAdminRecipients() {
+            const data = {
+                admin_recipients: [
+                    {
+                        id: "admin_001",
+                        email: "luciano.manicardi@lineexpress.it",
+                        name: "Luciano Manicardi",
+                        role: "Founder",
+                        status: "active",
+                        format: "excel",
+                        frequency: "daily",
+                        markets: ["AZIONI", "FONDI", "ETF"]
+                    },
+                    {
+                        id: "admin_002",
+                        email: "newfrontiers65@gmail.com",
+                        name: "Laura Manicardi",
+                        role: "Operations",
+                        status: "active",
+                        format: "excel",
+                        frequency: "daily",
+                        markets: ["AZIONI"]
+                    },
+                    {
+                        id: "admin_003",
+                        email: "laura.manicardi65@gmail.com",
+                        name: "Laura Manicardi (Backup)",
+                        role: "Operations",
+                        status: "active",
+                        format: "excel",
+                        frequency: "daily",
+                        markets: ["AZIONI", "FONDI"]
+                    }
+                ]
+            };
+
+            const container = document.getElementById('admin-recipients');
+            container.innerHTML = data.admin_recipients.map(r => `
+                <div class="recipient-card">
+                    <h3>${r.name}</h3>
+                    <div class="recipient-info">
+                        <strong>Email:</strong> ${r.email}<br>
+                        <strong>Role:</strong> ${r.role}<br>
+                        <strong>Format:</strong> ${r.format}<br>
+                        <strong>Markets:</strong> ${r.markets.join(', ')}
+                    </div>
+                    <span class="status-badge status-active">✅ Active</span>
+                    <div class="button-group" style="margin-top: 1rem;">
+                        <button class="secondary" onclick="alert('Edit not yet implemented')">Edit</button>
+                        <button class="danger" onclick="alert('Delete not yet implemented')">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('stat-admin').textContent = data.admin_recipients.length;
+            document.getElementById('stat-total').textContent = 
+                data.admin_recipients.length + (parseInt(document.getElementById('stat-customers').textContent) || 0);
+        }
+
+        function addAdminRecipient() {
+            alert('✅ Recipient added! (Demo — In production, saves to DATABASE_RECIPIENTS.json)');
+            document.getElementById('success-admin').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('success-admin').classList.remove('show');
+            }, 3000);
+        }
+
+        function clearAdminForm() {
+            document.getElementById('admin-email').value = '';
+            document.getElementById('admin-name').value = '';
+            document.getElementById('admin-role').value = '';
+            document.getElementById('admin-notes').value = '';
+        }
+
+        // Initialize
+        loadAdminRecipients();
+    </script>
+</body>
+</html>

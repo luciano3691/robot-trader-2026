@@ -1,0 +1,212 @@
+
+# DYNAMIC EMAIL RECIPIENTS SYSTEM — Implementation Guide
+
+## OVERVIEW
+
+OLD SYSTEM (Today, April 29):
+- hardcoded emails -> Python script -> Send report
+
+NEW SYSTEM (Starting May 4):
+- DATABASE_RECIPIENTS.json -> Python script -> Send report
+                            (updated daily by admin)
+
+---
+
+## FILE STRUCTURE
+
+Robot Trader 2026/
+├── DATABASE_RECIPIENTS.json        (Main database - JSON)
+├── scheduler_daemon_UPDATED.py     (Updated scheduler - reads from DB)
+├── manage_recipients_CLI.py        (Admin CLI tool)
+├── ADMIN_DASHBOARD_EMAIL_RECIPIENTS.html  (Web UI - optional)
+└── email_notifier.py              (Unchanged - same function)
+
+---
+
+## DATABASE SCHEMA
+
+Main fields in DATABASE_RECIPIENTS.json:
+
+ADMIN RECIPIENTS:
+- id: unique identifier
+- email: email address
+- status: active/inactive
+- frequency: daily/weekly/manual
+- markets: [AZIONI, FONDI, ETF]
+- created_date: YYYY-MM-DD
+- notes: description
+
+CUSTOMER RECIPIENTS:
+- Same as above, plus customer_id and customer_name
+
+METADATA:
+- last_report_run: timestamp of last screening
+- total_emails_sent: count of emails sent
+
+---
+
+## HOW IT WORKS
+
+Step 1: DATABASE IS LOADED (08:05 UTC+2)
+- Load DATABASE_RECIPIENTS.json
+- Parse JSON
+
+Step 2: ACTIVE RECIPIENTS ARE FILTERED
+- Get all active recipients where:
+  * status = 'active'
+  * frequency = 'daily'
+  * 'AZIONI' in markets
+
+Step 3: REPORT IS SENT
+- For each filtered recipient:
+  * Send report to email
+  * Log transmission
+
+Step 4: DATABASE IS LOGGED
+- Update metadata (last_report_run, total_emails_sent)
+- Save back to file
+
+---
+
+## MANAGEMENT OPTIONS
+
+Option 1: Manual Edit (Simple)
+- Open DATABASE_RECIPIENTS.json with text editor
+- Modify entries directly
+- Save and restart scheduler
+- Pros: Simple, no dependencies
+- Cons: Manual, error-prone
+
+Option 2: CLI Tool (Recommended)
+- python3 manage_recipients_CLI.py list
+- python3 manage_recipients_CLI.py add-admin --email xxx --name xxx
+- python3 manage_recipients_CLI.py remove --id admin_001
+- python3 manage_recipients_CLI.py update --id admin_001 --status inactive
+- Pros: Easy, validated, logged
+- Cons: Command line only
+
+Option 3: Admin Dashboard (Future)
+- Open ADMIN_DASHBOARD_EMAIL_RECIPIENTS.html in browser
+- Provides visual form for add/remove/edit
+- Pros: User-friendly, visual
+- Cons: Needs backend integration
+
+---
+
+## IMPLEMENTATION TIMELINE
+
+TODAY (April 29):
+1. Create DATABASE_RECIPIENTS.json with your 3 emails
+2. Save in: C:/Users/lucia/Desktop/Robot Trader 2026/
+3. Test manual edit
+
+Monday (May 4):
+1. Replace scheduler_daemon.py with scheduler_daemon_UPDATED.py
+2. Test CLI tool: python3 manage_recipients_CLI.py list
+3. Verify: Scheduler reads from DB, not hardcoded
+
+May 4-20 (Testing Phase):
+1. Run daily screenings
+2. Verify emails sent to all 3 admin recipients
+3. Test adding/removing recipient via CLI
+4. Test deactivating recipient (stop sending)
+
+May 21 (Launch Day):
+1. Customers sign up
+2. Each customer enters their email preferences
+3. New entries auto-added to customer_recipients
+4. Daily screening sends to ALL active recipients
+
+---
+
+## MONITORING
+
+Check Recipient Status:
+python3 manage_recipients_CLI.py list
+
+Output shows:
+- All admin recipients with status
+- All customer recipients
+- Total count
+
+Check Logs:
+- Scheduler outputs during daily run
+- Shows: Recipients found, emails sent
+
+---
+
+## SECURITY NOTES
+
+Safe:
+- Credentials NOT in DATABASE_RECIPIENTS.json
+- Database is plain JSON (human-readable)
+- No sensitive data exposed
+
+Best Practices:
+- Keep DATABASE_RECIPIENTS.json in private directory
+- Don't commit to GitHub (.gitignore)
+- Backup regularly
+- Log all modifications
+
+---
+
+## SCALING (After Launch)
+
+May 21 - End of May:
+- Expected: 50-100 customers
+- Database size: 1-2 KB
+- Performance: Instant
+
+June - August:
+- Expected: 500-1000 customers
+- Database size: 10-50 KB
+- Performance: Still instant
+
+Future Scaling (Optional):
+- If 10K+ customers: Migrate to SQLite or PostgreSQL
+- Same code, different backend
+- JSON code already supports this
+
+---
+
+## BENEFITS OF THIS SYSTEM
+
+✅ Scalable: Add 1000 customers without changing code
+✅ Flexible: Each customer chooses their own email preferences
+✅ Maintainable: No hardcoding, easy to modify
+✅ Auditable: Full log of who receives what
+✅ Testable: Can toggle recipients on/off easily
+✅ Customer-friendly: Self-service in dashboard (May 21+)
+
+---
+
+## CHECKLIST (Before May 21 Launch)
+
+[] DATABASE_RECIPIENTS.json created with 3 emails
+[] scheduler_daemon_UPDATED.py tested locally
+[] manage_recipients_CLI.py tested
+[] Add/remove recipient works correctly
+[] Daily screening sends emails successfully
+[] Fallback to hardcoded emails works
+[] Logging shows recipient list each day
+[] Admin can easily modify recipient list
+
+---
+
+## TROUBLESHOOTING
+
+Problem: DATABASE_RECIPIENTS.json not found
+Solution: Copy file to working directory
+
+Problem: Email not sent (but no error)
+Debug:
+1. Check recipient status
+2. Verify email is active and frequency is daily
+3. Check email spelling
+4. Test with update command
+
+Problem: Too many emails sent (sent to everyone)
+Debug:
+1. Check filter logic
+2. Verify market filter includes AZIONI
+3. Deactivate recipient if needed

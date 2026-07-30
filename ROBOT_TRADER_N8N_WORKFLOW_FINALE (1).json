@@ -1,0 +1,93 @@
+{
+  "name": "Robot Trader 2026 - FINALE",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "43f339e1-17d6-4bcb-a3f7-5165c32e9c2f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "43f339e1-17d6-4bcb-a3f7-5165c32e9c2f"
+    },
+    {
+      "parameters": {
+        "sendTo": "luciano.manicardi@lineexpress.it",
+        "subject": "=🚀 Nuovo Signup Robot Trader: {{ $json.body.nome }}",
+        "emailType": "html",
+        "message": "=<h2>Nuovo Cliente Registrato!</h2><table border='1' cellpadding='8' style='border-collapse:collapse'><tr><th>Campo</th><th>Valore</th></tr><tr><td><b>Nome</b></td><td>{{ $json.body.nome }}</td></tr><tr><td><b>Email</b></td><td>{{ $json.body.email }}</td></tr><tr><td><b>Piano</b></td><td>{{ $json.body.piano }}</td></tr><tr><td><b>Screener</b></td><td>{{ $json.body.screener }}</td></tr><tr><td><b>Data</b></td><td>{{ $now }}</td></tr></table><br><p>Robot Trader 2026 - Fuerte Venture Capital</p>",
+        "options": {
+          "ccList": "info@newcapitalfuerte.com,paolo.paterlini@tin.it"
+        }
+      },
+      "id": "a1b2c3d4-0002-0002-0002-000000000002",
+      "name": "Invia Email Notifica",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [500, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-credential",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"success\": true, \"message\": \"Registrazione completata! Benvenuto su Robot Trader 2026.\", \"nome\": \"{{ $('Webhook').item.json.body.nome }}\", \"email\": \"{{ $('Webhook').item.json.body.email }}\" }",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "a1b2c3d4-0003-0003-0003-000000000003",
+      "name": "Risposta Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [800, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Invia Email Notifica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invia Email Notifica": {
+      "main": [
+        [
+          {
+            "node": "Risposta Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "base_url": "https://plaza-gothic-barcode.ngrok-free.dev",
+  "fattura": {
+    "intestatario": "Fuerte Venture Capital SL",
+    "iban": "ES83 2100 1513 7202 0070 3406",
+    "bic": "CAIXESBBXXX",
+    "banca": "CaixaBank SA",
+    "valuta": "EUR"
+  },
+  "filtri_azioni": {
+    "ev_fcf_max": 12.0,
+    "pb_max": 1.2,
+    "roe_min": 0.0,
+    "net_debt_ebitda_max": 2.5,
+    "market_cap_min": 100,
+    "exclude_financial": true
+  },
+  "filtri_etf": {
+    "ter_max": 0.5,
+    "aum_min": 100,
+    "sharpe_min": 0.5
+  },
+  "filtri_fondi": {
+    "ter_max": 1.0,
+    "aum_min": 500,
+    "sharpe_min": 0.3
+  },
+  "scheduler": {
+    "enabled": true,
+    "time": "23:00",
+    "timezone": "Europe/Rome",
+    "days": [
+      "MON",
+      "TUE",
+      "WED",
+      "THU",
+      "FRI"
+    ]
+  },
+  "email": {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "sender": "newcapitalfuerte@gmail.com",
+    "smtp_login": "newcapitalfuerte@gmail.com",
+    "app_password": "",
+    "recipients": [
+      "rioluc63@gmail.com",
+      "marketing@fuerteventurecapital.com",
+      "laura.manicardi65@gmail.com",
+      "paolo.paterlini@tin.it",
+      "luciano.manicardi@lineexpress.it"
+    ],
+    "subject_template": "Robot Trader 2026 - Report {asset_type} {date}"
+  },
+  "whatsapp": {
+    "_note": "Meta WhatsApp Cloud API — business.facebook.com → WhatsApp Business",
+    "token": "",
+    "phone_number_id": "1098859536651515",
+    "waba_id": "1451835150031737",
+    "api_version": "v20.0",
+    "templates": {
+      "screener_pronto": "screener_pronto",
+      "brief_mattutino": "brief_mattutino"
+    }
+  },
+  "social": {
+    "_note": "Tutti i campi con stringa vuota sono PLACEHOLDER da configurare",
+    "brevo": {
+      "api_key": "",
+      "smtp_login": "info@fuerteventurecapital.com",
+      "smtp_password": "",
+      "sender_email": "marketing@fuerteventurecapital.com",
+      "sender_name": "Fuerte Venture Capital",
+      "list_ids": [3],
+      "admin_email": "rioluc63@gmail.com",
+      "base_url": "http://localhost:8080"
+    },
+    "linkedin": {
+      "client_id": "",
+      "client_secret": "",
+      "redirect_uri": "http://localhost:8080/api/linkedin/callback",
+      "org_id": ""
+    },
+    "meta": {
+      "app_id": "",
+      "app_secret": "",
+      "redirect_uri": "http://localhost:8080/api/meta/callback",
+      "page_id": "",
+      "ig_user_id": ""
+    },
+    "anthropic": {
+      "api_key": ""
+    }
+  },
+  "scoring_weights": {
+    "azioni": {
+      "BASIC": {
+        "Dividend Yield": 35,
+        "P/B": 10,
+        "ROE": 20,
+        "Var_1D_%": 25,
+        "EV/FCF": 10,
+        "Net Debt/EBITDA": 0
+      },
+      "PRO": {
+        "EV/FCF": 35,
+        "ROE": 25,
+        "P/B": 20,
+        "Net Debt/EBITDA": 15,
+        "Dividend Yield": 0,
+        "Var_1D_%": 5
+      },
+      "VALUE": {
+        "EV/FCF": 40,
+        "ROE": 25,
+        "Net Debt/EBITDA": 20,
+        "P/B": 15,
+        "Dividend Yield": 0,
+        "Var_1D_%": 0
+      }
+    },
+    "etf": {
+      "BASIC": {
+        "Perf 3M %": 45,
+        "Performance 1Y": 20,
+        "TER": 20,
+        "Sharpe Ratio": 15
+      },
+      "PRO": {
+        "Sharpe Ratio": 40,
+        "Performance 1Y": 30,
+        "TER": 20,
+        "Perf 3M %": 10
+      },
+      "VALUE": {
+        "Sharpe Ratio": 45,
+        "Performance 1Y": 25,
+        "TER": 25,
+        "Perf 3M %": 5
+      }
+    },
+    "fondi": {
+      "BASIC": {
+        "Perf 3M %": 30,
+        "Performance 1Y": 30,
+        "TER": 25,
+        "Sharpe Ratio": 15
+      },
+      "PRO": {
+        "Sharpe Ratio": 40,
+        "Performance 1Y": 25,
+        "TER": 30,
+        "Perf 3M %": 5
+      },
+      "VALUE": {
+        "Sharpe Ratio": 45,
+        "TER": 35,
+        "Performance 1Y": 15,
+        "Perf 3M %": 5
+      }
+    }
+  },
+  "admin_password": ""
+}

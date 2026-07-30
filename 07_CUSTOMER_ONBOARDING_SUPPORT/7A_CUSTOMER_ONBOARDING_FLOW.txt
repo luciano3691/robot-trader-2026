@@ -1,0 +1,427 @@
+
+# CUSTOMER ONBOARDING FLOW — ROBOT TRADER 2026
+
+## 🎯 OVERVIEW
+
+Flusso completo dal payment fino al primo report quotidiano automatico.
+Timeline: Day 0 (payment) → Day 1 (first report) → Day 7 (mastery).
+
+**Obiettivo:** 95%+ activation rate (utenti che usano il prodotto attivamente)
+
+---
+
+## 📊 ONBOARDING TIMELINE
+
+### DAY 0 — PURCHASE + ACCOUNT CREATION
+
+**Trigger:** User clicks "Subscribe to BASIC/PRO/ENTERPRISE"
+
+**Flow:**
+```
+1. Stripe payment page (secure)
+   ├─ Choose plan (BASIC/PRO/ENTERPRISE)
+   ├─ Enter credit card
+   ├─ Billing email
+   └─ Confirm purchase
+
+2. Account creation (auto-generated)
+   ├─ Username = email
+   ├─ Temporary password (sent via email)
+   ├─ Account tier = BASIC/PRO/ENTERPRISE
+   └─ Signup date = today
+
+3. Welcome email (immediate)
+   Subject: "✅ Benvenuto in Robot Trader AZIONI — Accedi Adesso"
+   
+   Content:
+   - Login credentials
+   - First report will arrive tomorrow at 08:05 UTC+2
+   - Dashboard link: https://app.robot-trader.io/dashboard
+   - Getting started guide (PDF)
+   - Support email + Discord community
+   - FAQ: "Come funziona il primo report?"
+
+4. Dashboard redirect (immediate)
+   ├─ "Dashboard" button after payment
+   ├─ Onboarding checklist shown
+   └─ First task: "Verify your email"
+```
+
+---
+
+### DAY 1 — FIRST REPORT DELIVERY
+
+**Trigger:** Screening eseguito a 08:05 UTC+2 (giorno successivo)
+
+**What the User Gets:**
+```
+1. Email notification (08:15 UTC+2)
+   Subject: "📊 Robot Trader AZIONI — First Report Ready"
+   
+   Content:
+   - Report Excel attached
+   - Summary: "14 stocks analyzed, 2 selected"
+   - Top 3 opportunities preview
+   - Call-to-action: "Open dashboard → View full report"
+
+2. Dashboard Shows:
+   ├─ Report overview (with charts)
+   ├─ Top 5 selected stocks
+   ├─ Export to CSV option
+   ├─ Add to watchlist button
+   ├─ Next report: Tomorrow 08:05
+   └─ Tutorial: "How to read your report"
+```
+
+---
+
+### DAY 2-3 — EDUCATION PHASE
+
+**Email 2 (Day 2):** "Your First Report Explained"
+```
+Subject: 📖 Let Me Explain Your Robot Trader Report
+
+Content:
+- What does each column mean? (EV/FCF, P/B, ROE, etc.)
+- Why are these stocks selected?
+- How to analyze the report in 5 minutes
+- Tutorial video (3 min): "Reading Your Robot Trader Report"
+- FAQ: "Can I filter by sector?"
+```
+
+**In-App Onboarding (Day 2-3):**
+```
+Checklist items (gamified):
+☐ Verify email (1 point)
+☐ Download first report (1 point)
+☐ Watch "Getting Started" video (2 points)
+☐ Explore dashboard filters (1 point)
+☐ Add a stock to watchlist (1 point)
+☐ Set email notification preferences (1 point)
+└─ Total: 7 points → Unlock "Analyst Badge"
+```
+
+---
+
+### DAY 4-7 — FEATURE DISCOVERY
+
+**For BASIC Users (Day 4-5):**
+```
+Email 3: "BASIC Features You Might Have Missed"
+- Download reports as Excel/CSV
+- Email digest (daily/weekly/monthly)
+- Basic watchlist management
+- Sector filters (IT, Finance, Healthcare, etc.)
+
+Call-to-action: "Ready to unlock more? Upgrade to PRO"
+```
+
+**For PRO Users (Day 4-5):**
+```
+Email 3: "PRO Features — Advanced Screening"
+- Custom filters (modify EV/FCF, P/B, ROE thresholds)
+- API access (integrate with your trading platform)
+- Backtesting tool (test filters on historical data)
+- Slack/Telegram alerts
+- Advanced reports + charts
+
+Call-to-action: "Explore API documentation"
+```
+
+**Day 6 — Success Check-in:**
+```
+In-app notification: "You've received 4 reports! How's it going?"
+├─ Link to: Success stories from other users
+├─ Schedule: "30-min call with founder" (optional)
+└─ Survey: "What could we improve?"
+```
+
+**Day 7 — Level Up Offer (BASIC only):**
+```
+Email 4: "You've Used Robot Trader for 1 Week"
+
+Content:
+- Summary: X stocks screened, Y analyzed
+- Testimonial: Real user success story
+- PRO upgrade offer: "First month 50% off"
+- Show: What PRO users are getting (social proof)
+
+If user hasn't logged in:
+→ Send retention email: "We miss you! Here's what you missed"
+```
+
+---
+
+## 🎓 ONBOARDING RESOURCES
+
+### Getting Started Videos (YouTube)
+
+1. **"Robot Trader in 2 Minutes"** (2 min)
+   - What is Robot Trader?
+   - How does it work?
+   - What can you do with reports?
+
+2. **"Your First Report Explained"** (3 min)
+   - Column-by-column breakdown
+   - Why these stocks?
+   - How to read metrics
+
+3. **"5 Filters Explained"** (5 min)
+   - EV/FCF ratio deep dive
+   - P/B ratio explained
+   - ROE, Net Debt/EBITDA, Score
+
+4. **"Using Dashboard + Filters"** (3 min)
+   - Dashboard tour
+   - Using sector filters
+   - Sorting + exporting reports
+
+5. **"PRO Features Tour"** (4 min)
+   - Custom filters
+   - API integration
+   - Backtesting tool
+
+### Knowledge Base Articles
+
+```
+FAQ:
+├─ "What is value investing?"
+├─ "How are the filters chosen?"
+├─ "Can I modify the filters?" (BASIC vs PRO)
+├─ "How often are stocks screened?" (Daily)
+├─ "Can I export to Excel?" (Yes)
+├─ "What time are reports sent?" (08:05 UTC+2)
+├─ "Is there a free trial?" (7 days free for BASIC)
+├─ "Can I cancel anytime?" (Yes, no questions)
+├─ "What if I find a bug?" (email: support@robot-trader.io)
+└─ "Can I integrate with my broker?" (PRO: Yes via API)
+
+Guides:
+├─ "Getting Started (5 min read)"
+├─ "Value Investing 101"
+├─ "How to Read a Screening Report"
+├─ "Interpreting Financial Metrics"
+├─ "Using the API (PRO)"
+├─ "Backtesting Filters (PRO)"
+└─ "Building Your Own Screener"
+```
+
+---
+
+## 🎯 ACTIVATION METRICS
+
+**Target:** 95%+ of customers complete onboarding by Day 7
+
+```
+Tracking:
+├─ Email verified: 100%
+├─ Downloaded first report: 85%+ by Day 1
+├─ Watched video: 70%+ by Day 3
+├─ Used dashboard filters: 60%+ by Day 5
+├─ Added to watchlist: 55%+ by Day 7
+├─ Opened 3+ reports: 80%+ by Day 7
+├─ Set notifications: 45%+ by Day 7
+├─ Upgrade inquiry: 15%+ of BASIC users by Day 7
+└─ Support ticket: < 5% (happy users)
+```
+
+---
+
+## 🎁 ONBOARDING INCENTIVES
+
+### Free Trial Period (BASIC Plan)
+
+```
+Offer: "7 days FREE, then €49/month"
+
+Benefits of free trial:
+- Full access to BASIC features
+- 7 daily reports (auto-generated)
+- Learn without commitment
+- If love it: Auto-charge on Day 8
+- If don't love it: Cancel anytime (no questions)
+
+Retention strategy:
+Day 4: "Halfway through! Have you found any opportunities?"
+Day 6: "Last chance to try before upgrade"
+Day 8: "Thanks for upgrading! Here's what's next"
+```
+
+### Referral Bonuses
+
+```
+For new users:
+- Sign up → Get 7 days free (vs. 1-click purchase)
+- Refer a friend → Get 1 month free (if friend pays)
+- 3 referrals → Get PRO for 1 month free
+
+For existing users:
+- Share your referral link in Discord
+- Each paid signup → €5 credit toward subscription
+- 5 referrals → Free month of service
+```
+
+---
+
+## 🔄 RE-ENGAGEMENT CAMPAIGNS
+
+### For Users Who Signed Up But Didn't Activate
+
+**Day 1 (No login):**
+```
+Email: "Your Robot Trader Dashboard is Ready"
+- Your first report will arrive tomorrow morning
+- Quick tour of dashboard
+- Link to "Getting Started" video
+```
+
+**Day 3 (Still no login):**
+```
+Email: "3 Amazing Stocks We Found for You"
+- Preview of 3 stocks from first screening
+- 1-sentence explanation of why each is selected
+- Call-to-action: "See full report inside dashboard"
+```
+
+**Day 7 (Still no login):**
+```
+Email: "Here's What You're Missing Out On"
+- Stats: "We've found 100+ opportunities for you"
+- User testimonial: "I found 2 stocks I'm buying next week"
+- Offer: "Still unsure? Let me help: [Luciano calendar link]"
+- Fallback: "No pressure. We're here whenever you need us."
+```
+
+### For Users Who Logged In Once Then Disappeared
+
+**Day 4 (No activity):**
+```
+Email: "You Opened Dashboard Once. Let Me Help."
+- Your biggest question probably is: [common FAQ]
+- Try this: [step-by-step guide]
+- Schedule 15-min onboarding call?
+```
+
+**Day 8 (Still inactive):**
+```
+Email: "Real Users Share Their Robot Trader Success"
+- 3 success stories (quote + screenshot)
+- "Why they signed up, how they use it, results"
+- Referral offer: "Bring a friend, get free month"
+```
+
+---
+
+## 📞 SUPPORT DURING ONBOARDING
+
+### Support Channels
+
+1. **Email:** support@robot-trader.io (< 24h response)
+2. **Discord:** #support channel (community + team)
+3. **Chat:** In-app chat (live during European business hours)
+4. **Schedule:** Founder 1-on-1 (Calendly link, 30 min)
+
+### Common Onboarding Issues + Responses
+
+| Issue | Solution |
+|-------|----------|
+| "Can't login" | Password reset email sent automatically |
+| "Report didn't arrive" | Check spam folder + resend manually |
+| "How do I export?" | Link to YouTube video (30 sec) |
+| "What's EV/FCF?" | Link to blog post (2 min read) |
+| "I want to change filters" | BASIC: Not possible. PRO: Docs link |
+| "Integration with my broker" | PRO: API docs. BASIC: Upgrade suggested |
+| "Can I get a refund?" | Yes, 30-day money-back guarantee |
+
+---
+
+## 🎖️ GAMIFICATION
+
+### Achievement Badges (In-App)
+
+```
+🟢 ANALYST BADGE (7 points)
+   ├─ Verify email
+   ├─ Download first report
+   ├─ Watch video
+   └─ Unlock: "Analyst" title in Discord
+
+🔷 EXPLORER BADGE (10 points)
+   ├─ Use 3+ different filters
+   ├─ Add 5+ stocks to watchlist
+   ├─ View weekly analytics
+   └─ Unlock: Early access to new features
+
+🔶 TRADER BADGE (15 points)
+   ├─ Receive 30+ reports
+   ├─ Export data 5+ times
+   ├─ Complete all tutorials
+   └─ Unlock: 1 month free if upgrade to PRO
+
+⭐ MASTER BADGE (20 points)
+   ├─ Use backtesting (PRO feature)
+   ├─ Integrate with API
+   ├─ Refer a friend
+   └─ Unlock: "Master" title + feature request priority
+```
+
+---
+
+## 📋 ONBOARDING CHECKLIST (In-App)
+
+```
+GETTING STARTED (Required)
+☐ Verify your email address
+☐ Download your first report
+☐ Explore the dashboard
+
+LEARN THE BASICS (Recommended)
+☐ Watch "Getting Started" video (3 min)
+☐ Read "5 Filters Explained" guide
+☐ Explore the knowledge base
+
+MASTER THE TOOL (Advanced)
+☐ Use sector filters
+☐ Add stocks to watchlist
+☐ Set up email notifications
+☐ [PRO ONLY] Create custom filters
+☐ [PRO ONLY] Explore API documentation
+
+Progress bar: 3/11 → 60/100 points
+
+Next milestone: 100 points = "Master Badge" unlocked + 1 month free PRO
+```
+
+---
+
+## 🎯 SUCCESS METRICS (By End of May)
+
+```
+✅ Onboarding completion rate: 85%+
+✅ First report activation: 90%+
+✅ Video watch-through rate: 65%+
+✅ Support ticket response time: < 4 hours
+✅ Customer satisfaction (CSAT): 8.5/10+
+✅ Churn rate (first 30 days): < 5%
+✅ Upgrade rate (BASIC → PRO): 20%+
+✅ Refund requests: < 2%
+```
+
+---
+
+## 🔄 CONTINUOUS IMPROVEMENT
+
+**Weekly:**
+- Review support tickets for trends
+- Check activation metrics dashboard
+- Respond to feedback
+
+**Monthly:**
+- Update onboarding materials
+- Optimize email sequences (A/B test subject lines)
+- Add new video tutorials based on FAQs
+
+**Quarterly:**
+- Full onboarding audit
+- Customer interviews (why did they sign up?)
+- Update value prop based on learnings

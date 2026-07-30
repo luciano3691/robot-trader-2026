@@ -1,0 +1,308 @@
+
+# 🔗 N8N LINKEDIN AUTOMATION — FUERTE VENTURE CAPITAL
+
+## 📋 OVERVIEW
+Sistema completamente automatizzato per publicare contenuti LinkedIn per Fuerte Venture Capital, 
+gestito via N8N con approvazione umana, generazione AI di post, e content calendar strutturato.
+
+**Launch Date:** 4 Maggio 2026 (Week 1 Development)
+**Frequency:** 3-5 post/settimana
+**Lingue:** IT + ES (adattati al mercato)
+
+---
+
+## 🏗️ ARCHITETTURA N8N WORKFLOW
+
+### WORKFLOW 1: DAILY CONTENT TRIGGER (08:00 UTC+2)
+```
+[Cron Trigger 08:00 UTC+2]
+    ↓
+[Check Calendar → Content programmato per oggi?]
+    ↓
+[Call Claude API → Generate Post + Image Prompt]
+    ↓
+[Call DALL-E 3 API → Generate Image]
+    ↓
+[Salva Draft su Google Drive]
+    ↓
+[Invia Email Approvazione a luciano.manicardi@lineexpress.it]
+    ↓
+[Attendi Approvazione (webhook form)]
+```
+
+### WORKFLOW 2: APPROVAL & PUBLISH (dopo approvazione)
+```
+[Ricevi Approvazione (webhook form)]
+    ↓
+[Edit post se necessario]
+    ↓
+[Call LinkedIn API → Publish Post]
+    ↓
+[Log success su Sheets]
+    ↓
+[Archivia in Google Drive]
+```
+
+### WORKFLOW 3: WEEKLY ANALYTICS (lunedì 09:00 UTC+2)
+```
+[Cron Trigger lunedì 09:00]
+    ↓
+[Fetch LinkedIn Metrics via API]
+    ↓
+[Calculate: impressioni, engagement, followers gained]
+    ↓
+[Create Weekly Report Excel]
+    ↓
+[Email Report a luciano.manicardi + laura.manicardi65@gmail.com]
+```
+
+---
+
+## 🎨 CONTENT CALENDAR STRUTTURA
+
+**Tema del Post:** [Value Investing / VC / Entrepreneurship / AI Strategy / Case Study]
+**Formato:** [Carousel / Thread / Single Post / Article]
+**Lingua:** [IT / ES]
+**Timing:** [Lunedì 10:00 / Mercoledì 15:00 / Venerdì 11:00 UTC+2]
+
+### MAGGIO 2026 (PLANNING)
+
+**Settimana 1 (4-10 Maggio)** — "Robot Trader Launch Week"
+- Lunedì 4: Announcing "Robot Trader - Week 1 Development Starts" + Value Investing intro
+- Mercoledì 6: Deep dive "5 Filtri Value Investing" (carousel 5 slide)
+- Venerdì 8: Case study "Come abbiamo trovato 14 azioni undervalue"
+
+**Settimana 2 (11-17 Maggio)** — "Value Screener Deep Dive"
+- Lunedì 11: "EV/FCF Ratio Spiegazione" + Real example
+- Mercoledì 13: "P/B vs ROE: Cosa preferire?"
+- Venerdì 15: Thread "Value Investing vs Growth investing"
+
+**Settimana 3 (18-24 Maggio)** — "Pre-Launch Hype"
+- Lunedì 18: "Robot Trader AZIONI in 48h" (countdown)
+- Mercoledì 20: "Meet the team behind Robot Trader"
+- Venerdì 22: "AZIONI Live! Here's what you get"
+
+**Settimana 4 (25-31 Maggio)** — "Post-Launch Momentum"
+- Lunedì 25: "First 100 Users Testimonials"
+- Mercoledì 27: "Results from Week 1 Screening"
+- Venerdì 29: "FONDI Module Coming June 15"
+
+---
+
+## 🤖 AI PROMPT TEMPLATE (Claude API)
+
+```
+Tu sei un content creator per Fuerte Venture Capital SL.
+Crea un post LinkedIn in [LINGUA] su [TEMA].
+
+REQUISITI:
+- Tono: Professionale ma accessible, credibile
+- Lunghezza: 200-300 caratteri
+- Hashtag: 3-5 rilevanti
+- Call-to-action: "Scopri di più" / "Commenta"
+- Hook: primo 30 caratteri DEVE attrarre
+- Emojis: Massimo 2, solo se appropriati
+
+TEMA: [tema specifico]
+LINGUA: [IT/ES]
+AUDIENCE: Imprenditori, investitori, professionisti finanziari
+TARGET TONE: [Educational / Motivational / How-to / Case Study]
+
+Rispondi SOLO con il post LinkedIn, senza prefissi.
+```
+
+---
+
+## 🖼️ IMAGE GENERATION PROMPT (DALL-E 3)
+
+```
+Create a professional infographic for LinkedIn about [TEMA].
+Style: Modern, clean, Fuerte Venture Capital brand colors (orange #F5A623, navy #1E3A5F).
+Text overlay: [POST_HEADLINE]
+Aspect ratio: 1200x628px (LinkedIn standard)
+Quality: High, realistic, professional
+No faces. Focus on: charts, graphs, icons, data visualization.
+```
+
+---
+
+## 📊 CONTENT THEMES (Rotation 3 settimane)
+
+**Week 1-2-3 Pattern:**
+1. **Educational** (Deep Value concept + example) — 40%
+2. **Case Study** (Real screening results) — 30%
+3. **Motivational/Vision** (Future of investing) — 20%
+4. **Product Update** (Robot Trader progress) — 10%
+
+---
+
+## 📅 N8N NODES SETUP CHECKLIST
+
+### Node 1: Cron Trigger
+- [ ] Imposta trigger a 08:00 UTC+2 (sempre)
+- [ ] Timezone: Europe/Canary (UTC+1 standard, UTC+2 estate)
+
+### Node 2: Google Sheets Integration
+- [ ] Leggi Content Calendar da Sheets
+- [ ] Controlla se c'è post programmato per today
+- [ ] Se no: salta
+
+### Node 3: Claude API
+- [ ] Setup API Key: sk-... (Anthropic)
+- [ ] Model: claude-opus-4-20250514
+- [ ] Temperature: 0.7 (creativo ma consistente)
+- [ ] Max tokens: 500
+
+### Node 4: DALL-E 3 Integration
+- [ ] Setup API Key (OpenAI)
+- [ ] Model: dall-e-3
+- [ ] Size: 1024x1024
+- [ ] Quality: hd
+- [ ] Style: natural
+
+### Node 5: Google Drive Upload
+- [ ] Salva immagine generata
+- [ ] Nomina file: AZIONI_20260504_PostTitle.png
+- [ ] Folder: "/N8N LinkedIn Automation/Generated Images"
+
+### Node 6: Gmail Draft
+- [ ] Destinatario: luciano.manicardi@lineexpress.it
+- [ ] Subject: "🔗 LinkedIn Post Approval — [Data] [Titolo]"
+- [ ] Body: Post preview + Image
+- [ ] Include link approvazione (webhook)
+
+### Node 7: Webhook Approval Form
+- [ ] Nome: "LinkedIn_Post_Approval"
+- [ ] Metodo: POST
+- [ ] Parametri:
+  - post_id
+  - action: [approve / reject / edit]
+  - comments (opzionale)
+  - edited_text (se edit)
+
+### Node 8: LinkedIn API Integration
+- [ ] Setup LinkedIn API credentials
+- [ ] Endpoint: /ugcPosts
+- [ ] Parametri: text, media, visibility
+- [ ] Error handling: Retry 3 volte
+
+### Node 9: Logging su Google Sheets
+- [ ] Aggiungi riga a "Analytics" sheet
+- [ ] Colonne: Date, Post_ID, Text, Image_URL, Status, Approval_Time, Publish_Time
+- [ ] Link al post LinkedIn
+
+---
+
+## 🔑 CREDENZIALI & API KEYS SETUP
+
+```
+ANTHROPIC API:
+  Key: sk-ant-v0-... (da Anthropic dashboard)
+  Model: claude-opus-4-20250514
+
+OPENAI API:
+  Key: sk-proj-... (da OpenAI dashboard)
+  Model: dall-e-3
+
+LINKEDIN API:
+  Client ID: ...
+  Client Secret: ...
+  Access Token (generi da LinkedIn Developer)
+  
+GOOGLE SHEETS:
+  Service Account JSON (usa N8N integrazione)
+  Spreadsheet ID: [Content Calendar Sheets]
+
+GOOGLE DRIVE:
+  Stessa Service Account
+  Folder ID: [N8N Automation folder]
+
+GMAIL (Notifications):
+  App Password: (genera da Google Account)
+```
+
+---
+
+## 📈 ANALYTICS TRACKING
+
+**Metriche settimanali:**
+- Impressioni totali
+- Engagement rate (likes + comments + shares)
+- Click-through rate (se link tracking)
+- Follower growth
+- Top 3 performing posts
+- A/B test results (tema/timing)
+
+**Dashboard:** Google Sheets + Data Studio (optional)
+
+---
+
+## 🚨 FALLBACK & ERROR HANDLING
+
+```
+IF Claude API fails:
+  → Use pre-written post template
+  → Notify luciano via email
+  
+IF DALL-E fails:
+  → Use stock image (Unsplash integration)
+  → Notify luciano
+  
+IF LinkedIn API fails:
+  → Save to Google Drive as draft
+  → Manual re-publish later
+  → Log error + retry
+  
+IF approval webhook times out:
+  → Auto-delete draft after 24h
+  → Send reminder email
+```
+
+---
+
+## 📝 APPROVAL FORM EXAMPLE
+
+```
+Subject: 🔗 LinkedIn Post Approval — 4 Maggio 2026
+
+Ciao Luciano,
+
+Ecco il post programmato per oggi:
+
+---
+[POST TEXT]
+
+[IMAGE PREVIEW]
+---
+
+Opzioni:
+1. ✅ APPROVA → Publish ora
+2. ✏️ MODIFICA → Click link e edita testo
+3. ❌ RIFIUTA → Non publicare, cancella draft
+
+Link approvazione (valido 24h):
+https://n8n.example.com/webhook/linkedin_approval?post_id=20260504_001
+
+---
+```
+
+---
+
+## 🎯 SUCCESS METRICS (Fine Maggio)
+
+- [ ] 100% automazione post generation
+- [ ] 15+ post pubblicati
+- [ ] 1.000+ impressioni medie per post
+- [ ] 50+ engagement medio per post
+- [ ] 0 manual errors (automation + approval loop)
+- [ ] Approval time < 2 ore media
+
+---
+
+## 📅 IMPLEMENTATION TIMELINE
+
+**4 Maggio:** Workflow 1 setup (daily trigger)
+**5 Maggio:** Workflow 2 setup (approval + publish)
+**6 Maggio:** Workflow 3 setup (analytics)
+**7 Maggio:** Testing completo
+**8 Maggio:** Go-live con content pre-approved
