@@ -5090,7 +5090,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
     </div>
     <div class="box" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
       <div>
-        <div style="font-weight:700;margin-bottom:.25rem">🤖 Assistente AI — Knowledge Base</div>
+        <div style="font-weight:700;margin-bottom:.25rem">🤖 VERA — Value &amp; Research Assistant</div>
         <div style="font-size:.82rem;color:#aaa" id="kb-status">Caricamento...</div>
       </div>
       <button class="btn btn-gr" onclick="reloadKB()" id="btn-reload-kb">↺ Ricarica KB</button>
@@ -14020,18 +14020,18 @@ CHAT_WIDGET_HTML = """
 #rt-chat-send svg{width:16px;height:16px;fill:#1a1a1a}
 </style>
 
-<button id="rt-chat-btn" onclick="rtToggleChat()" title="Assistente Robot Trader">
+<button id="rt-chat-btn" onclick="rtToggleChat()" title="VERA — Value & Research Assistant">
   <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
 </button>
 
 <div id="rt-chat-box">
   <div id="rt-chat-hdr">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-    <span>Assistente Robot Trader</span>
-    <small>Fuerte VC</small>
+    <span>VERA</span>
+    <small>Value &amp; Research Assistant</small>
   </div>
   <div id="rt-chat-msgs">
-    <div class="rt-msg bot">Ciao! Sono l'assistente di Robot Trader 2026. Come posso aiutarti? 👋</div>
+    <div class="rt-msg bot">Ciao! Sono VERA, la tua Value &amp; Research Assistant di Fuerte Venture Capital. Come posso aiutarti? 👋</div>
   </div>
   <form id="rt-chat-form" onsubmit="rtSend(event)">
     <textarea id="rt-chat-input" rows="1" placeholder="Scrivi un messaggio..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rtSend(event)}"></textarea>
@@ -14126,18 +14126,18 @@ CHAT_ABB_WIDGET_HTML = """
 #rt-abb-send svg{width:16px;height:16px;fill:#fff}
 </style>
 
-<button id="rt-abb-btn" onclick="rtAbbToggle()" title="Assistente Report — Solo Abbonati">
+<button id="rt-abb-btn" onclick="rtAbbToggle()" title="VERA — Report Abbonati">
   <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14l4-4h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 9H7v-2h7v2zm3-4H7V6h10v2z"/></svg>
 </button>
 
 <div id="rt-abb-box">
   <div id="rt-abb-hdr">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14l4-4h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 9H7v-2h7v2zm3-4H7V6h10v2z"/></svg>
-    <span>Assistente Report</span>
-    <small>Solo Abbonati</small>
+    <span>VERA</span>
+    <small>Report Abbonati</small>
   </div>
   <div id="rt-abb-msgs">
-    <div class="rt-abb-msg bot">Ciao! Sono il tuo assistente personale. Puoi chiedermi informazioni sui report — ad esempio se un titolo è presente, il suo score, o perché è stato scartato. 📊</div>
+    <div class="rt-abb-msg bot">Ciao! Sono VERA, la tua assistente personale. Puoi chiedermi informazioni sui tuoi report — ad esempio se un titolo è presente, il suo score, o perché è stato scartato. 📊</div>
   </div>
   <form id="rt-abb-form" onsubmit="rtAbbSend(event)">
     <textarea id="rt-abb-input" rows="1" placeholder="Es: LLY è nel report Azioni PRO?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();rtAbbSend(event)}"></textarea>
