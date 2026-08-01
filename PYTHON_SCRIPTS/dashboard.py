@@ -9,7 +9,7 @@ Tab: Home | Servizi | Parametri | Azioni | ETF | Fondi | Esecuzione
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 import json, os, sys, glob, subprocess, threading, secrets, time
-import smtplib, hashlib, string, csv, io, base64 as b64lib, tempfile
+import smtplib, hashlib, html, string, csv, io, base64 as b64lib, tempfile
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -123,9 +123,9 @@ def _load_admin_password():
         return pw
     try:
         with open(os.path.join(BASE_DIR, "config.json"), encoding="utf-8") as _f:
-            return json.load(_f).get("admin_password", "changeme")
+            return json.load(_f).get("admin_password", "")
     except Exception:
-        return "changeme"
+        return ""
 
 ADMIN_PASSWORD = _load_admin_password()
 if ADMIN_PASSWORD in ("123", "changeme", ""):
@@ -190,6 +190,8 @@ def _persist_sessions():
         with open(tmp, 'w', encoding='utf-8') as f:
             json.dump(data, f)
         os.replace(tmp, SESSIONS_FILE)
+        try: os.chmod(SESSIONS_FILE, 0o600)
+        except Exception: pass
     except Exception:
         pass
 
@@ -2945,7 +2947,18 @@ def _genera_password(n=10):
     return ''.join(secrets.choice(chars) for _ in range(n))
 
 def _hash_pwd(pwd):
-    return hashlib.sha256(pwd.encode()).hexdigest()
+    import bcrypt
+    return bcrypt.hashpw(pwd.encode(), bcrypt.gensalt()).decode()
+
+def _verify_pwd(pwd, stored_hash):
+    """Verifica password: supporta bcrypt (nuovo) e SHA256 legacy."""
+    import bcrypt
+    if stored_hash.startswith('$2b$') or stored_hash.startswith('$2a$'):
+        try:
+            return bcrypt.checkpw(pwd.encode(), stored_hash.encode())
+        except Exception:
+            return False
+    return hashlib.sha256(pwd.encode()).hexdigest() == stored_hash
 
 def _piani_label(c):
     parts = []
@@ -12129,7 +12142,7 @@ def _build_privacy_page() -> str:
 
 def _build_cambia_password_page(error='', voluntary=False):
     logo_src = f"data:image/png;base64,{FUERTE_LOGO_B64}"
-    err_html = f'<p style="color:#FC8181;font-size:.85rem;text-align:center;margin-bottom:1rem">{error}</p>' if error else ''
+    err_html = f'<p style="color:#FC8181;font-size:.85rem;text-align:center;margin-bottom:1rem">{html.escape(error)}</p>' if error else ''
     if voluntary:
         _title    = 'Modifica la tua password'
         _subtitle = 'Inserisci la password attuale e scegli la nuova password sicura.'
@@ -15062,7 +15075,7 @@ Contatta il supporto per attivare il tuo piano.</p>
             for c in (db.get('tester', []) + db.get('clienti', [])):
                 if c.get('email', '').lower() == email_in:
                     match = c; break
-            if match and match.get('stato') in ('ATTIVO', 'TESTER') and match.get('password_hash') == _hash_pwd(pwd_in):
+            if match and match.get('stato') in ('ATTIVO', 'TESTER') and _verify_pwd(pwd_in, match.get('password_hash', '')):
                 _rl_ok(_ip)
                 # Controlla scadenza trial (solo TESTER con trial_end impostato)
                 if match.get('stato') == 'TESTER' and match.get('trial_end'):
@@ -15239,7 +15252,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     for c in grp:
                         if c.get('email','').lower() == email.lower():
                             if voluntary:
-                                if not old_pwd or _hash_pwd(old_pwd) != c.get('password_hash', ''):
+                                if not old_pwd or not _verify_pwd(old_pwd, c.get('password_hash', '')):
                                     self._html(_build_cambia_password_page(error='Password attuale non corretta.', voluntary=True)); return
                             c['password_hash']        = _hash_pwd(new_pwd)
                             c['must_change_password'] = False
@@ -15249,7 +15262,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                             _redirect(self, '/area-clienti'); return
                 self._json({'ok': False, 'msg': 'Cliente non trovato'})
             except Exception as e:
-                self._html(_build_cambia_password_page(error=str(e)))
+                self._html(_build_cambia_password_page(error=html.escape(str(e))))
             return
         # ── Checkout pubblico ──────────────────────────────────
         if p == '/api/checkout':
