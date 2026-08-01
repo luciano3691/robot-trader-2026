@@ -13081,6 +13081,7 @@ def _build_area_clienti(email):
         if ordini_list:
             ordini_cards = ''
             for _ord in ordini_list[:20]:
+                if not isinstance(_ord, dict): continue
                 _n   = len(_ord.get('righe', []))
                 _tot = {}
                 for _r in _ord.get('righe', []):
