@@ -8,7 +8,7 @@ Tab: Home | Servizi | Parametri | Azioni | ETF | Fondi | Esecuzione
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
-import json, os, sys, glob, subprocess, threading, secrets, time
+import json, os, sys, glob, subprocess, threading, secrets, time, ssl
 import smtplib, hashlib, html, string, csv, io, base64 as b64lib, tempfile
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -2813,7 +2813,7 @@ def _brevo_check_openers(campagna_id, emails):
             req = _ur.Request(url)
             req.add_header('api-key', key)
             req.add_header('Accept', 'application/json')
-            with _ur.urlopen(req, timeout=10) as r:
+            with _ur.urlopen(req, timeout=10, context=_SSL_CTX) as r:
                 d = json.loads(r.read())
             if any(str(x.get('campaignId')) == cid for x in d.get('opened', [])):
                 openers.add(email.lower())
@@ -2838,6 +2838,8 @@ def _load_base_url() -> str:
 BASE_URL            = _load_base_url()
 CLIENT_LOGIN_URL    = os.getenv("CLIENT_LOGIN_URL", BASE_URL + "/area-clienti")
 PWA_VERSION         = "2.0"
+_SSL_CTX            = ssl.create_default_context()   # verifica certificati HTTPS
+CORS_ORIGIN         = BASE_URL.rstrip('/')
 
 def _load_anthropic_key() -> str:
     if os.getenv("ANTHROPIC_API_KEY"):
@@ -3291,7 +3293,7 @@ def _invia_email_early_adopter(nome, email, piani_list):
             data=payload,
             headers={"api-key": api_key, "Content-Type": "application/json", "Accept": "application/json"},
         )
-        with _ur.urlopen(req, timeout=15) as resp:
+        with _ur.urlopen(req, timeout=15, context=_SSL_CTX) as resp:
             status = resp.status
         if status in (200, 201):
             print(f"[EMAIL] Early adopter inviato a {email} (Brevo API {status})", flush=True)
@@ -9764,7 +9766,7 @@ def create_checkout_session(asset, tier):
             data=payload,
             headers={"Authorization": f"Bearer {STRIPE_SECRET_KEY}"}
         )
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req, context=_SSL_CTX) as resp:
             session = json.loads(resp.read())
             return {"url": session["url"]}
     except Exception as e:
@@ -15034,7 +15036,8 @@ Contatta il supporto per attivare il tuo piano.</p>
                 }
                 db.setdefault('clienti', []).append(nuovo)
                 save_clienti(db)
-                print(f"[REG] {codice_cliente} — {nome} {cogn} <{email}> — {paese} — CF:{cf}", flush=True)
+                _cf_mask = (cf[:4] + '***') if cf else '-'
+                print(f"[REG] {codice_cliente} — {nome} {cogn} <{email}> — {paese} — CF:{_cf_mask}", flush=True)
                 # Genera fattura PDF e invia email con credenziali
                 num_fatt  = _prossimo_numero_fattura()
                 pdf_bytes = genera_fattura_pdf(nuovo, num_fatt)
@@ -15992,7 +15995,7 @@ Contatta il supporto per attivare il tuo piano.</p>
         body = json.dumps(_san(data), ensure_ascii=False, default=str).encode()
         self.send_response(200)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Origin', CORS_ORIGIN)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -16081,12 +16084,16 @@ if __name__ == '__main__':
         with open(_domain_file) as _df:
             _ngrok_domain = _df.read().strip()
         print(f'  [NGROK] Dominio: {_ngrok_domain}', flush=True)
-        _sp.run(['taskkill', '/IM', 'ngrok.exe', '/F'], capture_output=True)
-        # Apre ngrok in finestra visibile
-        _sp.Popen(
-            f'start "ngrok" "{_ngrok_exe}" http --domain={_ngrok_domain} {PORT}',
-            shell=True
-        )
+        import re as _re
+        if not _re.fullmatch(r'[a-zA-Z0-9._-]+', _ngrok_domain):
+            print('  [NGROK] Dominio non valido — skip avvio per sicurezza.', flush=True)
+        else:
+            _sp.run(['taskkill', '/IM', 'ngrok.exe', '/F'], capture_output=True)
+            # Apre ngrok in finestra visibile (shell=True richiesto da cmd start)
+            _sp.Popen(
+                f'start "ngrok" "{_ngrok_exe}" http --domain={_ngrok_domain} {PORT}',
+                shell=True
+            )
         print(f'  [NGROK] Tunnel avviato → https://{_ngrok_domain}', flush=True)
     else:
         print('  [NGROK] ngrok.exe o ngrok_domain.txt non trovati.', flush=True)
