@@ -2959,7 +2959,8 @@ def _invia_email_credenziali(nome, email, piani_label, password_temp, pdf_bytes=
     if not BREVO_SMTP_LOGIN or not BREVO_SMTP_PASSWORD:
         print(f"[EMAIL] BREVO_SMTP_LOGIN non configurato — email NON inviata a {email}", flush=True)
         return False
-    logo_src = f"data:image/png;base64,{FUERTE_LOGO_B64}"
+    logo_src   = f"data:image/png;base64,{FUERTE_LOGO_B64}"
+    profilo_url = f"{BASE_URL}/profilo-investitore"
     corpo = f"""<!DOCTYPE html>
 <html lang="it">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -3009,6 +3010,22 @@ def _invia_email_credenziali(nome, email, piani_label, password_temp, pdf_bytes=
                       text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
               Accedi all'Area Riservata
             </a>
+          </div>
+          <div style="background:linear-gradient(135deg,#1a2744,#0d1b35);border:1px solid rgba(159,122,234,.35);border-radius:10px;padding:18px 22px;margin-bottom:24px">
+            <div style="font-size:11px;color:#9F7AEA;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">🧠 Primo passo consigliato</div>
+            <p style="margin:0 0 10px;font-size:13px;color:#c0cce0;line-height:1.65">
+              Compila il tuo <strong style="color:#e0e0e0">Profilo Investitore MiFID II</strong> — 7 domande, meno di 3 minuti.<br>
+              Scopri la tua allocazione ideale tra Liquidità, Obbligazioni, ETF, Azioni, Oro e Fondi.
+            </p>
+            <div style="text-align:center">
+              <a href="{profilo_url}"
+                 style="background:linear-gradient(135deg,#9F7AEA,#805AD5);color:#fff;
+                        padding:11px 28px;border-radius:7px;text-decoration:none;
+                        font-weight:700;font-size:13px;display:inline-block">
+                Scopri il mio Profilo Investitore &rarr;
+              </a>
+            </div>
+            <p style="margin:8px 0 0;font-size:10px;color:#445;text-align:center">A scopo informativo &middot; non costituisce consulenza finanziaria (MiFID II)</p>
           </div>
           <p style="font-size:12px;color:#666;border-top:1px solid rgba(255,255,255,.06);padding-top:16px;margin:0 0 20px">
             Conserva questa email. Se non riesci ad accedere scrivi a

@@ -104,6 +104,7 @@ BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "") or _email_cfg.get("send
 BREVO_SENDER_NAME  = os.getenv("BREVO_SENDER_NAME", "Fuerte Venture Capital SL")
 URL_SETTORI   = BASE_URL.rstrip('/') + '/settori'
 URL_AREA      = BASE_URL.rstrip('/') + '/area-clienti'
+URL_PROFILO   = BASE_URL.rstrip('/') + '/profilo-investitore'
 
 
 def load_recipients_for_plan(report_type, piano):
@@ -163,7 +164,8 @@ def create_email_body(template, report_type, piano, recipient_name, report_date,
             .replace("{DATA}",        report_date)
             .replace("{NUM_TICKER}",  num_ticker)
             .replace("{URL_SETTORI}", URL_SETTORI)
-            .replace("{URL_AREA}",    URL_AREA))
+            .replace("{URL_AREA}",    URL_AREA)
+            .replace("{URL_PROFILO}", URL_PROFILO))
 
 
 def _build_client_attachment(filepath):

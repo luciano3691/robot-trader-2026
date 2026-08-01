@@ -40,6 +40,24 @@ Apri qui: {URL_SETTORI}
 (Accedi con le tue credenziali — Area Riservata: {URL_AREA})
 
 ───────────────────────────────────────────────────────────────────
+🧠 PROFILO INVESTITORE MIFID II — Compila il tuo profilo
+───────────────────────────────────────────────────────────────────
+
+Hai già compilato il tuo Profilo Investitore?
+7 domande, meno di 3 minuti.
+
+Analizziamo i tuoi obiettivi, orizzonte temporale e tolleranza al
+rischio per costruire il portafoglio su misura per te:
+
+• 5 profili: Difensivo · Prudente · Bilanciato · Dinamico · Aggressivo
+• Allocazione per asset class (Liquidità, Obbligazioni, ETF, Azioni...)
+• Grafico a torta con il portafoglio consigliato
+• Salvato nel tuo profilo, aggiornabile in qualsiasi momento
+
+Compila qui: {URL_PROFILO}
+(A scopo informativo — non costituisce consulenza finanziaria)
+
+───────────────────────────────────────────────────────────────────
 🤖 ROBOT TRADER 2026
 ───────────────────────────────────────────────────────────────────
 
