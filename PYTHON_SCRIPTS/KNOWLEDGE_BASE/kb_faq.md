@@ -10,7 +10,7 @@
 Vai su www.fuerteventurecapital.com e clicca "ACCEDI". Inserisci email e password ricevuta al momento della registrazione.
 
 **Ho dimenticato la password. Come la recupero?**
-Scrivi a marketing@fuerteventurecapital.com indicando la tua email di registrazione. Il team reimposta la password manualmente entro 24 ore lavorative.
+Nella pagina di login clicca "Password dimenticata?" e inserisci la tua email. Riceverai un link di reset valido per 1 ora. Se l'email non arriva entro qualche minuto, controlla la cartella spam o scrivi a marketing@fuerteventurecapital.com.
 
 **Posso avere più piani contemporaneamente?**
 Sì. Puoi combinare liberamente qualsiasi piano — ad esempio Azioni PRO + ETF VALUE + Fondi EU BASIC + Ordini BASIC. Il costo è la somma dei singoli abbonamenti.
@@ -160,7 +160,7 @@ Sì. Invia richiesta a marketing@fuerteventurecapital.com. I dati vengono elimin
 Ve a www.fuerteventurecapital.com y haz clic en "ACCEDER". Introduce tu email y la contraseña recibida al registrarte.
 
 **He olvidado mi contraseña. ¿Cómo la recupero?**
-Escribe a marketing@fuerteventurecapital.com indicando tu email de registro. El equipo restablece la contraseña manualmente en 24 horas hábiles.
+En la página de inicio de sesión haz clic en "¿Olvidaste tu contraseña?" e introduce tu email. Recibirás un enlace de restablecimiento válido durante 1 hora. Si el email no llega en unos minutos, revisa la carpeta de spam o escribe a marketing@fuerteventurecapital.com.
 
 **¿Puedo tener varios planes a la vez?**
 Sí. Puedes combinar libremente cualquier plan — por ejemplo Acciones PRO + ETF VALUE + Fondos EU BASIC + Órdenes BASIC. El coste es la suma de las suscripciones individuales.
@@ -234,7 +234,7 @@ Tus datos se usan exclusivamente para prestar el servicio. No se ceden a tercero
 Go to www.fuerteventurecapital.com and click "LOGIN". Enter your registration email and password.
 
 **I forgot my password. How do I recover it?**
-Email marketing@fuerteventurecapital.com with your registration email address. The team resets your password manually within 24 business hours.
+On the login page, click "Forgot your password?" and enter your email. You will receive a reset link valid for 1 hour. If the email doesn't arrive within a few minutes, check your spam folder or contact marketing@fuerteventurecapital.com.
 
 **Can I have multiple plans at the same time?**
 Yes. You can combine any plans freely — for example Stocks PRO + ETF VALUE + EU Funds BASIC + Orders BASIC. The cost is the sum of individual subscriptions.
@@ -328,7 +328,7 @@ Yes. Email marketing@fuerteventurecapital.com. Data is deleted within 30 days, i
 Rendez-vous sur www.fuerteventurecapital.com et cliquez sur « CONNEXION ». Saisissez votre email et le mot de passe reçu lors de l'inscription.
 
 **J'ai oublié mon mot de passe. Comment le récupérer ?**
-Écrivez à marketing@fuerteventurecapital.com en indiquant votre email d'inscription. L'équipe réinitialise le mot de passe manuellement sous 24 heures ouvrables.
+Sur la page de connexion, cliquez sur « Mot de passe oublié ? » et saisissez votre email. Vous recevrez un lien de réinitialisation valable 1 heure. Si l'email n'arrive pas dans quelques minutes, vérifiez vos spams ou écrivez à marketing@fuerteventurecapital.com.
 
 **Puis-je avoir plusieurs plans simultanément ?**
 Oui. Vous pouvez combiner librement n'importe quels plans. Le coût est la somme des abonnements individuels.
@@ -396,7 +396,7 @@ Vos données sont utilisées exclusivement pour fournir le service. Elles ne son
 Gehen Sie zu www.fuerteventurecapital.com und klicken Sie auf „ANMELDEN". Geben Sie Ihre Registrierungs-E-Mail und Ihr Passwort ein.
 
 **Ich habe mein Passwort vergessen. Wie kann ich es zurücksetzen?**
-Schreiben Sie an marketing@fuerteventurecapital.com und geben Sie Ihre Registrierungs-E-Mail-Adresse an. Das Team setzt Ihr Passwort manuell innerhalb von 24 Wertstunden zurück.
+Klicken Sie auf der Anmeldeseite auf „Passwort vergessen?" und geben Sie Ihre E-Mail-Adresse ein. Sie erhalten einen Reset-Link, der 1 Stunde lang gültig ist. Wenn die E-Mail nicht ankommt, prüfen Sie Ihren Spam-Ordner oder schreiben Sie an marketing@fuerteventurecapital.com.
 
 **Kann ich mehrere Pläne gleichzeitig haben?**
 Ja. Sie können beliebig kombinieren. Der Preis ist die Summe der einzelnen Abonnements.
