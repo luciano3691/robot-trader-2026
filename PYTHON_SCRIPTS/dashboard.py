@@ -15159,7 +15159,7 @@ Contatta il supporto per attivare il tuo piano.</p>
             email_in = fields.get('email', '').strip().lower()
             db = read_clienti()
             match = next((c for c in (db.get('tester', []) + db.get('clienti', []))
-                          if c.get('email', '').lower() == email_in and c.get('stato') == 'ATTIVO'), None)
+                          if c.get('email', '').lower() == email_in and c.get('stato') in ('ATTIVO', 'TESTER')), None)
             if match:
                 token = secrets.token_urlsafe(32)
                 RESET_TOKENS[token] = (email_in, time.time() + 3600)
@@ -15174,17 +15174,17 @@ Contatta il supporto per attivare il tuo piano.</p>
 </p>
 <p style="color:#666;font-size:12px">Il link è valido per 1 ora. Se non hai richiesto il reset, ignora questa email.</p>
 </div></body></html>"""
-                try:
-                    msg = MIMEText(corpo, 'html', 'utf-8')
-                    msg['Subject'] = 'Reset password — Fuerte Venture Capital'
-                    msg['From']    = f'{BREVO_SENDER_NAME} <{BREVO_SENDER_EMAIL}>'
-                    msg['To']      = email_in
-                    with smtplib.SMTP(BREVO_SMTP_HOST, BREVO_SMTP_PORT) as srv:
-                        srv.starttls(); srv.login(BREVO_SMTP_LOGIN, BREVO_SMTP_PASSWORD)
-                        srv.sendmail(BREVO_SENDER_EMAIL, [email_in], msg.as_string())
-                    print(f"[RESET-PWD] Email inviata a {email_in}", flush=True)
-                except Exception as e:
-                    print(f"[RESET-PWD] Errore SMTP: {e}", flush=True)
+                _fp_payload = {
+                    "sender":      {"name": BREVO_SENDER_NAME, "email": BREVO_SENDER_EMAIL},
+                    "to":          [{"email": email_in}],
+                    "subject":     "Reset password — Fuerte Venture Capital",
+                    "htmlContent": corpo,
+                }
+                _fp_data, _fp_status = _brevo_call('/smtp/email', method='POST', payload=_fp_payload)
+                if _fp_status in (200, 201):
+                    print(f"[RESET-PWD] Email inviata a {email_in} (Brevo {_fp_status})", flush=True)
+                else:
+                    print(f"[RESET-PWD] Brevo {_fp_status}: {_fp_data}", flush=True)
             self._html(_fp_ok); return
         # ── Reset password (da link email) ─────────────────────
         if p == '/api/reset-password':
@@ -15612,6 +15612,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     self._json({'ok': False, 'msg': f'Email {email} già presente nei clienti'}); return
                 from datetime import timedelta as _td_p
                 _now_p = datetime.now()
+                _pwd_p = _genera_password()
                 nuovo = {
                     'nome': found.get('nome',''),
                     'cognome': found.get('cognome',''),
@@ -15625,6 +15626,9 @@ Contatta il supporto per attivare il tuo piano.</p>
                     'trial_start': _now_p.strftime('%Y-%m-%dT%H:%M:%S'),
                     'trial_end':   (_now_p + _td_p(days=7)).strftime('%Y-%m-%dT%H:%M:%S'),
                     'fonte': 'prospect',
+                    'password_hash':      _hash_pwd(_pwd_p),
+                    'must_change_password': True,
+                    'password_expiry':    (_now_p + _td_p(hours=48)).strftime('%Y-%m-%dT%H:%M:%S'),
                     'dati_fiscali': {'paese': found.get('paese','IT'), 'telefono': found.get('telefono','')},
                 }
                 db.setdefault('tester', []).append(nuovo)
@@ -15632,6 +15636,8 @@ Contatta il supporto per attivare il tuo piano.</p>
                 found['stato'] = 'Promosso ✓'
                 found['promosso'] = True
                 save_prospect(items)
+                _nome_p = f"{nuovo['nome']} {nuovo['cognome']}".strip() or email
+                _invia_email_credenziali(_nome_p, email, 'Trial 7 giorni — accesso completo', _pwd_p)
                 print(f'[PROSPECT] {email} promosso a Tester', flush=True)
                 self._json({'ok': True, 'email': email})
             except Exception as e:
@@ -15912,6 +15918,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     self._json({'ok': False, 'msg': 'Email già presente'}); return
                 from datetime import timedelta as _td_a
                 _now_a = datetime.now()
+                _pwd_a = _genera_password()
                 nuovo = {
                     'nome':               req.get('nome', '').strip(),
                     'cognome':            req.get('cognome', '').strip(),
@@ -15926,10 +15933,15 @@ Contatta il supporto per attivare il tuo piano.</p>
                     'stato':              'TESTER',
                     'trial_start':        _now_a.strftime('%Y-%m-%dT%H:%M:%S'),
                     'trial_end':          (_now_a + _td_a(days=7)).strftime('%Y-%m-%dT%H:%M:%S'),
+                    'password_hash':      _hash_pwd(_pwd_a),
+                    'must_change_password': True,
+                    'password_expiry':    (_now_a + _td_a(hours=48)).strftime('%Y-%m-%dT%H:%M:%S'),
                     'dati_fiscali':       {'paese':'','data_nascita':'','indirizzo':'','cap':'','citta':'','codice_fiscale':'','telefono':'','p_iva':''},
                 }
                 db.setdefault('tester', []).append(nuovo)
                 save_clienti(db)
+                _nome_a = f"{nuovo['nome']} {nuovo['cognome']}".strip() or email
+                _invia_email_credenziali(_nome_a, email, 'Trial 7 giorni — accesso completo', _pwd_a)
                 self._json({'ok': True})
             except Exception as e:
                 self._json({'ok': False, 'msg': str(e)})
