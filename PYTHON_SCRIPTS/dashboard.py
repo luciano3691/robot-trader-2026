@@ -14500,6 +14500,23 @@ Contatta il supporto per attivare il tuo piano.</p>
             self.end_headers()
             self.wfile.write(data)
             return
+        # ── Route miste admin+client (settori / idee) ──────────
+        if p == '/api/idee' and (_is_auth(self) or _is_client_auth(self)):
+            if 'force=1' in self.path:
+                _idee_cache['data'] = None
+            self._json(get_idee_data()); return
+        if p == '/api/settori' and (_is_auth(self) or _is_client_auth(self)):
+            self._json(get_settori_data()); return
+        if p == '/api/settori/titoli' and (_is_auth(self) or _is_client_auth(self)):
+            qs_params = {}
+            if '?' in self.path:
+                for kv in self.path.split('?',1)[1].split('&'):
+                    if '=' in kv:
+                        k,v = kv.split('=',1)
+                        qs_params[k] = v.replace('%20',' ').replace('+',' ')
+            from urllib.parse import unquote_plus
+            settore = unquote_plus(qs_params.get('s',''))
+            self._json(get_settori_titoli(settore)); return
         # ── Rotte admin (richiede sessione) ────────────────────
         if not _is_auth(self):
             _redirect(self, '/login'); return
@@ -14572,22 +14589,6 @@ Contatta il supporto per attivare il tuo piano.</p>
             self._json(get_table_data(p.split('/')[-1]))
         elif p == '/api/mercati':
             self._json(get_mercati())
-        elif p == '/api/idee' and (_is_auth(self) or _is_client_auth(self)):
-            if 'force=1' in self.path:
-                _idee_cache['data'] = None
-            self._json(get_idee_data())
-        elif p == '/api/settori' and (_is_auth(self) or _is_client_auth(self)):
-            self._json(get_settori_data())
-        elif p == '/api/settori/titoli' and (_is_auth(self) or _is_client_auth(self)):
-            qs_params = {}
-            if '?' in self.path:
-                for kv in self.path.split('?',1)[1].split('&'):
-                    if '=' in kv:
-                        k,v = kv.split('=',1)
-                        qs_params[k] = v.replace('%20',' ').replace('+',' ')
-            from urllib.parse import unquote_plus
-            settore = unquote_plus(qs_params.get('s',''))
-            self._json(get_settori_titoli(settore))
         elif p == '/api/params':
             self._json(read_params())
         elif p == '/api/clienti':
