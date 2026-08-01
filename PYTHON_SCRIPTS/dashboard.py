@@ -11659,6 +11659,322 @@ contiLoad();
             .replace('__TIPO_JS__',         tipo))
 
 
+def _build_profilo_investitore(nome: str, email: str, cliente: dict = None) -> str:
+    """Questionario MiFID II profilo investitore — area clienti."""
+    import html as _html, json as _json
+    profilo_js = _json.dumps((cliente or {}).get('profilo_investitore') or {}, ensure_ascii=False)
+    nome_js    = nome.replace('\\','\\\\').replace('"','\\"')
+    email_safe = _html.escape(email)
+
+    page = '''<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profilo Investitore — Fuerte Screener</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0f1e;color:#e0e0e0;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#1a365d,#2b6cb0);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.hdr-back{color:#90cdf4;text-decoration:none;font-size:13px}
+.main{max-width:640px;margin:2rem auto;padding:0 1.2rem 3rem}
+.phase{display:none}.phase.active{display:block}
+.progress-bar{background:rgba(255,255,255,.1);border-radius:99px;height:4px;margin-bottom:2rem}
+.progress-fill{background:linear-gradient(90deg,#F6AD55,#ED8936);height:4px;border-radius:99px;transition:width .4s ease}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.8rem;margin-bottom:1rem}
+.q-num{font-size:.75rem;color:#F6AD55;letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem}
+.q-text{font-size:1.1rem;font-weight:600;line-height:1.5;margin-bottom:1.5rem}
+.answers{display:flex;flex-direction:column;gap:.6rem}
+.ans{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;
+     padding:.85rem 1.1rem;cursor:pointer;transition:all .18s;font-size:.92rem;display:flex;align-items:center;gap:.8rem}
+.ans:hover{background:rgba(246,173,85,.08);border-color:rgba(246,173,85,.4);color:#F6AD55}
+.ans.selected{background:rgba(246,173,85,.12);border-color:#F6AD55;color:#F6AD55}
+.ans-icon{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);
+          display:flex;align-items:center;justify-content:center;font-size:.75rem;
+          color:#718096;flex-shrink:0;font-weight:700;min-width:28px}
+.btn-next{background:linear-gradient(135deg,#F6AD55,#ED8936);color:#0a0f1e;border:none;
+          border-radius:10px;padding:.85rem 2rem;font-size:.95rem;font-weight:700;
+          cursor:pointer;width:100%;margin-top:1rem;display:none}
+.btn-next.visible{display:block}
+.profilo-badge{display:inline-flex;align-items:center;gap:.6rem;padding:.5rem 1.2rem;
+               border-radius:99px;font-weight:700;font-size:1rem;margin-bottom:1.2rem}
+.alloc-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.55rem}
+.alloc-bar-wrap{flex:1;background:rgba(255,255,255,.06);border-radius:99px;height:8px;overflow:hidden}
+.alloc-bar{height:8px;border-radius:99px;transition:width .6s ease}
+.alloc-pct{font-weight:700;font-size:.88rem;width:36px;text-align:right;flex-shrink:0}
+.alloc-lbl{font-size:.85rem;width:105px;flex-shrink:0;color:#ccc}
+.fuerte-box{background:rgba(246,173,85,.06);border:1px solid rgba(246,173,85,.2);border-radius:12px;padding:1.4rem;margin-top:1rem}
+.btn-cta{display:inline-block;background:linear-gradient(135deg,#F6AD55,#ED8936);color:#0a0f1e;
+         border:none;border-radius:10px;padding:.75rem 1.6rem;font-size:.9rem;font-weight:700;
+         cursor:pointer;text-decoration:none;margin-top:.8rem;margin-right:.5rem}
+.btn-redo{display:inline-block;background:transparent;color:#90cdf4;border:1px solid rgba(144,205,244,.3);
+          border-radius:10px;padding:.75rem 1.4rem;font-size:.9rem;cursor:pointer;text-decoration:none;margin-top:.8rem}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:1rem">
+    <img src="data:image/png;base64,__FUERTE_LOGO__" alt="Fuerte" style="height:32px">
+    <span style="font-size:.82rem;color:rgba(255,255,255,.5)">Profilo Investitore</span>
+  </div>
+  <a href="/area-clienti" class="hdr-back">&#8592; Area Riservata</a>
+</div>
+<div class="main">
+
+<!-- FASE 0: INTRO -->
+<div class="phase active" id="ph-intro">
+  <div style="text-align:center;padding:2rem 0">
+    <div style="font-size:3rem;margin-bottom:1rem">&#x1F9E0;</div>
+    <h1 style="font-size:1.6rem;font-weight:700;margin-bottom:.8rem">Scopri il tuo Profilo Investitore</h1>
+    <p style="color:#888;font-size:.95rem;line-height:1.7;margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto">
+      7 domande &mdash; meno di 3 minuti.<br>
+      Analizziamo obiettivi, tolleranza al rischio e orizzonte temporale
+      per costruire il <strong style="color:#F6AD55">portafoglio su misura</strong> per te.
+    </p>
+    <div id="profilo-esistente" style="margin-bottom:1.2rem"></div>
+    <button onclick="avviaQuiz()" style="background:linear-gradient(135deg,#F6AD55,#ED8936);color:#0a0f1e;
+      border:none;border-radius:12px;padding:1rem 2.5rem;font-size:1rem;font-weight:700;cursor:pointer">
+      Inizia il test &#8594;
+    </button>
+    <div style="margin-top:1.5rem;font-size:.75rem;color:#444">
+      &#x26A0; A scopo informativo &mdash; non costituisce consulenza finanziaria (MiFID II)
+    </div>
+  </div>
+</div>
+
+<!-- FASE 1: QUIZ -->
+<div class="phase" id="ph-quiz">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div id="quiz-container"></div>
+  <button class="btn-next" id="btn-next" onclick="nextQuestion()">Continua &#8594;</button>
+</div>
+
+<!-- FASE 2: RISULTATI -->
+<div class="phase" id="ph-results">
+  <div id="results-container"></div>
+</div>
+
+</div>
+<script>
+var PROFILO_SALVATO = __PROFILO_JS__;
+var PROFILI = {
+  difensivo: {
+    label:'Difensivo', emoji:'🛡️', color:'#4299E1',
+    range:[7,11],
+    desc:'La tua priorità è la <strong>protezione del capitale</strong>. Preferisci dormire tranquillo sapendo che il tuo patrimonio è al sicuro, anche se questo significa rendimenti più contenuti. Il portafoglio punta su strumenti a bassa volatilità — liquidità e obbligazioni governative di qualità — con una piccola componente diversificata.',
+    desc2:'Le azioni sono presenti in quota minima: quando presenti, privilegia titoli ad alto dividendo e bassa volatilità.',
+    alloc:{Liquidità:20,Obbligazioni:55,Oro:5,Fondi:10,ETF:5,Azioni:5},
+    piano:'BASIC', piano_label:'Piano BASIC — Azioni dividendo, ETF a basso costo'
+  },
+  prudente: {
+    label:'Prudente', emoji:'⚖️', color:'#48BB78',
+    range:[12,16],
+    desc:'Cerchi un equilibrio tra <strong>stabilità e rendimento</strong>. Accetti una modesta volatilità in cambio di risultati superiori al semplice deposito. Il portafoglio combina obbligazioni di qualità con una crescente esposizione a fondi ed ETF, costruendo rendimento costante nel medio termine.',
+    desc2:'La componente azionaria è contenuta — ideale per titoli blue chip con buona visibilità di utili e dividendo sostenibile.',
+    alloc:{Liquidità:10,Obbligazioni:45,Oro:5,Fondi:15,ETF:15,Azioni:10},
+    piano:'BASIC', piano_label:'Piano BASIC — Azioni blue chip, ETF bilanciati'
+  },
+  bilanciato: {
+    label:'Bilanciato', emoji:'📊', color:'#F6AD55',
+    range:[17,20],
+    desc:'Il tuo profilo è equilibrato: accetti <strong>volatilità moderata</strong> in cambio di rendimenti interessanti nel medio-lungo periodo. Il portafoglio combina strumenti difensivi con una significativa componente di crescita, bilanciando stabilità e opportunità senza eccessi.',
+    desc2:'Azioni e ETF occupano metà del portafoglio — seleziona strumenti con buoni fondamentali e diversificazione geografica globale.',
+    alloc:{Liquidità:5,Obbligazioni:30,Oro:5,Fondi:15,ETF:20,Azioni:25},
+    piano:'PRO', piano_label:'Piano PRO — Analisi fondamentale globale, ETF diversificati'
+  },
+  dinamico: {
+    label:'Dinamico', emoji:'🚀', color:'#ED8936',
+    range:[21,24],
+    desc:'La <strong>crescita del capitale</strong> è il tuo obiettivo principale. Sei disposto ad attraversare periodi di volatilità significativa con la consapevolezza che il lungo termine premia chi non si lascia spaventare dalle oscillazioni. Il portafoglio è orientato principalmente verso azioni ed ETF ad alto potenziale.',
+    desc2:'La componente obbligazionaria funge da ammortizzatore — azioni ed ETF selezionati per qualità fondamentale e momentum di mercato.',
+    alloc:{Liquidità:5,Obbligazioni:15,Oro:5,Fondi:10,ETF:25,Azioni:40},
+    piano:'PRO', piano_label:'Piano PRO — Growth stocks, ETF settoriali e tematici'
+  },
+  aggressivo: {
+    label:'Aggressivo', emoji:'⚡', color:'#FC8181',
+    range:[25,28],
+    desc:'Punti alla <strong>massima crescita del capitale</strong> nel lungo periodo. Hai piena consapevolezza dei rischi e la solidità emotiva per gestire drawdown anche importanti senza cedere alla paura. Il portafoglio è quasi interamente investito in azioni ed ETF ad alto potenziale di crescita.',
+    desc2:"L'orizzonte temporale lungo è il tuo vantaggio competitivo — usa il value investing profondo per selezionare i migliori titoli globali con margine di sicurezza.",
+    alloc:{Liquidità:0,Obbligazioni:5,Oro:5,Fondi:10,ETF:25,Azioni:55},
+    piano:'VALUE', piano_label:'Piano VALUE — Deep value globale, ETF growth'
+  }
+};
+var ALLOC_COLORS = {
+  Liquidità:'#718096',Obbligazioni:'#4299E1',Oro:'#F6AD55',
+  Fondi:'#68D391',ETF:'#9F7AEA',Azioni:'#FC8181'
+};
+var DOMANDE = [
+  {testo:'Quanti anni hai?', risposte:[
+    {t:'Più di 65 anni',p:1},{t:'Tra 50 e 65 anni',p:2},
+    {t:'Tra 35 e 50 anni',p:3},{t:'Meno di 35 anni',p:4}]},
+  {testo:'Per quanto tempo puoi tenere investito il tuo denaro senza toccarlo?', risposte:[
+    {t:'Meno di 1 anno — ho bisogno di liquidità a breve',p:1},{t:'Da 1 a 3 anni',p:2},
+    {t:'Da 3 a 10 anni',p:3},{t:'Più di 10 anni — orizzonte lungo',p:4}]},
+  {testo:'Qual è il tuo obiettivo principale?', risposte:[
+    {t:"Proteggere il capitale dall'inflazione",p:1},
+    {t:'Generare un reddito regolare (cedole, dividendi)',p:2},
+    {t:'Far crescere il capitale nel medio-lungo periodo',p:3},
+    {t:'Massimizzare la crescita — accetto alta volatilità',p:4}]},
+  {testo:'Se il tuo portafoglio perdesse il 20% del valore in pochi mesi, cosa faresti?', risposte:[
+    {t:'Venderei tutto per evitare ulteriori perdite',p:1},
+    {t:'Aspetterei preoccupato senza fare nulla',p:2},
+    {t:'Manterrei la posizione con fiducia nel lungo termine',p:3},
+    {t:"Comprerei di più — è un'opportunità",p:4}]},
+  {testo:'Qual è la tua esperienza con gli investimenti finanziari?', risposte:[
+    {t:'Nessuna — ho solo un conto corrente',p:1},
+    {t:'Limitata — qualche fondo pensione o polizza',p:2},
+    {t:'Media — investo regolarmente in azioni o ETF',p:3},
+    {t:'Avanzata — gestisco un portafoglio diversificato',p:4}]},
+  {testo:'Che quota del tuo patrimonio complessivo intendi investire?', risposte:[
+    {t:'Meno del 10%',p:1},{t:'Tra il 10% e il 30%',p:2},
+    {t:'Tra il 30% e il 50%',p:3},{t:'Più del 50%',p:4}]},
+  {testo:'Hai bisogno di accedere ai tuoi risparmi investiti entro i prossimi 12 mesi?', risposte:[
+    {t:'Sì, ho bisogno urgente di liquidità',p:1},{t:'Forse, non sono sicuro',p:2},
+    {t:'Probabilmente no',p:3},{t:'No, sono finanziariamente sereno',p:4}]}
+];
+
+var currentQ=0, risposte=[], selectedP=-1;
+
+function avviaQuiz(){showPhase('ph-quiz');renderQ(0);}
+function showPhase(id){document.querySelectorAll('.phase').forEach(function(p){p.classList.remove('active');});document.getElementById(id).classList.add('active');}
+
+function renderQ(idx){
+  currentQ=idx; selectedP=-1;
+  var d=DOMANDE[idx];
+  document.getElementById('progress-fill').style.width=Math.round((idx/DOMANDE.length)*100)+'%';
+  var letters=['A','B','C','D'];
+  var html='<div class="card"><div class="q-num">Domanda '+(idx+1)+' di '+DOMANDE.length+'</div>'
+    +'<div class="q-text">'+d.testo+'</div><div class="answers">';
+  d.risposte.forEach(function(r,i){
+    html+='<div class="ans" id="ans-'+i+'" onclick="selectAns('+i+','+r.p+')">'
+      +'<div class="ans-icon">'+letters[i]+'</div><span>'+r.t+'</span></div>';
+  });
+  html+='</div></div>';
+  document.getElementById('quiz-container').innerHTML=html;
+  var btn=document.getElementById('btn-next');
+  btn.classList.remove('visible');
+  btn.textContent=(idx<DOMANDE.length-1)?'Continua →':'Vedi il mio profilo →';
+}
+
+function selectAns(idx,punti){
+  document.querySelectorAll('.ans').forEach(function(el){el.classList.remove('selected');});
+  document.getElementById('ans-'+idx).classList.add('selected');
+  selectedP=punti;
+  document.getElementById('btn-next').classList.add('visible');
+}
+
+function nextQuestion(){
+  if(selectedP<0) return;
+  risposte.push(selectedP);
+  if(currentQ<DOMANDE.length-1){renderQ(currentQ+1);}
+  else{document.getElementById('progress-fill').style.width='100%';calcolaRisultato();}
+}
+
+function calcolaRisultato(){
+  var score=risposte.reduce(function(s,v){return s+v;},0);
+  var tipo='bilanciato';
+  Object.keys(PROFILI).forEach(function(k){var r=PROFILI[k].range;if(score>=r[0]&&score<=r[1])tipo=k;});
+  mostraRisultato(tipo,score);
+  fetch('/api/salva-profilo-investitore',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({tipo:tipo,label:PROFILI[tipo].label,score:score,allocazione:PROFILI[tipo].alloc})
+  }).catch(function(){});
+}
+
+function buildDonut(alloc){
+  var items=Object.keys(alloc).filter(function(k){return alloc[k]>0;}).map(function(k){return {label:k,value:alloc[k],color:ALLOC_COLORS[k]};});
+  var total=items.reduce(function(s,d){return s+d.value;},0);
+  var cx=120,cy=120,r=95,ir=55,start=-Math.PI/2,paths='',gap=0.02;
+  items.forEach(function(d){
+    var ang=(d.value/total)*2*Math.PI-gap;
+    var end=start+ang;
+    var x1=cx+r*Math.cos(start),y1=cy+r*Math.sin(start);
+    var x2=cx+r*Math.cos(end),  y2=cy+r*Math.sin(end);
+    var ix1=cx+ir*Math.cos(end),iy1=cy+ir*Math.sin(end);
+    var ix2=cx+ir*Math.cos(start),iy2=cy+ir*Math.sin(start);
+    var la=ang>Math.PI?1:0;
+    paths+='<path d="M '+x1+' '+y1+' A '+r+' '+r+' 0 '+la+' 1 '+x2+' '+y2
+          +' L '+ix1+' '+iy1+' A '+ir+' '+ir+' 0 '+la+' 0 '+ix2+' '+iy2+' Z"'
+          +' fill="'+d.color+'" stroke="#0a0f1e" stroke-width="3"/>';
+    start+=ang+gap;
+  });
+  return '<svg width="240" height="240" viewBox="0 0 240 240" style="display:block;margin:1rem auto">'+paths+'</svg>';
+}
+
+function mostraRisultato(tipo,score){
+  var p=PROFILI[tipo];
+  var html='<div style="text-align:center;padding:1.5rem 0 1rem">'
+    +'<div style="font-size:2.8rem;margin-bottom:.6rem">'+p.emoji+'</div>'
+    +'<div class="profilo-badge" style="background:'+p.color+'22;color:'+p.color+';border:1px solid '+p.color+'44;margin:0 auto">'
+    +p.label.toUpperCase()+'</div>'
+    +'<div style="font-size:.8rem;color:#555;margin-top:.4rem">Score: '+score+' / 28</div>'
+    +'</div>';
+
+  // Descrizione
+  html+='<div class="card">'
+    +'<h3 style="color:'+p.color+';margin-bottom:.8rem;font-size:.88rem;text-transform:uppercase;letter-spacing:.5px">Il tuo profilo</h3>'
+    +'<p style="color:#ccc;font-size:.92rem;line-height:1.8;margin-bottom:.8rem">'+p.desc+'</p>'
+    +'<p style="color:#aaa;font-size:.87rem;line-height:1.7">'+p.desc2+'</p>'
+    +'</div>';
+
+  // Grafico + legenda + barre
+  html+='<div class="card">'
+    +'<h3 style="color:#e0e0e0;margin-bottom:.8rem;font-size:.88rem;text-transform:uppercase;letter-spacing:.5px">Allocazione consigliata</h3>'
+    +buildDonut(p.alloc)
+    +'<div style="display:flex;flex-wrap:wrap;gap:.45rem .9rem;margin:1rem 0">';
+  Object.keys(p.alloc).forEach(function(k){
+    if(p.alloc[k]===0) return;
+    html+='<div style="display:flex;align-items:center;gap:.35rem;font-size:.78rem">'
+      +'<span style="width:9px;height:9px;border-radius:50%;background:'+ALLOC_COLORS[k]+';display:inline-block"></span>'
+      +'<span style="color:#aaa">'+k+'</span>'
+      +'<strong style="color:'+ALLOC_COLORS[k]+'">'+p.alloc[k]+'%</strong></div>';
+  });
+  html+='</div>';
+  Object.keys(p.alloc).forEach(function(k){
+    if(p.alloc[k]===0) return;
+    html+='<div class="alloc-row">'
+      +'<div class="alloc-lbl">'+k+'</div>'
+      +'<div class="alloc-bar-wrap"><div class="alloc-bar" style="width:'+p.alloc[k]+'%;background:'+ALLOC_COLORS[k]+'"></div></div>'
+      +'<div class="alloc-pct" style="color:'+ALLOC_COLORS[k]+'">'+p.alloc[k]+'%</div>'
+      +'</div>';
+  });
+  html+='</div>';
+
+  // CTA Fuerte
+  html+='<div class="fuerte-box">'
+    +'<div style="font-size:.78rem;color:#F6AD55;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.6rem">&#x1F4BC; Prodotti Fuerte Venture Capital consigliati</div>'
+    +'<div style="font-size:.92rem;color:#e0e0e0;font-weight:600;margin-bottom:.4rem">'+p.piano_label+'</div>'
+    +'<div style="font-size:.83rem;color:#888;line-height:1.6;margin-bottom:.3rem">Ricevi ogni settimana i migliori titoli selezionati dal nostro screener quantitativo, già filtrati per il tuo profilo di rischio.</div>'
+    +'<a href="/area-clienti" class="btn-cta">Gestisci il mio piano</a>'
+    +'<button onclick="rifaiTest()" class="btn-redo">&#x21BA; Rifai il test</button>'
+    +'</div>'
+    +'<div style="font-size:.69rem;color:#333;text-align:center;margin-top:1.2rem;line-height:1.6">'
+    +'&#x26A0; Documento informativo — non costituisce consulenza finanziaria, raccomandazione di investimento o sollecitazione all\'acquisto ai sensi della Direttiva MiFID II (2014/65/UE). Prima di investire consulta un consulente finanziario abilitato.'
+    +'</div>';
+
+  showPhase('ph-results');
+  document.getElementById('results-container').innerHTML=html;
+}
+
+function rifaiTest(){risposte=[];currentQ=0;selectedP=-1;showPhase('ph-quiz');renderQ(0);}
+
+// Mostra profilo esistente nella intro
+(function(){
+  var el=document.getElementById('profilo-esistente');
+  if(!el||!PROFILO_SALVATO||!PROFILO_SALVATO.tipo) return;
+  var p=PROFILI[PROFILO_SALVATO.tipo]||{};
+  el.innerHTML='<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);'
+    +'border-radius:10px;padding:.75rem 1.2rem;font-size:.85rem;color:#aaa;display:inline-block">'
+    +'Profilo attuale: <strong style="color:'+(p.color||\'#F6AD55\')+'">'+(p.emoji||'')+' '+(p.label||PROFILO_SALVATO.tipo)+'</strong>'
+    +(PROFILO_SALVATO.data?' &middot; '+PROFILO_SALVATO.data:'')
+    +'</div>';
+})();
+</script>
+</body></html>'''
+
+    return (page
+            .replace('__FUERTE_LOGO__', FUERTE_LOGO_B64)
+            .replace('__PROFILO_JS__',  profilo_js))
+
+
 def _build_grazie_page() -> str:
     logo_tag = f'<img src="data:image/png;base64,{FUERTE_LOGO_B64}" alt="Fuerte Venture Capital" style="height:60px;width:auto;border-radius:12px;margin-bottom:1.5rem">'
     return f"""<!DOCTYPE html><html lang="it"><head>
@@ -12681,6 +12997,30 @@ def _build_area_clienti(email):
         '</a>'
     )
 
+    _pi = cliente.get('profilo_investitore') if cliente else None
+    _pi_label = _pi.get('label','') if _pi else ''
+    _pi_data  = _pi.get('data','')  if _pi else ''
+    _pi_color_map = {'Difensivo':'#4299E1','Prudente':'#48BB78','Bilanciato':'#F6AD55','Dinamico':'#ED8936','Aggressivo':'#FC8181'}
+    _pi_color = _pi_color_map.get(_pi_label, '#F6AD55')
+    _pi_sub   = (f'<span style="color:{_pi_color};font-weight:700">{_pi_label}</span>'
+                 f'<span style="color:#555;font-size:.75rem"> &middot; {_pi_data}</span>') if _pi_label else \
+                '<span style="color:#555;font-size:.82rem">Non ancora compilato — fai il test in 3 minuti</span>'
+    _profilo_card = (
+        '<a href="/profilo-investitore" style="display:block;text-decoration:none;'
+        'background:linear-gradient(135deg,rgba(66,153,225,.12),rgba(15,23,42,.6));'
+        'border:1px solid rgba(66,153,225,.3);border-radius:10px;padding:1rem 1.2rem;'
+        'margin-bottom:.6rem;transition:border-color .2s" '
+        'onmouseover="this.style.borderColor=\'#4299E1\'" onmouseout="this.style.borderColor=\'rgba(66,153,225,.3)\'">'
+        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">'
+        '<div>'
+        f'<div style="font-weight:700;font-size:.95rem;color:#90cdf4;margin-bottom:.3rem">&#x1F9E0; Profilo Investitore</div>'
+        f'<div style="font-size:.82rem">{_pi_sub}</div>'
+        '</div>'
+        '<span style="font-size:.82rem;color:#90cdf4;white-space:nowrap;font-weight:600">Apri &#8594;</span>'
+        '</div>'
+        '</a>'
+    )
+
     _settori_card = (
         '<a href="/settori" style="display:block;text-decoration:none;'
         'background:linear-gradient(135deg,rgba(44,82,130,.25),rgba(15,23,42,.6));'
@@ -13008,7 +13348,7 @@ h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-tra
   {trial_badge}
   <h3>I tuoi screener</h3>
   {rows}
-  <div style="margin-bottom:.6rem">{_idee_card}{_settori_card}</div>
+  <div style="margin-bottom:.6rem">{_profilo_card}{_idee_card}{_settori_card}</div>
   <div style="margin:1.2rem 0">
     {_ordine_block}
   </div>
@@ -13893,6 +14233,16 @@ class Handler(BaseHTTPRequestHandler):
                           if x.get('email','').lower() == email.lower()), None)
             nome  = c.get('nome', email) if c else email
             self._html(_build_settori_clienti(nome)); return
+        if p in ('/profilo-investitore', '/profilo-investitore/'):
+            if not _is_client_auth(self):
+                _redirect(self, '/client-login?next=/profilo-investitore'); return
+            tok   = _get_client_token(self)
+            email = CLIENT_SESSIONS.get(tok, '')
+            db    = read_clienti()
+            c     = next((x for grp in db.values() for x in grp
+                          if x.get('email','').lower() == email.lower()), None)
+            nome  = c.get('nome', email) if c else email
+            self._html(_build_profilo_investitore(nome, email, c)); return
         if p in ('/idee', '/idee/'):
             if not _is_client_auth(self):
                 _redirect(self, '/client-login?next=/idee'); return
@@ -14910,6 +15260,30 @@ Contatta il supporto per attivare il tuo piano.</p>
                     self._json({'ok': False, 'msg': str(e)})
                 return
         # ── Profili banca cliente ─────────────────────────────
+        if p == '/api/salva-profilo-investitore':
+            if not _is_client_auth(self):
+                self._json({'ok': False, 'msg': 'Non autorizzato'}); return
+            try:
+                tok_c   = _get_client_token(self)
+                c_email = CLIENT_SESSIONS.get(tok_c, '')
+                req     = json.loads(self._body())
+                db      = read_clienti()
+                c       = next((x for grp in db.values() for x in grp
+                                if x.get('email','').lower() == c_email.lower()), None)
+                if c:
+                    from datetime import datetime as _dt
+                    c['profilo_investitore'] = {
+                        'tipo':       req.get('tipo', ''),
+                        'label':      req.get('label', ''),
+                        'score':      req.get('score', 0),
+                        'allocazione': req.get('allocazione', {}),
+                        'data':       _dt.now().strftime('%d/%m/%Y'),
+                    }
+                    save_clienti(db)
+                self._json({'ok': True})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
         if p in ('/api/banche', '/api/banche/save', '/api/banche/delete'):
             if not _is_client_auth(self):
                 self._json({'ok': False, 'msg': 'Non autorizzato'}); return
