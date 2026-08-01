@@ -107,8 +107,9 @@ PARAMETRI_FILE= os.path.join(BASE_DIR, "parametri.json")
 SERVIZI_FILE  = os.path.join(BASE_DIR, "servizi_config.json")
 CLIENTI_FILE  = os.path.join(BASE_DIR, "clienti.json")
 BACKUPS_DIR   = os.path.join(BASE_DIR, "BACKUPS", "clienti")
-SESSIONS_FILE = os.path.join(BASE_DIR, "sessions.json")
-PROSPECT_FILE = os.path.join(BASE_DIR, "prospect.json")
+SESSIONS_FILE  = os.path.join(BASE_DIR, "sessions.json")
+RL_BLOCKS_FILE = os.path.join(BASE_DIR, ".rl_blocks.json")
+PROSPECT_FILE  = os.path.join(BASE_DIR, "prospect.json")
 
 running  = {}
 run_lock = threading.Lock()
@@ -164,11 +165,42 @@ def _rl_fail(ip: str):
         _LOGIN_BLOCKED[ip] = now + _RL_BLOCK_TIME
         _LOGIN_ATTEMPTS[ip] = []
         print(f"[SECURITY] IP {ip} bloccato per 30 minuti ({_RL_MAX_ATTEMPTS} tentativi falliti)", flush=True)
+        _save_rl_blocks()
 
 def _rl_ok(ip: str):
     """Azzera i tentativi dopo un login riuscito."""
     _LOGIN_ATTEMPTS.pop(ip, None)
     _LOGIN_BLOCKED.pop(ip, None)
+
+def _save_rl_blocks():
+    """Persiste blocchi IP attivi su file per sopravvivere al riavvio."""
+    try:
+        now = time.time()
+        active = {ip: ts for ip, ts in _LOGIN_BLOCKED.items() if ts > now}
+        tmp = RL_BLOCKS_FILE + '.tmp'
+        with open(tmp, 'w') as f:
+            json.dump(active, f)
+        os.replace(tmp, RL_BLOCKS_FILE)
+        try: os.chmod(RL_BLOCKS_FILE, 0o600)
+        except Exception: pass
+    except Exception as e:
+        print(f"[SECURITY] Errore salvataggio blocchi: {e}", flush=True)
+
+def _load_rl_blocks():
+    """Ripristina blocchi IP attivi all'avvio."""
+    try:
+        now = time.time()
+        with open(RL_BLOCKS_FILE) as f:
+            data = json.load(f)
+        for ip, ts in data.items():
+            if ts > now:
+                _LOGIN_BLOCKED[ip] = ts
+        if _LOGIN_BLOCKED:
+            print(f"[SECURITY] Ripristinati {len(_LOGIN_BLOCKED)} blocchi IP", flush=True)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+    except Exception as e:
+        print(f"[SECURITY] Errore caricamento blocchi: {e}", flush=True)
 
 # ─── VALIDAZIONE INPUT ────────────────────────────────────────
 def _validate_str(s, max_len=200):
@@ -192,8 +224,8 @@ def _persist_sessions():
         os.replace(tmp, SESSIONS_FILE)
         try: os.chmod(SESSIONS_FILE, 0o600)
         except Exception: pass
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[SESSIONS] Errore persist: {e}", flush=True)
 
 def _load_sessions():
     """Ripristina sessioni valide all'avvio del server."""
@@ -218,6 +250,7 @@ def _load_sessions():
         print(f"[SESSIONS] Errore caricamento: {e}", flush=True)
 
 _load_sessions()
+_load_rl_blocks()
 
 def _scadenza_trial_check():
     """Imposta stato='SCADUTO' per i TESTER con trial_end nel passato."""
@@ -2861,7 +2894,8 @@ def _get_token(handler):
     for part in handler.headers.get('Cookie', '').split(';'):
         k, _, v = part.strip().partition('=')
         if k.strip() == 'rt_admin':
-            return v.strip()
+            raw = v.strip()
+            return hashlib.sha256(raw.encode()).hexdigest() if raw else None
     return None
 
 def _is_auth(handler):
@@ -2880,7 +2914,7 @@ def _redirect(handler, location):
 
 def _do_login(handler):
     token = secrets.token_hex(20)
-    SESSIONS[token] = time.time()
+    SESSIONS[hashlib.sha256(token.encode()).hexdigest()] = time.time()
     _persist_sessions()
     handler.send_response(302)
     handler.send_header('Location', '/admin')
@@ -2902,7 +2936,8 @@ def _get_client_token(handler):
     for part in handler.headers.get('Cookie', '').split(';'):
         k, _, v = part.strip().partition('=')
         if k.strip() == 'rt_client':
-            return v.strip()
+            raw = v.strip()
+            return hashlib.sha256(raw.encode()).hexdigest() if raw else None
     return None
 
 def _is_client_auth(handler):
@@ -2918,8 +2953,9 @@ def _is_client_auth(handler):
 
 def _do_client_login(handler, email, must_change=False, next_url=''):
     token = secrets.token_hex(20)
-    CLIENT_SESSIONS[token] = email
-    CLIENT_SESSION_TIMES[token] = time.time()
+    _tkey = hashlib.sha256(token.encode()).hexdigest()
+    CLIENT_SESSIONS[_tkey] = email
+    CLIENT_SESSION_TIMES[_tkey] = time.time()
     _persist_sessions()
     if must_change:
         dest = '/cambia-password'
@@ -15111,11 +15147,16 @@ Contatta il supporto per attivare il tuo piano.</p>
             return
         # ── Forgot password ────────────────────────────────────
         if p == '/api/forgot-password':
+            _logo = f'<img src="data:image/png;base64,{FUERTE_LOGO_B64}" alt="Fuerte Venture Capital">'
+            _fp_ok = FORGOT_PWD_HTML.format(logo=_logo, msg='<p class="msg ok">Se l\'email è registrata riceverai il link entro pochi minuti.</p>')
+            _ip_fp = self.client_address[0]
+            if _rl_check(_ip_fp):
+                self._html(_fp_ok); return  # stessa risposta per non rivelare il blocco
+            _rl_fail(_ip_fp)
             import urllib.parse as _up
             body = self._body()
             fields = dict(_up.parse_qsl(body, keep_blank_values=True))
             email_in = fields.get('email', '').strip().lower()
-            _logo = f'<img src="data:image/png;base64,{FUERTE_LOGO_B64}" alt="Fuerte Venture Capital">'
             db = read_clienti()
             match = next((c for c in (db.get('tester', []) + db.get('clienti', []))
                           if c.get('email', '').lower() == email_in and c.get('stato') == 'ATTIVO'), None)
@@ -15144,8 +15185,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     print(f"[RESET-PWD] Email inviata a {email_in}", flush=True)
                 except Exception as e:
                     print(f"[RESET-PWD] Errore SMTP: {e}", flush=True)
-            self._html(FORGOT_PWD_HTML.format(logo=_logo,
-                msg='<p class="msg ok">Se l\'email è registrata riceverai il link entro pochi minuti.</p>')); return
+            self._html(_fp_ok); return
         # ── Reset password (da link email) ─────────────────────
         if p == '/api/reset-password':
             import urllib.parse as _up
