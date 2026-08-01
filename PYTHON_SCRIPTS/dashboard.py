@@ -5701,7 +5701,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
 
     <div class="box" style="font-size:.84rem;line-height:1.7">
       <strong>⏰ Scheduler automatico (lun-ven):</strong><br>
-      <span style="opacity:.55">22:30 Aggiorna Universo Fondi EU &nbsp;·&nbsp; 23:00 AZIONI &nbsp;·&nbsp; 23:30 ETF+FONDI+FONDI_EU</span>
+      <span style="opacity:.55">08:00 Social (lun/mer/ven) &nbsp;·&nbsp; 20:30 Aggiorna Universo Fondi EU &nbsp;·&nbsp; 21:00 AZIONI &nbsp;·&nbsp; 21:45 ETF+FONDI+FONDI_EU</span>
     </div>
   </div>
 
