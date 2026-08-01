@@ -11947,7 +11947,7 @@ function mostraRisultato(tipo,score){
     +'<button onclick="rifaiTest()" class="btn-redo">&#x21BA; Rifai il test</button>'
     +'</div>'
     +'<div style="font-size:.69rem;color:#333;text-align:center;margin-top:1.2rem;line-height:1.6">'
-    +'&#x26A0; Documento informativo — non costituisce consulenza finanziaria, raccomandazione di investimento o sollecitazione all\'acquisto ai sensi della Direttiva MiFID II (2014/65/UE). Prima di investire consulta un consulente finanziario abilitato.'
+    +'&#x26A0; Documento informativo — non costituisce consulenza finanziaria, raccomandazione di investimento o sollecitazione all&#39;acquisto ai sensi della Direttiva MiFID II (2014/65/UE). Prima di investire consulta un consulente finanziario abilitato.'
     +'</div>';
 
   showPhase('ph-results');
