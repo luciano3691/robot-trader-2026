@@ -3644,6 +3644,41 @@ def _delete_conto(email: str, conto: str) -> None:
     with open(_conti_path(email), 'w', encoding='utf-8') as f:
         json.dump(conti, f, ensure_ascii=False)
 
+# ─── Profili banca cliente (banca + iban + gestore + email) ──
+def _profili_path(email: str) -> str:
+    return os.path.join(_email_to_folder(email), 'profili_banca.json')
+
+def _load_profili(email: str) -> list:
+    path = _profili_path(email)
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def _save_profilo(email: str, profilo: dict) -> None:
+    iban = (profilo.get('iban') or '').strip().upper().replace(' ', '')
+    if not iban:
+        return
+    folder = _email_to_folder(email)
+    os.makedirs(folder, exist_ok=True)
+    profili = [p for p in _load_profili(email)
+               if (p.get('iban') or '').strip().upper().replace(' ', '') != iban]
+    profili.insert(0, profilo)
+    with open(_profili_path(email), 'w', encoding='utf-8') as f:
+        json.dump(profili[:20], f, ensure_ascii=False)
+
+def _delete_profilo(email: str, iban: str) -> None:
+    iban = iban.strip().upper().replace(' ', '')
+    profili = [p for p in _load_profili(email)
+               if (p.get('iban') or '').strip().upper().replace(' ', '') != iban]
+    folder = _email_to_folder(email)
+    os.makedirs(folder, exist_ok=True)
+    with open(_profili_path(email), 'w', encoding='utf-8') as f:
+        json.dump(profili, f, ensure_ascii=False)
+
 def _leggi_ordini_cliente(email: str) -> list:
     folder = _email_to_folder(email)
     if not os.path.isdir(folder):
@@ -10821,6 +10856,33 @@ table.sl-tbl input.num:focus{outline:none;border-color:#f6ad55}
 
   <div class="card">
     <div class="card-title">Destinatario &amp; Invio</div>
+    <div class="form-row" style="margin-bottom:.75rem">
+      <div class="fg" style="position:relative">
+        <label>Profilo Banca Salvato <span style="opacity:.45;font-size:.78rem;font-weight:400">(pre-compila tutti i campi)</span></label>
+        <div style="display:flex;gap:.35rem">
+          <div style="flex:1;position:relative">
+            <input type="text" id="profilo-inp" placeholder="Cerca banca salvata..." autocomplete="off"
+                   style="width:100%" oninput="profiliFilter()" onfocus="profiliShow()" onblur="setTimeout(profiliHide,200)">
+            <button type="button" onclick="profiliToggle()" tabindex="-1"
+                    style="position:absolute;right:.45rem;top:50%;transform:translateY(-50%);
+                           background:none;border:none;color:#90cdf4;cursor:pointer;font-size:.85rem">&#9660;</button>
+          </div>
+          <button type="button" onclick="profiliSalva()"
+                  style="padding:0 .9rem;background:#1a2e40;border:1px solid #2C5282;
+                         border-radius:6px;color:#90cdf4;cursor:pointer;font-size:.78rem;
+                         white-space:nowrap;flex-shrink:0" title="Salva profilo banca corrente">&#x1F4BE; Salva</button>
+        </div>
+        <div id="profili-drop" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 2px);
+             background:#111827;border:1px solid #2C5282;border-radius:8px;z-index:200;
+             box-shadow:0 8px 24px rgba(0,0,0,.6);overflow:hidden;max-height:220px;overflow-y:auto">
+          <div id="profili-list"></div>
+          <div style="padding:.3rem .8rem;border-top:1px solid rgba(255,255,255,.05);font-size:.7rem;color:#4a5568">
+            &#x1F4BE; Salvato automaticamente dopo ogni ordine
+          </div>
+        </div>
+        <div id="profili-msg" style="font-size:.75rem;margin-top:.25rem;min-height:.9rem"></div>
+      </div>
+    </div>
     <div class="form-row">
       <div class="fg" style="flex:2">
         <label>Nome Banca / Intermediario *</label>
@@ -11397,6 +11459,105 @@ function prefillRows() {
 
 prefillRows();
 initAnagrafica();
+
+// ─── Profili banca salvati ──────────────────────────────────
+var _profiliSaved = [];
+
+function profiliLoad(){
+  fetch('/api/banche').then(function(r){return r.json();}).then(function(d){
+    _profiliSaved = d.profili || [];
+    profiliRender(_profiliSaved);
+  }).catch(function(){});
+}
+
+function profiliRender(list){
+  var el = document.getElementById('profili-list');
+  if(!el) return;
+  if(!list.length){
+    el.innerHTML='<div style="padding:.55rem 1rem;color:#4a5568;font-size:.82rem">Nessun profilo salvato</div>';
+    return;
+  }
+  el.innerHTML='';
+  list.forEach(function(p){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;padding:.45rem .85rem;cursor:pointer;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.04);transition:background .12s';
+    row.addEventListener('mouseover',function(){this.style.background='#1a2e40';});
+    row.addEventListener('mouseout',function(){this.style.background='';});
+    row.addEventListener('mousedown',function(){profiliSelect(p);});
+    var info=document.createElement('div');
+    info.style.cssText='flex:1;min-width:0';
+    info.innerHTML='<div style="font-size:.87rem;font-weight:600;color:#e2e8f0">'+(p.banca||'—')+'</div>'
+      +'<div style="font-size:.75rem;color:#718096;font-family:monospace">'+(p.iban||'')+'</div>'
+      +(p.nome_gestore?'<div style="font-size:.73rem;color:#4a5568">'+(p.nome_gestore)+'</div>':'');
+    var del=document.createElement('span');
+    del.title='Elimina';
+    del.style.cssText='color:#e53e3e;font-size:.72rem;padding:.15rem .4rem;border-radius:3px;cursor:pointer;opacity:.65;flex-shrink:0';
+    del.textContent='✕';
+    del.addEventListener('mouseover',function(){this.style.opacity='1';});
+    del.addEventListener('mouseout',function(){this.style.opacity='.65';});
+    del.addEventListener('mousedown',function(e){e.stopPropagation();profiliDelete(p.iban);});
+    row.appendChild(info);
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+}
+
+function profiliShow(){ var d=document.getElementById('profili-drop'); if(d) d.style.display='block'; }
+function profiliHide(){ var d=document.getElementById('profili-drop'); if(d) d.style.display='none'; }
+function profiliToggle(){ var d=document.getElementById('profili-drop'); if(d) d.style.display=(d.style.display==='none'?'block':'none'); }
+function profiliFilter(){
+  var q=(document.getElementById('profilo-inp').value||'').toLowerCase();
+  var filtered=q?_profiliSaved.filter(function(p){
+    return (p.banca||'').toLowerCase().indexOf(q)>=0
+        || (p.nome_gestore||'').toLowerCase().indexOf(q)>=0
+        || (p.iban||'').toLowerCase().indexOf(q)>=0;
+  }):_profiliSaved;
+  profiliRender(filtered);
+  profiliShow();
+}
+
+function profiliSelect(p){
+  var setBk=document.getElementById('bank_nome');
+  var setGe=document.getElementById('nome_gestore');
+  var setEm=document.getElementById('bank_email');
+  var setIb=document.getElementById('bank_iban');
+  if(setBk) setBk.value=p.banca||'';
+  if(setGe) setGe.value=p.nome_gestore||'';
+  if(setEm) setEm.value=p.email_gestore||'';
+  if(setIb) setIb.value=p.iban||'';
+  var inp=document.getElementById('profilo-inp');
+  if(inp) inp.value=(p.banca||'')+(p.nome_gestore?' — '+p.nome_gestore:'');
+  profiliHide();
+}
+
+function profiliDelete(iban){
+  fetch('/api/banche/delete',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({iban:iban})}).then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      _profiliSaved=_profiliSaved.filter(function(p){return p.iban!==iban;});
+      profiliRender(_profiliSaved);
+    }
+  }).catch(function(){});
+}
+
+function profiliSalva(){
+  var banca=(document.getElementById('bank_nome')||{}).value||'';
+  var gestore=(document.getElementById('nome_gestore')||{}).value||'';
+  var email=(document.getElementById('bank_email')||{}).value||'';
+  var iban=(document.getElementById('bank_iban')||{}).value||'';
+  var msg=document.getElementById('profili-msg');
+  if(!iban){if(msg){msg.style.color='#FC8181';msg.textContent='Inserisci prima l\'IBAN nel form sottostante';}return;}
+  fetch('/api/banche/save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({banca:banca,iban:iban,nome_gestore:gestore,email_gestore:email})})
+  .then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      if(msg){msg.style.color='#68D391';msg.textContent='Profilo salvato!';setTimeout(function(){msg.textContent='';},2500);}
+      profiliLoad();
+    }else{if(msg){msg.style.color='#FC8181';msg.textContent=d.msg||'Errore';}}
+  }).catch(function(){if(msg){msg.style.color='#FC8181';msg.textContent='Errore di rete';}});
+}
+
+profiliLoad();
 
 // ─── Conti bancari salvati ─────────────────────────────────
 var _contiSaved = [];
@@ -12708,6 +12869,83 @@ function confermaAggiuntaSvc(){{
     else:
         aggiungi_section = ''
 
+    # ─── Sezione Banche Salvate ──────────────────────────────
+    _banche_section = (
+        '<div style="margin-top:1.5rem">'
+        '<h3>&#x1F3E6; Banche Salvate</h3>'
+        '<div id="banche-list" style="margin-bottom:.8rem"></div>'
+        '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem">'
+        '<div style="font-size:.82rem;color:#F6AD55;font-weight:600;margin-bottom:.8rem">Aggiungi profilo banca</div>'
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">'
+        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Banca / Intermediario</label>'
+        '<input id="nb-banca" type="text" placeholder="es. Banca Sella, Fineco..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
+        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">IBAN Conto Cliente</label>'
+        '<input id="nb-iban" type="text" placeholder="IT60 X054..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;font-family:monospace;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>'
+        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Gestore</label>'
+        '<input id="nb-gestore" type="text" placeholder="es. Mario Rossi" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
+        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Email Gestore</label>'
+        '<input id="nb-email" type="email" placeholder="gestore@banca.it" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
+        '</div>'
+        '<div style="display:flex;align-items:center;gap:.6rem">'
+        '<button onclick="bancaSalva()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:600;cursor:pointer">Salva profilo</button>'
+        '<span id="nb-msg" style="font-size:.78rem"></span>'
+        '</div></div></div>'
+        '<script>'
+        'function bancaLoad(){'
+        '  fetch("/api/banche").then(function(r){return r.json();}).then(function(d){'
+        '    bancaRender(d.profili||[]);'
+        '  }).catch(function(){});'
+        '}'
+        'function bancaRender(list){'
+        '  var el=document.getElementById("banche-list");'
+        '  if(!el)return;'
+        '  if(!list.length){el.innerHTML=\'<div style="font-size:.82rem;color:#555;padding:.4rem 0">Nessun profilo salvato</div>\';return;}'
+        '  el.innerHTML="";'
+        '  list.forEach(function(c){'
+        '    var row=document.createElement("div");'
+        '    row.style.cssText="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.65rem 1rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.8rem";\n'
+        '    var sub=(c.nome_gestore?(c.nome_gestore+(c.email_gestore?" \xb7 "+c.email_gestore:"")):"");\n'
+        '    row.innerHTML=\'<div style="flex:1"><div style="font-weight:600;font-size:.88rem;color:#90cdf4">\''
+        '      +(c.banca||"—")+"</div>"'
+        '      +\'<div style="font-size:.76rem;color:#888;font-family:monospace">\''
+        '      +(c.iban||"—")+"</div>"'
+        '      +(sub?\'<div style="font-size:.75rem;color:#666">\'+sub+"</div>":"")+'
+        '      \'</div>\''
+        '      +\'<span onclick="bancaDel(\\\'\'+c.iban+\'\\\')" style="color:#e53e3e;font-size:.8rem;cursor:pointer;padding:.2rem .5rem">&#x2715;</span>\';\n'
+        '    el.appendChild(row);'
+        '  });'
+        '}'
+        'function bancaSalva(){'
+        '  var banca=document.getElementById("nb-banca").value.trim();'
+        '  var iban=document.getElementById("nb-iban").value.trim();'
+        '  var gestore=document.getElementById("nb-gestore").value.trim();'
+        '  var email=document.getElementById("nb-email").value.trim();'
+        '  var msg=document.getElementById("nb-msg");'
+        '  if(!iban){msg.style.color="#FC8181";msg.textContent="IBAN obbligatorio";return;}'
+        '  fetch("/api/banche/save",{method:"POST",headers:{"Content-Type":"application/json"},'
+        '    body:JSON.stringify({banca:banca,iban:iban,nome_gestore:gestore,email_gestore:email})})'
+        '  .then(function(r){return r.json();}).then(function(d){'
+        '    if(d.ok){'
+        '      msg.style.color="#68D391";msg.textContent="Salvato!";'
+        '      document.getElementById("nb-banca").value="";'
+        '      document.getElementById("nb-iban").value="";'
+        '      document.getElementById("nb-gestore").value="";'
+        '      document.getElementById("nb-email").value="";'
+        '      setTimeout(function(){msg.textContent="";},2500);'
+        '      bancaLoad();'
+        '    }else{msg.style.color="#FC8181";msg.textContent=d.msg||"Errore";}'
+        '  }).catch(function(){msg.style.color="#FC8181";msg.textContent="Errore di rete";});'
+        '}'
+        'function bancaDel(iban){'
+        '  fetch("/api/banche/delete",{method:"POST",headers:{"Content-Type":"application/json"},'
+        '    body:JSON.stringify({iban:iban})})'
+        '  .then(function(r){return r.json();}).then(function(d){if(d.ok)bancaLoad();})'
+        '  .catch(function(){});'
+        '}'
+        'bancaLoad();'
+        '</script>'
+    )
+
     _num_fatt = cliente.get('numero_fattura', '')
     _fattura_btn = (
         f'<a href="/api/mia-fattura" target="_blank"'
@@ -12775,6 +13013,7 @@ h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-tra
     {_ordine_block}
   </div>
   {_ordini_storico}
+  {_banche_section}
   {aggiungi_section}
   <div style="display:flex;justify-content:flex-end;align-items:center;gap:.8rem;margin-top:1.2rem;margin-bottom:.5rem">
     {_fattura_btn}
@@ -14670,6 +14909,32 @@ Contatta il supporto per attivare il tuo piano.</p>
                 except Exception as e:
                     self._json({'ok': False, 'msg': str(e)})
                 return
+        # ── Profili banca cliente ─────────────────────────────
+        if p in ('/api/banche', '/api/banche/save', '/api/banche/delete'):
+            if not _is_client_auth(self):
+                self._json({'ok': False, 'msg': 'Non autorizzato'}); return
+            tok_c   = _get_client_token(self)
+            c_email = CLIENT_SESSIONS.get(tok_c, '')
+            if p == '/api/banche':
+                self._json({'ok': True, 'profili': _load_profili(c_email)}); return
+            try:
+                req = json.loads(self._body())
+                if p == '/api/banche/save':
+                    iban = req.get('iban', '').strip()
+                    if not iban:
+                        self._json({'ok': False, 'msg': 'IBAN obbligatorio'}); return
+                    _save_profilo(c_email, {
+                        'banca':         req.get('banca', '').strip(),
+                        'iban':          iban.upper(),
+                        'nome_gestore':  req.get('nome_gestore', '').strip(),
+                        'email_gestore': req.get('email_gestore', '').strip(),
+                    })
+                else:  # /api/banche/delete
+                    _delete_profilo(c_email, req.get('iban', ''))
+                self._json({'ok': True})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
         # ── Rotte ordine cliente (richiede sessione cliente) ──
         if p in ('/api/ordine/prezzi', '/api/ordine/csv', '/api/ordine/invia'):
             if not _is_client_auth(self):
@@ -14764,6 +15029,19 @@ Contatta il supporto per attivare il tuo piano.</p>
                         if conto_val:
                             try:
                                 _save_conto(c_email, conto_val)
+                            except Exception:
+                                pass
+                        # Auto-salva profilo banca completo se IBAN e email gestore presenti
+                        _bank_iban  = data.get('bank_iban', '').strip()
+                        _bank_email = data.get('bank_email', '').strip()
+                        if _bank_iban and _bank_email and c_email:
+                            try:
+                                _save_profilo(c_email, {
+                                    'banca':         data.get('bank_nome', '').strip(),
+                                    'iban':          _bank_iban.upper(),
+                                    'nome_gestore':  data.get('nome_gestore', '').strip(),
+                                    'email_gestore': _bank_email,
+                                })
                             except Exception:
                                 pass
                     self._json({'ok': ok, 'msg': msg, 'riferimento': rif})
