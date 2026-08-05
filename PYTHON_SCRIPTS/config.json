@@ -84,8 +84,8 @@
     "meta": {
       "app_id": "",
       "app_secret": "",
-      "redirect_uri": "http://localhost:8080/api/meta/callback",
-      "page_id": "",
+      "redirect_uri": "https://plaza-gothic-barcode.ngrok-free.dev/api/meta/callback",
+      "page_id": "61591196613530",
       "ig_user_id": ""
     },
     "anthropic": {
