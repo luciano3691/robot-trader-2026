@@ -181,7 +181,38 @@ def run_fetch_fondi_eu():
 # JOB 1a — Screener AZIONI (23:00 lun-ven)
 # ---------------------------------------------------------------------------
 
+def _notify_brevo(subject, html):
+    api_key     = os.getenv('BREVO_API_KEY', '')
+    sender_email = os.getenv('BREVO_SENDER_EMAIL', 'marketing@fuerteventurecapital.com')
+    sender_name  = os.getenv('BREVO_SENDER_NAME',  'Fuerte Venture Capital SL')
+    if not api_key:
+        return
+    try:
+        requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            headers={'api-key': api_key, 'content-type': 'application/json'},
+            json={
+                'sender': {'name': sender_name, 'email': sender_email},
+                'to':     [{'email': 'rioluc63@gmail.com', 'name': 'Luciano'}],
+                'subject': subject,
+                'htmlContent': html,
+            },
+            timeout=15,
+        )
+    except Exception as e:
+        logger.warning("_notify_brevo fallito: %s" % e)
+
+
 def run_screeners_azioni():
+    ts = datetime.now().strftime('%d/%m/%Y %H:%M')
+    _notify_brevo(
+        subject='[RT2026] ▶ Screener AZIONI PARTITO — %s' % ts,
+        html=(
+            '<p>Lo screener <b>AZIONI</b> è partito alle <b>%s</b>.</p>'
+            '<p>Parallelismo: 12 worker · ~2621 ticker · stima completamento: <b>~20 minuti</b>.</p>'
+            '<p>Riceverai un\'altra mail quando i report sono pronti.</p>'
+        ) % ts,
+    )
     ok = _run_orchestrator(['AZIONI'], 'AZIONI', timeout_sec=7200)  # max 2h
     if ok and _WA_OK:
         try:
