@@ -13,7 +13,8 @@ import time
 import json
 import smtplib
 from email.mime.text import MIMEText
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+import threading as _threading
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout, as_completed as _as_completed
 
 
 def _is_network_error(detail):
@@ -915,16 +916,15 @@ def _write_azioni_plan_excel(plan_name, cfg, selected, rejected, non_validi, err
     print(f"  ✅ Salvato: {os.path.basename(fname)}")
 
 # ===========================================================================
-# FASE 1 — RACCOLTA DATI (tutti i ticker, nessun filtro applicato)
+# FASE 1 — RACCOLTA DATI PARALLELA (tutti i ticker, nessun filtro applicato)
 # ===========================================================================
-all_stocks = []   # dati validi raccolti, senza filtri
-errors     = []
+_FETCH_WORKERS = 12   # thread paralleli; Yahoo Finance regge 10-15 senza ban
 
-for idx, ticker in enumerate(ALL_AZIONI, 1):
-    print(f"[{idx}/{len(ALL_AZIONI)}] {ticker}...", end=" ", flush=True)
+def _fetch_one(ticker):
+    """Scarica dati per un ticker con retry su errori di rete. Thread-safe."""
     mercato = get_market_from_ticker(ticker)
     stock   = None
-    for attempt in range(1, 4):  # max 3 tentativi
+    for attempt in range(1, 4):
         try:
             _ex  = ThreadPoolExecutor(max_workers=1)
             _fut = _ex.submit(get_stock_data, ticker)
@@ -933,29 +933,40 @@ for idx, ticker in enumerate(ALL_AZIONI, 1):
             except FuturesTimeout:
                 stock = {'Ticker': ticker, 'Error': 'timeout (>45s)'}
                 _fut.cancel()
-                break  # non ritentare su timeout
+                break
             finally:
-                _ex.shutdown(wait=False)  # non aspettare thread yfinance bloccato
+                _ex.shutdown(wait=False)
         except Exception as _e:
             stock = {'Ticker': ticker, 'Error': str(_e)}
         if 'Error' not in stock:
             break
         if not _is_network_error(stock.get('Error', '')):
-            break  # errore dati strutturale — non ha senso riprovare
+            break
         if attempt < 3:
-            print(f"\n  ↻ Errore rete — retry {attempt}/2 tra 5s...", flush=True)
             time.sleep(5)
+    return ticker, mercato, stock
 
-    if 'Error' in stock:
-        errors.append(stock)
-        print(f"❌ [{stock['Error'][:60]}]", flush=True)
-        time.sleep(0.1)
-        continue
-    stock['Mercato'] = mercato
-    stock['Indice']  = TICKER_TO_INDICE.get(ticker, 'N/A')
-    all_stocks.append(stock)
-    print("✓", flush=True)
-    time.sleep(0.5)
+all_stocks = []
+errors     = []
+_lock      = _threading.Lock()
+_total     = len(ALL_AZIONI)
+
+print(f"Parallelismo: {_FETCH_WORKERS} worker | {_total} ticker", flush=True)
+
+with ThreadPoolExecutor(max_workers=_FETCH_WORKERS) as _pool:
+    _futs = {_pool.submit(_fetch_one, t): t for t in ALL_AZIONI}
+    for _i, _fut in enumerate(_as_completed(_futs), 1):
+        _ticker, _mercato, _stock = _fut.result()
+        if 'Error' in _stock:
+            with _lock:
+                errors.append(_stock)
+            print(f"[{_i}/{_total}] {_ticker}... ❌ [{_stock['Error'][:60]}]", flush=True)
+        else:
+            _stock['Mercato'] = _mercato
+            _stock['Indice']  = TICKER_TO_INDICE.get(_ticker, 'N/A')
+            with _lock:
+                all_stocks.append(_stock)
+            print(f"[{_i}/{_total}] {_ticker}... ✓", flush=True)
 
 print(f"\n✅ Raccolta: {len(all_stocks)} validi · {len(errors)} errori")
 

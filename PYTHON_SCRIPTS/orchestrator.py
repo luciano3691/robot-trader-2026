@@ -16,6 +16,7 @@ import time
 import threading
 import json
 import smtplib
+import requests
 from email.mime.text import MIMEText
 from datetime import datetime
 
@@ -86,7 +87,31 @@ def _load_smtp():
     return host, login, pwd, sender, admin
 
 def send_admin_email(subject, body_text):
-    host, login, pwd, sender, admin = _load_smtp()
+    admin = _load_smtp()[4]
+    # Tentativo 1: Brevo REST API
+    api_key     = os.getenv('BREVO_API_KEY', '')
+    sender_email = os.getenv('BREVO_SENDER_EMAIL', 'marketing@fuerteventurecapital.com')
+    sender_name  = os.getenv('BREVO_SENDER_NAME',  'Fuerte Venture Capital SL')
+    if api_key:
+        try:
+            resp = requests.post(
+                'https://api.brevo.com/v3/smtp/email',
+                headers={'api-key': api_key, 'content-type': 'application/json'},
+                json={
+                    'sender':      {'name': sender_name, 'email': sender_email},
+                    'to':          [{'email': admin, 'name': 'Admin'}],
+                    'subject':     subject,
+                    'textContent': body_text,
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            print(f"  [ADMIN EMAIL] Inviata a {admin} via Brevo (HTTP {resp.status_code})", flush=True)
+            return
+        except Exception as e:
+            print(f"  [ADMIN EMAIL] Brevo fallito ({e}) — fallback SMTP", flush=True)
+    # Tentativo 2: SMTP fallback
+    host, login, pwd, sender, _ = _load_smtp()
     if not login or not pwd:
         print(f"  [ADMIN EMAIL] SMTP non configurato — email non inviata", flush=True)
         return
@@ -99,7 +124,7 @@ def send_admin_email(subject, body_text):
             srv.starttls()
             srv.login(login, pwd)
             srv.sendmail(sender, [admin], msg.as_string())
-        print(f"  [ADMIN EMAIL] Inviata a {admin}", flush=True)
+        print(f"  [ADMIN EMAIL] Inviata a {admin} via SMTP", flush=True)
     except Exception as e:
         print(f"  [ADMIN EMAIL] Errore SMTP: {e}", flush=True)
 

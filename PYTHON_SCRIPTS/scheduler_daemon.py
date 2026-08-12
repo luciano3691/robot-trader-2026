@@ -26,9 +26,18 @@ import sys
 import logging
 import subprocess
 import time
+import smtplib
+from email.mime.text import MIMEText
+import requests
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+
+try:
+    from dotenv import load_dotenv as _load_dotenv
+    _load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
+except ImportError:
+    pass
 
 try:
     import whatsapp_service as _wa
@@ -39,6 +48,60 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # PATH
 # ---------------------------------------------------------------------------
+
+def _notify_start():
+    log = logging.getLogger('scheduler')
+    ts = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    subject = f"[RT2026] Scheduler AVVIATO - {ts}"
+    body_html = (
+        f"<p>Lo scheduler di Robot Trader 2026 e' stato avviato alle <b>{ts}</b>.</p>"
+        f"<p>Job attivi: Fondi EU Fetch (20:30), AZIONI (21:00), ETF+FONDI+EU (21:45), Social (08:00 lun/mer/ven).</p>"
+    )
+
+    # Tentativo 1: Brevo REST API
+    api_key = os.getenv("BREVO_API_KEY", "")
+    sender_email = os.getenv("BREVO_SENDER_EMAIL", "marketing@fuerteventurecapital.com")
+    sender_name  = os.getenv("BREVO_SENDER_NAME",  "Fuerte Venture Capital SL")
+    if api_key:
+        try:
+            resp = requests.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={"api-key": api_key, "content-type": "application/json"},
+                json={
+                    "sender": {"name": sender_name, "email": sender_email},
+                    "to":     [{"email": "rioluc63@gmail.com", "name": "Luciano"}],
+                    "subject": subject,
+                    "htmlContent": body_html,
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            log.info("Email notifica avvio inviata OK via Brevo (HTTP %d)" % resp.status_code)
+            return
+        except Exception as e:
+            log.warning("Brevo fallito (%s) — fallback Gmail SMTP" % e)
+
+    # Tentativo 2: SMTP fallback (usa le stesse credenziali in BREVO_SMTP_*)
+    smtp_host = os.getenv("BREVO_SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("BREVO_SMTP_PORT", "587"))
+    smtp_user = os.getenv("BREVO_SMTP_LOGIN", "")
+    smtp_pwd  = os.getenv("BREVO_SMTP_PASSWORD", "")
+    if smtp_user and smtp_pwd:
+        try:
+            msg = MIMEText(body_html, "html", "utf-8")
+            msg["Subject"] = subject
+            msg["From"]    = smtp_user
+            msg["To"]      = "rioluc63@gmail.com"
+            with smtplib.SMTP(smtp_host, smtp_port, timeout=15) as smtp:
+                smtp.ehlo()
+                smtp.starttls()
+                smtp.login(smtp_user, smtp_pwd)
+                smtp.sendmail(smtp_user, ["rioluc63@gmail.com"], msg.as_string())
+            log.info("Email notifica avvio inviata OK via SMTP (%s)" % smtp_host)
+        except Exception as e2:
+            log.warning("Email notifica avvio fallita anche via SMTP: %s" % e2)
+    else:
+        log.warning("Email notifica avvio: nessuna credenziale SMTP disponibile")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PYTHON   = sys.executable  # usa sempre il Python corrente
@@ -119,7 +182,7 @@ def run_fetch_fondi_eu():
 # ---------------------------------------------------------------------------
 
 def run_screeners_azioni():
-    ok = _run_orchestrator(['AZIONI'], 'AZIONI', timeout_sec=3600)  # max 1h
+    ok = _run_orchestrator(['AZIONI'], 'AZIONI', timeout_sec=7200)  # max 2h
     if ok and _WA_OK:
         try:
             stats = _wa.notify_screener_ready()
@@ -158,6 +221,7 @@ def run_social():
             encoding='utf-8',
             errors='replace',
             timeout=300,  # 5 minuti
+            env={**os.environ, 'PYTHONIOENCODING': 'utf-8'},
         )
         if result.stdout:
             logger.info("OUTPUT:\n%s" % result.stdout)
@@ -253,6 +317,7 @@ if __name__ == '__main__':
 
     scheduler.start()
     logger.info("Scheduler avviato. Premi CTRL+C per fermare.")
+    _notify_start()
 
     try:
         while True:
