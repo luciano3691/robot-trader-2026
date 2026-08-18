@@ -1695,7 +1695,7 @@ def save_clienti(data):
 
 CSV_FIELDS = [
     'nome','cognome','email',
-    'piano_azioni','piano_etf','piano_fondi','piano_ordini',
+    'piano_azioni','piano_etf','piano_fondi','piano_ordini','piano_wealthos',
     'stato','data_registrazione','data_attivazione',
     # dati fiscali (flattenati)
     'paese','data_nascita','indirizzo','cap','citta',
@@ -2449,7 +2449,10 @@ input[type=password]:focus{{border-color:#F6AD55}}
   <div class="sub">Accesso Amministratore</div>
   {error}
   <form method="POST" action="/login">
-    <input type="password" name="pwd" placeholder="Password" autofocus autocomplete="current-password">
+    <div style="position:relative">
+      <input type="password" name="pwd" id="adm-pwd" placeholder="Password" autofocus autocomplete="current-password" style="width:100%;padding-right:2.8rem">
+      <span onclick="var i=document.getElementById('adm-pwd');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈'" style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;user-select:none">👁</span>
+    </div>
     <button type="submit" class="btn">ENTRA</button>
   </form>
   <div class="back"><a href="/">← Robot Trader 2026</a></div>
@@ -7655,10 +7658,11 @@ Contatta il supporto per attivare il tuo piano.</p>
                 nuovo = {
                     'nome':    nome, 'cognome': cogn, 'email': email,
                     'codice_cliente': codice_cliente,
-                    'piano_azioni':  req.get('piano_azioni', 'NONE'),
-                    'piano_etf':     req.get('piano_etf',    'NONE'),
-                    'piano_fondi':   req.get('piano_fondi',  'NONE'),
-                    'piano_ordini':  req.get('piano_ordini', 'NONE'),
+                    'piano_azioni':    req.get('piano_azioni',   'NONE'),
+                    'piano_etf':       req.get('piano_etf',      'NONE'),
+                    'piano_fondi':     req.get('piano_fondi',    'NONE'),
+                    'piano_ordini':    req.get('piano_ordini',   'NONE'),
+                    'piano_wealthos':  req.get('piano_wealthos', 'NONE'),
                     'screener_attivi': [],
                     'data_registrazione': now_str,
                     'data_attivazione':   now_str,
@@ -8533,10 +8537,11 @@ Contatta il supporto per attivare il tuo piano.</p>
                     'nome':               req.get('nome', '').strip(),
                     'cognome':            req.get('cognome', '').strip(),
                     'email':              email,
-                    'piano_azioni':       req.get('piano_azioni',  'NONE'),
-                    'piano_etf':          req.get('piano_etf',     'NONE'),
-                    'piano_fondi':        req.get('piano_fondi',   'NONE'),
-                    'piano_ordini':       req.get('piano_ordini',  'NONE'),
+                    'piano_azioni':       req.get('piano_azioni',   'NONE'),
+                    'piano_etf':          req.get('piano_etf',      'NONE'),
+                    'piano_fondi':        req.get('piano_fondi',    'NONE'),
+                    'piano_ordini':       req.get('piano_ordini',   'NONE'),
+                    'piano_wealthos':     req.get('piano_wealthos', 'NONE'),
                     'screener_attivi':    [],
                     'data_registrazione': _now_a.strftime('%Y-%m-%d'),
                     'data_attivazione':   '',
@@ -8566,7 +8571,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     self._json({'ok': False, 'msg': 'Cliente non trovato'}); return
                 c = lista[idx]
                 # Aggiorna piani se forniti
-                for asset in ['azioni','etf','fondi','ordini']:
+                for asset in ['azioni','etf','fondi','ordini','wealthos']:
                     k = f'piano_{asset}'
                     if k in req: c[k] = req[k]
                 # Genera credenziali
