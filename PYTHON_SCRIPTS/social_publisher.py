@@ -27,6 +27,14 @@ TOKENS_FILE  = os.path.join(BASE_DIR, "social_tokens.json")
 SOCIAL_LOGS  = os.path.join(BASE_DIR, "SOCIAL_LOGS")
 os.makedirs(SOCIAL_LOGS, exist_ok=True)
 
+# Logo FVC di default per ogni canale — dimensioni ottimali per post
+_ASSETS = "https://www.fuerteventurecapital.com/assets"
+DEFAULT_CHANNEL_IMAGES = {
+    "facebook":  f"{_ASSETS}/logo_fuerte_venture_FB_851x315_0726.png",
+    "instagram": f"{_ASSETS}/logo_fuerte_venture_IG_1080x566_0726.png",
+    "linkedin":  f"{_ASSETS}/logo_fuerte_venture_LI_400x400_0726.png",
+}
+
 
 def _cfg() -> dict:
     try:
@@ -489,8 +497,12 @@ def publish_to_all_channels(draft: dict) -> dict:
     channels = draft.get('channels', ['linkedin', 'facebook', 'instagram'])
     text_it  = draft.get('text_it', '')
     text_es  = draft.get('text_es', '')
-    image_url = draft.get('image_url')
+    image_url   = draft.get('image_url')
     article_url = draft.get('article_url')
+
+    # URL immagine per canale: usa quello del draft se presente, altrimenti il logo FVC di default
+    fb_image  = draft.get('facebook_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['facebook']
+    ig_image  = draft.get('instagram_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['instagram']
 
     # Brevo newsletter (testo IT come corpo email)
     if 'brevo' in channels:
@@ -517,23 +529,19 @@ def publish_to_all_channels(draft: dict) -> dict:
             url=article_url,
         )
 
-    # Facebook (testo IT)
+    # Facebook (testo IT + logo FVC 851×315)
     if 'facebook' in channels:
         meta = MetaService()
         results['facebook'] = meta.publish_facebook(
             text=text_it,
             url=article_url,
-            image_url=image_url,
+            image_url=fb_image,
         )
 
-    # Instagram (testo IT — richiede image_url pubblico)
+    # Instagram (testo IT + logo FVC 1080×566 — deve essere URL pubblico)
     if 'instagram' in channels:
         meta = MetaService()
-        if image_url:
-            results['instagram'] = meta.publish_instagram(text=text_it, image_url=image_url)
-        else:
-            results['instagram'] = {"ok": False, "detail": "Instagram richiede image_url — skippato"}
-            _log("Instagram: skippato (nessuna image_url nel draft)")
+        results['instagram'] = meta.publish_instagram(text=text_it, image_url=ig_image)
 
     ok_count = sum(1 for v in results.values() if v.get('ok'))
     _log(f"Pubblicazione draft {draft['draft_id']}: {ok_count}/{len(results)} canali OK")
