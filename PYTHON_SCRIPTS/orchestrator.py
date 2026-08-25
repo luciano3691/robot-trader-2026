@@ -35,6 +35,19 @@ REPORTS_DIR = os.path.join(os.path.dirname(BASE_DIR), "REPORTS_DAILY")
 LOGS_DIR    = os.path.join(os.path.dirname(BASE_DIR), "LOGS")
 os.makedirs(LOGS_DIR, exist_ok=True)
 
+# ── Lockfile: impedisce doppia esecuzione parallela ─────────────────────────
+import fcntl as _fcntl
+_LOCK_PATH = '/tmp/rt2026_orchestrator.lock'
+_lock_fh   = open(_LOCK_PATH, 'w')
+try:
+    _fcntl.flock(_lock_fh, _fcntl.LOCK_EX | _fcntl.LOCK_NB)
+    _lock_fh.write(str(os.getpid()))
+    _lock_fh.flush()
+except BlockingIOError:
+    print('[ORCHESTRATOR] Già in esecuzione (lockfile %s) — uscita.' % _LOCK_PATH, flush=True)
+    sys.exit(0)
+
+
 _log_path = os.path.join(LOGS_DIR, "orchestrator_%s.log" % datetime.now().strftime('%Y%m%d_%H%M%S'))
 _log_file = open(_log_path, 'w', encoding='utf-8', buffering=1)
 
@@ -210,6 +223,30 @@ tipi_label = ', '.join(s['type'] for s in screeners)
 print(f"Screener: {tipi_label}  ({len(screeners)}/{len(ALL_SCREENERS)})")
 print("=" * 70)
 
+# ── Pulizia REPORTS_DAILY: mantieni solo ultimi 30 giorni ────────────────────
+def _cleanup_old_reports(days_to_keep=30):
+    """Elimina file Excel in REPORTS_DAILY più vecchi di N giorni."""
+    import glob as _glob
+    from datetime import datetime as _dt, timedelta as _td
+    cutoff = _dt.now() - _td(days=days_to_keep)
+    removed = 0
+    try:
+        for fpath in _glob.glob(os.path.join(REPORTS_DIR, "*.xlsx")):
+            mtime = _dt.fromtimestamp(os.path.getmtime(fpath))
+            if mtime < cutoff:
+                os.remove(fpath)
+                removed += 1
+                print(f"  [CLEANUP] Rimosso: {os.path.basename(fpath)}", flush=True)
+        if removed:
+            print(f"  [CLEANUP] {removed} file rimossi (più vecchi di {days_to_keep} giorni)", flush=True)
+        else:
+            print(f"  [CLEANUP] Nessun file da rimuovere in REPORTS_DAILY", flush=True)
+    except Exception as e:
+        print(f"  [CLEANUP] Errore: {e}", flush=True)
+
+_cleanup_old_reports(days_to_keep=30)
+
+
 for i, screener in enumerate(screeners, 1):
     print(f"\n[{i}/{len(screeners)}] Eseguendo {screener['script']}...")
     print("-" * 70)
@@ -250,6 +287,15 @@ for i, screener in enumerate(screeners, 1):
         print(f"ERRORE durante {screener['script']} (exit {exit_code})")
 
     sys.stdout.flush()
+
+_ts_fine = datetime.now().strftime('%d/%m/%Y %H:%M')
+_tipi_label = '+'.join(s['type'] for s in screeners)
+send_admin_email(
+    f"[RT2026] ✅ Screener {_tipi_label} COMPLETATO — {_ts_fine}",
+    f"Screener {_tipi_label} completato alle {_ts_fine}.\n"
+    f"Report Excel generati in REPORTS_DAILY.\n"
+    f"--- Robot Trader 2026"
+)
 
 print("\n" + "=" * 70)
 print("ORCHESTRATOR COMPLETATO")
@@ -453,13 +499,12 @@ def genera_kb_reports():
 if os.path.exists(REPORTS_DIR):
     genera_kb_reports()
 
-# ── WhatsApp: notifica a tutti i clienti/tester con opt-in ──────────────────
-if _WA_OK:
-    print("\nInvio notifiche WhatsApp...")
-    try:
-        stats = _wa.notify_screener_ready()
-        print(f"WhatsApp: inviati={stats['sent']} falliti={stats['failed']} saltati={stats['skipped']}")
-    except Exception as e:
-        print(f"WhatsApp: errore ({e})")
-else:
-    print("\nWhatsApp: modulo non disponibile (pip install requests)")
+# WhatsApp: notifica spostata al job 07:00 WEST (watchdog in scheduler_daemon.py)
+
+# ── Aggiorna frequenza ticker (persistenza storica) ──────────────────────────
+try:
+    from ticker_frequency import run as _tf_run
+    _tf_run()
+except Exception as _tf_ex:
+    print(f'[ticker_freq] Errore: {_tf_ex}', flush=True)
+

@@ -13,15 +13,17 @@ import time
 import json
 import smtplib
 from email.mime.text import MIMEText
+import socket
+socket.setdefaulttimeout(20)
 import threading as _threading
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout, as_completed as _as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed as _as_completed
 
 
 def _is_network_error(detail):
     if not detail:
         return False
     d = detail.lower()
-    return any(k in d for k in ['curl', 'resolve host', 'connection', 'timeout', 'network', 'errno 11001', 'recv failure'])
+    return any(k in d for k in ['curl', 'resolve host', 'connection', 'timeout', 'network', 'errno 11001', 'recv failure', 'too many', 'rate limit', 'rate limited', '429'])
 
 
 def _send_alert_email_azioni(total, network_errors, non_validi_total):
@@ -918,32 +920,30 @@ def _write_azioni_plan_excel(plan_name, cfg, selected, rejected, non_validi, err
 # ===========================================================================
 # FASE 1 — RACCOLTA DATI PARALLELA (tutti i ticker, nessun filtro applicato)
 # ===========================================================================
-_FETCH_WORKERS = 12   # thread paralleli; Yahoo Finance regge 10-15 senza ban
+_FETCH_WORKERS = 1    # 1 worker + sleep 1.5s = ~65 min, evita ban Yahoo Finance
 
 def _fetch_one(ticker):
-    """Scarica dati per un ticker con retry su errori di rete. Thread-safe."""
+    """Scarica dati per un ticker con retry su errori di rete. Thread-safe.
+    Timeout gestito da socket.setdefaulttimeout(20) — nessun inner ThreadPoolExecutor."""
+    time.sleep(1.5)  # pace anti rate-limit Yahoo Finance
     mercato = get_market_from_ticker(ticker)
     stock   = None
     for attempt in range(1, 4):
         try:
-            _ex  = ThreadPoolExecutor(max_workers=1)
-            _fut = _ex.submit(get_stock_data, ticker)
-            try:
-                stock = _fut.result(timeout=45)
-            except FuturesTimeout:
-                stock = {'Ticker': ticker, 'Error': 'timeout (>45s)'}
-                _fut.cancel()
-                break
-            finally:
-                _ex.shutdown(wait=False)
+            stock = get_stock_data(ticker)
         except Exception as _e:
             stock = {'Ticker': ticker, 'Error': str(_e)}
+        if stock is None:
+            stock = {'Ticker': ticker, 'Error': 'nessun dato'}
         if 'Error' not in stock:
             break
-        if not _is_network_error(stock.get('Error', '')):
+        err = stock.get('Error', '')
+        if not _is_network_error(err):
             break
+        is_rate_limit = any(k in err.lower() for k in ['too many', 'rate limit', '429'])
+        wait = 90 if is_rate_limit else 5
         if attempt < 3:
-            time.sleep(5)
+            time.sleep(wait)
     return ticker, mercato, stock
 
 all_stocks = []

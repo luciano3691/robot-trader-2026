@@ -3,6 +3,8 @@
 Robot Trader 2026 - ETF Screener
 FIXED: Formato percentuale italiano + Parametri dinamici da parametri.json
 """
+import socket
+socket.setdefaulttimeout(20)
 import yfinance as yf
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side, GradientFill

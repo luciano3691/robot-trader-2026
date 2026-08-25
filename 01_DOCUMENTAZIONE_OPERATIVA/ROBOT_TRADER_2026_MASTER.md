@@ -752,25 +752,47 @@ Richiede: account Meta Business verificato + numero di telefono dedicato + templ
 
 ## 20. Sicurezza e Autenticazione
 
+**Ultimo aggiornamento sicurezza:** 01/08/2026 — sessione 11 (3 commit: 799c545, 025616c, 3df253a)
+
 ### Admin
 
 | Aspetto | Dettaglio |
 |---|---|
-| **Cookie** | `rt_admin=secrets.token_hex(20)` |
-| **Storage** | In-memory dict `SESSIONS` — reset a ogni riavvio |
+| **Cookie** | `rt_admin=secrets.token_hex(20)` (raw, inviato al browser) |
+| **Storage** | `SESSIONS[SHA256(raw_cookie)]` — chiave = hash, non il token raw |
+| **Persistenza** | `sessions.json` (atomic write + chmod 600) — sopravvive al riavvio |
 | **Timeout** | 8 ore fisso (non sliding) |
-| **Password** | In `config.json → admin_password` — ⚠️ CAMBIARE da "123" |
+| **Password** | In `config.json → admin_password` — nessun default; stringa vuota = login impossibile |
 | **Lock** | `threading.Lock()` su lettura/scrittura clienti.json |
 
 ### Cliente
 
 | Aspetto | Dettaglio |
 |---|---|
-| **Cookie** | `rt_client` |
-| **Storage** | In-memory dict `CLIENT_SESSIONS` — reset a ogni riavvio |
+| **Cookie** | `rt_client` raw → `CLIENT_SESSIONS[SHA256(raw)]` come chiave |
+| **Persistenza** | Incluso in `sessions.json` (stessa logica admin) |
 | **Timeout** | 24h sliding (si rinnova ad ogni richiesta) |
-| **Password** | Hash SHA-256 in clienti.json |
+| **Password** | **bcrypt** per nuove password; `_verify_pwd()` backward-compat SHA-256 per utenti esistenti |
 | **Primo accesso** | Flag `must_change_password` → redirect cambio password obbligatorio |
+
+### Rate limiting
+
+| Aspetto | Dettaglio |
+|---|---|
+| **Login** | 5 tentativi in 15 min → blocco IP 30 min |
+| **Persistenza blocchi** | `.rl_blocks.json` (chmod 600) — sopravvive al riavvio |
+| **Forgot-password** | Rate limit con risposta identica se bloccato (anti-enumeration) |
+
+### Protezioni aggiuntive (sessione 11)
+
+| Protezione | Dettaglio |
+|---|---|
+| **XSS** | `html.escape()` su tutti i messaggi di errore inseriti in HTML |
+| **SSL** | `ssl.create_default_context()` esplicito su tutti i `urlopen()` |
+| **CORS** | `Access-Control-Allow-Origin: {BASE_URL}` — no wildcard `*` |
+| **CF in log** | Codice Fiscale mascherato: `CF[:4]+'***'` |
+| **Ngrok injection** | Regex `^[a-zA-Z0-9._-]+$` valida dominio prima di `shell=True` |
+| **Session leak** | `sessions.json` contiene solo SHA256 dei token — inutile senza i cookie |
 
 ### Scrittura atomica (clienti.json)
 
@@ -817,22 +839,35 @@ def _safe(v):
 
 ### 🔴 Blocca il lancio pubblico
 
-1. **Cloudflare Tunnel** — senza questo il sito non è raggiungibile da internet
-   - Scaricare `cloudflared.exe`, configurare UUID in `config.yml`
+1. **Cloudflare Tunnel / VPS Hetzner** — senza questo il sito non è raggiungibile da internet
+   - Credenziali SSH Hetzner da recuperare via console cloud
+   - Installare `cloudflared` su VPS, configurare tunnel
    - Aggiornare `config.json → base_url` a `https://www.fuerteventurecapital.com`
 
-2. **Password admin** — ancora `"123"` in `config.json → admin_password`
-   - Cambiare con stringa forte prima del go-live
+2. **Email lancio 2.435 prospect** — bozza Brevo ID 1 pronta, da inviare **dopo** go-live
 
-### 🟡 In attesa credenziali
+### 🟡 In attesa / post go-live
 
-3. **Social Automation** — Brevo `api_key`, LinkedIn `client_id/secret`, Meta `page_id`
-4. **WhatsApp Business** — account Meta verificato + numero dedicato + template approvati
+3. **Stripe pagamenti automatici** — zero ricavi senza questo
+4. **LinkedIn posting** — in attesa approvazione "Marketing Developer Platform"
+5. **Meta completare** — recuperare Page ID + IG User ID
+6. **WhatsApp Business** — account Meta verificato + numero dedicato + template approvati
 
-### 🔑 Sicurezza — Azioni pendenti (da 16/06/2026)
+### ✅ Sicurezza — completato (01/08/2026)
 
-5. **Ruotare API key Anthropic** (era esposta in log debug di sessione)
-6. **Rigenerare App Password Gmail** (era in chiaro in config.json)
+- bcrypt per nuove password (backward-compat SHA-256) ✅
+- XSS escape su errori HTML ✅
+- Nessuna password default in config ✅
+- sessions.json chmod 600 ✅
+- SSL esplicito su tutti i urlopen ✅
+- CORS ristretto a BASE_URL ✅
+- CF mascherato nei log ✅
+- Ngrok injection prevention ✅
+- Rate limit persistente su disco ✅
+- Forgot-password throttle anti-enumeration ✅
+- SHA256 token keys (sessions.json non contiene token raw) ✅
+- Session persist error logging ✅
+- Segreti in `.env` (Anthropic, Gmail, Brevo, WhatsApp, LinkedIn, Meta) ✅
 
 ### 🔵 Nota operativa Python path
 
@@ -929,8 +964,33 @@ PYTHON_SCRIPTS\logs\robot_trader_20260626_2300.log
 | 24/06/2026 | Debug completo: 12 bug risolti — orchestrator file matching, NaN in JSON, FONDI_ALTRI→BOUTIQUE, FONDI_EU in get_status() e fatture, _get_param ETF/Fondi, chat split maxsplit, filtro SOSPESO email |
 | 25/06/2026 | 452 ticker morti rimossi da ticker_lists_5000.py; bottone ✕ rimozione manuale ticker + remove_ticker_from_lists(); click-per-riga con highlight visivo; Var% fix (priorità regularMarketChangePercent) |
 | 26/06/2026 | Database espanso a 9.779 ticker (JustETF 4.630 ISIN + Fondi EU 536); ISIN detection (regex JS+Python, bottone verde JustETF, no fetch YF); conteggi email dinamici runtime; tester inclusi nelle email; bug fix orchestrator FONDI/FONDI_EU (pattern _SCREENER_); log schedulatore notturno |
+| 19/07/2026 | Sessioni 6–9: `.env` creato (tutti i segreti); email early adopter 5/5 tester via Brevo REST; sessioni persistenti; rate limiting IP; validazione input; Trial 7gg automatico; tagline INFORMATI CON INTELLIGENZAI; ticker count dinamico 10.086; bozza lancio Brevo ID 1 (2.435 prospect); tab Analytics (MRR/ARR/ARPU/LTV/Funnel/Scenari) |
+| 29/07/2026 | Gmail SMTP fix orchestrator (`_load_smtp()` leggeva root invece di `cfg["email"]`); logging su file; Task Scheduler Windows installato (`RT2026 Scheduler Daemon` ONLOGON); `START_SCHEDULER.bat` |
+| 01/08/2026 | **Security audit dashboard.py** — 12 fix in 3 commit: bcrypt password (backward-compat SHA-256), XSS escape, nessuna password default, sessions.json chmod 600, SSL esplicito, CORS ristretto a BASE_URL, CF mascherato in log, ngrok regex injection prevention, rate limit persistente (.rl_blocks.json), forgot-password throttle anti-enumeration, SHA256 token keys in sessions, session persist error logging |
+| 22/08/2026 | Fix screener: 12→3 worker (Yahoo Finance 429); backoff 90s; swap 2GB VPS; Stripe RT2026 TEST end-to-end (9 price_id abbonamenti €29/39/59/mese); fattura FVC PDF unificata con WealthOS; tab Fatture AdminPanel; Landing form gratuito rimosso → solo Stripe |
+| 23/08/2026 | CRM Agente B2C; social footer; KB fetcher WealthOS; fix IPv4 Brevo |
+| 24/08/2026 | **report_pdf.py** — PDF A4 con Top N + colonna FREQ + Pagina 2 Scheda Ordine stampabile (checkbox SEL); **ticker_frequency.py** — conta apparizioni ticker in Top N ultimi 30gg; Tab admin Email Log + Ticker Freq.; fix scorer AZIONI BASIC; fix rate-limit Yahoo ETF+FONDI |
+| 25/08/2026 | VPS: /static/ route pubblica; logo WA 512×512 profilo WhatsApp; PHONE_NUMBER_ID +34 680678734; template screener_pronto PENDING Meta; sincronizzazione locale↔VPS |
+| 26/08/2026 | **email_notifier.py V3** — genera PDF, salva in /root/REPORTS_PDF/, allega PDF all'email (fallback Excel); **dashboard.py** — route /api/report-pdf/ + bottone "Scarica PDF" area cliente |
 
 ---
 
-*Fuerte Venture Capital SL · CIF B23881691 · Villaverde, Las Palmas de Gran Canaria, Spagna*  
-*Documento master — aggiornato il 26/06/2026 — sostituisce tutti i precedenti file Stato_Progetto_RobotTrader2026_\*.md*
+## 25. Flusso PDF — Dal 26/08/2026
+
+```
+21:00 scheduler → orchestrator → value_screener_*.py → Excel in REPORTS_DAILY/
+  └─ email_notifier V3 → report_pdf.py → PDF in memoria
+       ├─ Salva → /root/REPORTS_PDF/ASSET_PIANO_Report_YYYYMMDD.pdf
+       └─ Allega PDF all'email Brevo → clienti
+
+Area riservata (/area-clienti):
+  └─ "⬇ Scarica PDF" → GET /api/report-pdf/<asset>
+       └─ _latest_plan_pdf() → file più recente in REPORTS_PDF/
+```
+
+Fallback automatico: se PDF fallisce → allega Excel come V2.
+
+---
+
+*Fuerte Venture Capital SL · CIF B23881691 · Villaverde, Las Palmas de Gran Canaria, Spagna*
+*Documento master — aggiornato il 26/08/2026*

@@ -4,6 +4,8 @@ Robot Trader 2026 - FONDI EU Screener
 Analizza fondi UCITS europei usando fondi_eu_universe_cache.json
 (costruito da fetch_fondi_eu_universe.py) + dati Yahoo Finance.
 """
+import socket
+socket.setdefaulttimeout(20)
 import yfinance as yf
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side

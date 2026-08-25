@@ -15,7 +15,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* TOPBAR */
 .topbar{background:#2C5282;border-bottom:3px solid #F6AD55;padding:.9rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
 .brand{display:flex;align-items:center;gap:.75rem}
-.brand-logo{width:36px;height:36px;background:linear-gradient(135deg,#2C5282,#F6AD55);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.brand-logo{height:36px;width:auto;border-radius:8px;display:block;flex-shrink:0}
 .brand-title{color:#F6AD55;font-size:1.15rem;font-weight:700;letter-spacing:.3px}
 .brand-sub{font-size:.72rem;opacity:.45;margin-top:.1rem}
 .topbar-right{display:flex;align-items:center;gap:1rem}
@@ -196,7 +196,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
-    <div class="brand-logo">🤖</div>
+    <img class="brand-logo" src="data:image/png;base64,__FUERTE_LOGO__" alt="Fuerte Venture Capital">
     <div>
       <div class="brand-title">Robot Trader 2026</div>
       <div class="brand-sub">Fuerte Venture Capital SL</div>
@@ -225,6 +225,9 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
     <div class="tab" onclick="switchTab(this,'database')">🗃️ Database</div>
     <div class="tab" onclick="switchTab(this,'kb')">📚 KB</div>
     <div class="tab" onclick="switchTab(this,'onboarding')">📋 Onboarding</div>
+    <div class="tab" onclick="switchTab(this,'fatture')">&#x1F4C4; Fatture</div>
+    <div class="tab" onclick="switchTab(this,'emaillog')">&#x1F4E7; Email Log</div>
+    <div class="tab" onclick="switchTab(this,'tickerfreq')">&#x1F4CA; Ticker Freq.</div>
   </div>
 
   <!-- ══════════ HOME ══════════ -->
@@ -554,7 +557,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
               <div>
                 <div style="font-size:.78rem;color:#888;margin-bottom:.3rem">Interesse</div>
                 <select id="nl-interesse" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:.5rem .75rem;color:#e0e0e0;font-size:.88rem;outline:none">
-                  <option>Tutti</option><option>Azioni</option><option>ETF</option><option>Fondi</option>
+                  <option>Tutti</option><option>Azioni</option><option>ETF</option><option>Fondi</option><option>WealthOS</option>
                 </select>
               </div>
             </div>
@@ -696,6 +699,12 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
             </select>
           </div>
         </div>
+        <div style="margin-top:.6rem">
+          <div style="font-size:.78rem;color:#c9a84c;margin-bottom:.3rem">WealthOS</div>
+          <select id="ag-wealthos" style="width:100%;background:#0a0f1e;border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:.5rem;color:#e0e0e0;font-size:.85rem;outline:none">
+            <option>NONE</option><option>ATTIVO</option><option>SOSPESO</option>
+          </select>
+        </div>
       </div>
       <div style="display:flex;gap:.7rem;margin-top:1.4rem;justify-content:flex-end">
         <button class="btn" onclick="chiudiModals()" style="background:rgba(255,255,255,.07)">Annulla</button>
@@ -709,7 +718,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
     <div style="background:#1a1f2e;border:1px solid rgba(104,211,145,.3);border-radius:14px;padding:2rem;width:100%;max-width:460px;margin:1rem">
       <h3 style="margin-bottom:.4rem;color:#68D391">✅ Attiva Cliente</h3>
       <div id="at-info" style="font-size:.85rem;color:#aaa;margin-bottom:1.2rem"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin-bottom:1rem">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin-bottom:.6rem">
         <div>
           <div style="font-size:.78rem;color:#888;margin-bottom:.3rem">Piano Azioni</div>
           <select id="at-azioni" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem;color:#e0e0e0;font-size:.85rem;outline:none">
@@ -734,6 +743,12 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
             <option>NONE</option><option>BASIC</option><option>PRO</option><option>VALUE</option>
           </select>
         </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <div style="font-size:.78rem;color:#c9a84c;margin-bottom:.3rem">WealthOS</div>
+        <select id="at-wealthos" style="width:100%;background:#0a0f1e;border:1px solid rgba(201,168,76,.3);border-radius:6px;padding:.5rem;color:#e0e0e0;font-size:.85rem;outline:none">
+          <option>NONE</option><option>ATTIVO</option><option>SOSPESO</option>
+        </select>
       </div>
       <div style="font-size:.8rem;color:#888;background:rgba(104,211,145,.05);border-radius:8px;padding:.7rem .9rem;margin-bottom:1rem">
         Verrà generata una password temporanea e inviata via email (se Brevo è configurato).
@@ -1369,8 +1384,88 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
     </div>
   </div>
 
-  <div class="footer">Robot Trader 2026 — Fuerte Venture Capital SL</div>
+
+  <!-- FATTURE -->
+  <div id="fatture" class="panel">
+    <div class="sec-head">
+      <h2>&#x1F4C4; Fatture Emesse</h2>
+      <div style="display:flex;gap:.6rem;align-items:center">
+        <span id="fat-count" style="font-size:.8rem;color:rgba(255,255,255,.4)"></span>
+        <button onclick="loadFatture()" style="background:#2C5282;border:1px solid #F6AD55;color:#F6AD55;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600">&#x21BB; Aggiorna</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Numero Fattura</th><th>Data Emissione</th><th style="text-align:right">KB</th><th style="text-align:center">Download</th></tr></thead>
+        <tbody id="fat-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;opacity:.4">Caricamento...</td></tr></tbody>
+      </table>
+    </div>
+    <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:1rem">Fatture in <code>/root/FATTURE/</code> &mdash; invia al commercialista mensilmente.</p>
+  </div>
+
+  <div style="text-align:center;padding:1.5rem 2rem;font-size:.74rem;color:rgba(255,255,255,.28);border-top:1px solid rgba(246,173,85,.1);margin-top:2rem">
+    <img src="data:image/png;base64,__FUERTE_LOGO__" alt="FVC" style="height:22px;width:auto;border-radius:5px;vertical-align:middle;margin-right:6px;opacity:.6">
+    Robot Trader 2026 &mdash; Fuerte Venture Capital SL &middot; CIF B23881691<br>
+    Calle Puipana 3, 35640 Villaverde, Las Palmas, España &middot; <a href="mailto:info@fuerteventurecapital.com" style="color:rgba(246,173,85,.5);text-decoration:none">info@fuerteventurecapital.com</a> &middot; <a href="https://www.fuerteventurecapital.com" style="color:rgba(246,173,85,.5);text-decoration:none">www.fuerteventurecapital.com</a><br>
+    &copy; 2026 Fuerte Venture Capital SL &mdash; Tutti i diritti riservati
+  </div>
 </div>
+
+  <!-- ══════════ EMAIL LOG ══════════ -->
+  <div id="emaillog" class="panel">
+    <h2 style="margin-bottom:1rem;color:#F6AD55">&#x1F4E7; Email Log — Invii Report</h2>
+    <div id="elog-stats" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem"></div>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">
+      <select id="elog-filter-type" onchange="elogRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="">Tutti i tipi</option>
+        <option value="AZIONI">AZIONI</option>
+        <option value="ETF">ETF</option>
+        <option value="FONDI">FONDI</option>
+        <option value="FONDI_EU">FONDI_EU</option>
+      </select>
+      <select id="elog-filter-status" onchange="elogRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="">Tutti gli stati</option>
+        <option value="OK">Solo OK</option>
+        <option value="ERR">Solo Errori</option>
+      </select>
+    </div>
+    <div id="elog-table"></div>
+  </div>
+
+  <!-- ══════════ TICKER FREQUENCY ══════════ -->
+  <div id="tickerfreq" class="panel">
+    <h2 style="margin-bottom:1rem;color:#F6AD55">&#x1F4CA; Frequenza Ticker — Stabilita del Segnale</h2>
+    <p style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem">
+      Quante volte ogni ticker e apparso nel Top N degli ultimi 30 giorni.
+      <strong style="color:#68D391">Verde</strong> = molto stabile (5+ giorni).
+      <strong style="color:#F6AD55">Giallo</strong> = stabile (3-4 giorni).
+    </p>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">
+      <select id="tf-asset" onchange="tfRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="AZIONI">AZIONI</option>
+        <option value="ETF">ETF</option>
+        <option value="FONDI">FONDI</option>
+        <option value="FONDI_EU">FONDI_EU</option>
+      </select>
+      <select id="tf-piano" onchange="tfRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="BASIC">BASIC</option>
+        <option value="PRO">PRO</option>
+        <option value="VALUE">VALUE</option>
+      </select>
+      <select id="tf-min" onchange="tfRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="1">Tutti</option>
+        <option value="2">Min 2 gg</option>
+        <option value="3" selected>Min 3 gg</option>
+        <option value="5">Min 5 gg</option>
+      </select>
+    </div>
+    <div id="tf-table"></div>
+  </div>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -1459,7 +1554,7 @@ function renderClienti(){
   if(_sd) _sd.textContent = nDest + ' destinatari';
 
   // Tabella
-  var headers = ['Nome','Email','Paese','Azioni','ETF','Fondi','Ordini','Stato','Registrato','Operazioni'];
+  var headers = ['Nome','Email','Paese','Azioni','ETF','Fondi','Ordini','WealthOS','Stato','Registrato','Operazioni'];
   var headHtml = headers.map(function(h){
     return '<th style="background:#2C5282;color:#fff;padding:.5rem .8rem;text-align:left;font-size:.82rem">'+h+'</th>';
   }).join('');
@@ -1467,6 +1562,7 @@ function renderClienti(){
 
   var pianoColor = {NONE:'#555',BASIC:'#4A90D9',PRO:'#F6AD55',VALUE:'#68D391'};
   var statoColor = {TESTER:'#F6AD55',ATTIVO:'#68D391',SOSPESO:'#FC8181',SCADUTO:'#9F7AEA'};
+  var wosColor   = {NONE:'#444',ATTIVO:'#c9a84c',SOSPESO:'#FC8181'};
 
   function badge(val, colors){
     var c = colors[val]||'#888';
@@ -1489,7 +1585,7 @@ function renderClienti(){
     var anagBtn = '<button class="btn" style="padding:.2rem .55rem;font-size:.75rem;border-color:rgba(179,151,90,.4);color:#B3975A" '
       +'onclick="mostraModalAnagrafica(\''+cat+'\','+idx+')" title="Dati anagrafici e fiscali">📋'+cfOk+'</button>';
     var attivaBtn = (c.stato!=='ATTIVO')
-      ? '<button class="btn btn-gr" style="padding:.2rem .6rem;font-size:.75rem" onclick="mostraModalAttiva(\''+cat+'\','+idx+',\''+c.nome+'\',\''+c.email+'\',\''+c.piano_azioni+'\',\''+c.piano_etf+'\',\''+c.piano_fondi+'\',\''+c.piano_ordini+'\')">Attiva</button>'
+      ? '<button class="btn btn-gr" style="padding:.2rem .6rem;font-size:.75rem" onclick="mostraModalAttiva(\''+cat+'\','+idx+',\''+c.nome+'\',\''+c.email+'\',\''+c.piano_azioni+'\',\''+c.piano_etf+'\',\''+c.piano_fondi+'\',\''+c.piano_ordini+'\',\''+(c.piano_wealthos||'NONE')+'\')">Attiva</button>'
       : '<span style="color:#68D391;font-size:.78rem">✓</span>';
     var fattBtn = (c.numero_fattura)
       ? '<a href="/api/fattura/'+c.numero_fattura+'" target="_blank" class="btn" style="padding:.2rem .5rem;font-size:.72rem;border-color:rgba(246,173,85,.35);color:#F6AD55;text-decoration:none" title="Scarica fattura '+c.numero_fattura+'">🧾</a>'
@@ -1499,6 +1595,10 @@ function renderClienti(){
     var waBtn = '<button class="btn" style="padding:.2rem .5rem;font-size:.72rem;'
       +(waOn ? 'border-color:#25D36644;color:#25D366' : 'border-color:#55555566;color:#666')
       +'" onclick="toggleWhatsapp(\''+cat+'\','+idx+','+waOn+')" title="'+(waOn?'WhatsApp attivo — clicca per disattivare':'Attiva notifiche WhatsApp')+'">📱'+(waOn?'✓':'')+'</button>';
+    var wosStatus = c.piano_wealthos || 'NONE';
+    var wosBtn = (wosStatus === 'ATTIVO')
+      ? '<a href="http://localhost:3099" target="_blank" class="btn" style="padding:.2rem .5rem;font-size:.72rem;border-color:#c9a84c55;color:#c9a84c;text-decoration:none" title="Apri WealthOS Admin">⚡</a>'
+      : '<a href="http://localhost:3099" target="_blank" class="btn" style="padding:.2rem .5rem;font-size:.72rem;border-color:#55555566;color:#666;text-decoration:none" title="Attiva WealthOS">W</a>';
     return '<tr style="background:'+bg+'">'
       +'<td style="padding:.45rem .8rem;font-size:.84rem">'+(c.cognome?c.nome+' '+c.cognome:c.nome)+(c.codice_cliente?'<br><span style="font-size:.68rem;color:#F6AD55;opacity:.6;font-family:monospace">'+c.codice_cliente+'</span>':'')+'</td>'
       +'<td style="padding:.45rem .8rem;font-size:.82rem;opacity:.75">'+c.email+'</td>'
@@ -1507,12 +1607,13 @@ function renderClienti(){
       +'<td style="padding:.45rem .8rem">'+badge(c.piano_etf||'NONE',pianoColor)+'</td>'
       +'<td style="padding:.45rem .8rem">'+badge(c.piano_fondi||'NONE',pianoColor)+'</td>'
       +'<td style="padding:.45rem .8rem">'+badge(c.piano_ordini||'NONE',pianoColor)+'</td>'
+      +'<td style="padding:.45rem .8rem">'+badge(wosStatus,wosColor)+' '+wosBtn+'</td>'
       +'<td style="padding:.45rem .8rem">'+badge(c.stato||'—',statoColor)+'</td>'
       +'<td style="padding:.45rem .8rem;font-size:.78rem;opacity:.6">'+c.data_registrazione+'</td>'
       +'<td style="padding:.45rem .8rem;display:flex;gap:.35rem">'+anagBtn+' '+attivaBtn+' '+fattBtn+' '+waBtn+' '+eliminaBtn+'</td>'
       +'</tr>';
   }).join('');
-  document.getElementById('cl-body').innerHTML = rows || '<tr><td colspan="10" style="padding:2rem;text-align:center;opacity:.4">Nessun cliente</td></tr>';
+  document.getElementById('cl-body').innerHTML = rows || '<tr><td colspan="11" style="padding:2rem;text-align:center;opacity:.4">Nessun cliente</td></tr>';
 }
 
 // ─── MODALS CLIENTI ──────────────────────────────────────────
@@ -1631,6 +1732,7 @@ function confermaAggiungi(){
       piano_etf:document.getElementById('ag-etf').value,
       piano_fondi:document.getElementById('ag-fondi').value,
       piano_ordini:document.getElementById('ag-ordini').value,
+      piano_wealthos:document.getElementById('ag-wealthos').value,
     })
   }).then(function(r){return r.json();}).then(function(res){
     if(res.ok){chiudiModals();_clienti=null;loadClienti();showMsg('cl-msg','✅ Cliente aggiunto','ok');}
@@ -1638,7 +1740,7 @@ function confermaAggiungi(){
   });
 }
 
-function mostraModalAttiva(cat,idx,nome,email,pAz,pEtf,pFondi,pOrd){
+function mostraModalAttiva(cat,idx,nome,email,pAz,pEtf,pFondi,pOrd,pWos){
   _atCat=cat; _atIdx=idx;
   document.getElementById('at-info').textContent=nome+' — '+email;
   var sel=function(id,val){
@@ -1649,6 +1751,7 @@ function mostraModalAttiva(cat,idx,nome,email,pAz,pEtf,pFondi,pOrd){
   sel('at-etf',pEtf||'NONE');
   sel('at-fondi',pFondi||'NONE');
   sel('at-ordini',pOrd||'NONE');
+  sel('at-wealthos',pWos||'NONE');
   document.getElementById('modal-attiva').style.display='flex';
 }
 
@@ -1660,6 +1763,7 @@ function confermaAttiva(){
       piano_etf:document.getElementById('at-etf').value,
       piano_fondi:document.getElementById('at-fondi').value,
       piano_ordini:document.getElementById('at-ordini').value,
+      piano_wealthos:document.getElementById('at-wealthos').value,
     })
   }).then(function(r){return r.json();}).then(function(res){
     chiudiModals();
@@ -1719,6 +1823,23 @@ function importClienti(input){
 // CRM & MARKETING — Sotto-tab
 // ═══════════════════════════════════════════════
 var _crmSubActive = 'clienti';
+
+function loadFatture(){
+  var tb=document.getElementById('fat-tbody');
+  if(!tb) return;
+  fetch('/api/fatture').then(function(r){return r.json();}).then(function(d){
+    document.getElementById('fat-count').textContent=d.length+' fatture totali';
+    if(!d.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;padding:2rem;opacity:.4">Nessuna fattura trovata</td></tr>';return;}
+    tb.innerHTML=d.map(function(f){
+      return '<tr>'+
+        '<td><strong style="color:#F6AD55">'+f.numero+'</strong></td>'+
+        '<td>'+f.data+'</td>'+
+        '<td style="text-align:right;font-family:monospace">'+f.size_kb+' KB</td>'+
+        '<td style="text-align:center"><a href="/api/fattura/'+f.numero+'" download style="background:#276749;color:#68D391;padding:.3rem .8rem;border-radius:5px;font-size:.78rem;font-weight:700;text-decoration:none">PDF</a></td>'+
+      '</tr>';
+    }).join('');
+  }).catch(function(){tb.innerHTML='<tr><td colspan="4" style="color:#fc8181;text-align:center;padding:1rem">Errore</td></tr>';});
+}
 
 function switchCrmTab(el, tab) {
   document.querySelectorAll('.crm-subtab').forEach(function(t){t.classList.remove('active');});
@@ -2329,6 +2450,7 @@ function renderSocial() {
     html += '<div style="display:flex;gap:.5rem">';
     html += '<button onclick="renderSocial()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#e0e0e0;padding:.3rem .65rem;font-size:.8rem;cursor:pointer">↺ Aggiorna</button>';
     html += '<button onclick="socialGeneraDraft()" style="background:#2C5282;border:none;border-radius:6px;color:#F6AD55;padding:.3rem .75rem;font-size:.8rem;font-weight:700;cursor:pointer" id="btn-genera-draft">▶ Genera Draft</button>';
+    html += '<button onclick="socialApriPubblicaOra()" style="background:#276749;border:none;border-radius:6px;color:#68D391;padding:.3rem .75rem;font-size:.8rem;font-weight:700;cursor:pointer">🚀 Pubblica Ora</button>';
     html += '</div></div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem">';
     // LinkedIn
@@ -2365,6 +2487,24 @@ function renderSocial() {
     html += '<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.72rem;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border-radius:4px;padding:.1rem .3rem;font-weight:700">IG</span><span style="font-weight:700;font-size:.85rem;color:#e0e0e0">Instagram</span></div>';
     html += '<div style="font-size:.78rem;color:'+igCol+'">'+igLabel+'</div>';
     html += '<div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem">Collegato a Meta/Facebook</div>';
+    html += '</div>';
+    // Brevo
+    var br = (platforms.brevo || {});
+    var brCol = br.configurato ? '#68D391' : '#FC8181';
+    var brLabel = br.configurato ? '✅ Attivo — Lista ' + (br.list_ids||[]).join(',') : '❌ API key mancante';
+    html += '<div style="background:rgba(44,130,201,.1);border:1px solid rgba(44,130,201,.25);border-radius:8px;padding:.7rem 1rem">';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-weight:700;font-size:.85rem;color:#e0e0e0">📧 Brevo</span></div>';
+    html += '<div style="font-size:.78rem;color:'+brCol+'">'+brLabel+'</div>';
+    html += '<div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem">Email newsletter venerdì</div>';
+    html += '</div>';
+    // WhatsApp
+    var wa = (platforms.whatsapp || {});
+    var waCol = wa.configurato ? '#68D391' : '#FC8181';
+    var waLabel = wa.configurato ? '✅ Token presente' : (wa.token_presente ? '⚠️ Phone ID mancante' : '❌ Token scaduto/mancante');
+    html += '<div style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);border-radius:8px;padding:.7rem 1rem">';
+    html += '<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-weight:700;font-size:.85rem;color:#e0e0e0">💬 WhatsApp</span></div>';
+    html += '<div style="font-size:.78rem;color:'+waCol+'">'+waLabel+'</div>';
+    html += '<div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem">Token 24h — aggiornare in Meta BM</div>';
     html += '</div>';
     html += '</div></div>';
 
@@ -2513,15 +2653,20 @@ function socialModificaDraft(draftId, triggerBtn) {
   fetch('/api/social/status').then(function(r){return r.json();}).then(function(d){
     var draft = (d.drafts||[]).find(function(x){return x.draft_id===draftId;});
     if(!draft){ alert('Draft non trovato'); return; }
+    var mainLang = draft.lang || 'IT';
+    var mainText = draft.text_main || (mainLang==='IT' ? draft.text_it : (mainLang==='ES' ? draft.text_es : ''));
+    var isOther  = (mainLang !== 'IT' && mainLang !== 'ES');
     var html = '<h3 style="color:#F6AD55;margin-bottom:.3rem;font-size:1rem">✏ Modifica Draft</h3>'
       +'<p style="color:rgba(255,255,255,.4);font-size:.78rem;margin-bottom:1rem">'+draft.theme+' · '+draft.lang+' · '+draft.date+'</p>'
+      +(isOther ? '<div style="margin-bottom:.8rem"><label style="font-size:.75rem;color:#F6AD55;display:block;margin-bottom:.25rem">Testo '+mainLang+' (principale — usato per post e mail)</label>'
+        +'<textarea id="edit-text-main" style="width:100%;height:140px;background:rgba(0,0,0,.5);border:1px solid rgba(246,173,85,.3);border-radius:6px;color:#e0e0e0;padding:.5rem;font-size:.82rem;resize:vertical;line-height:1.5">'+mainText+'</textarea></div>' : '')
       +'<div style="margin-bottom:.8rem">'
       +'<label style="font-size:.75rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Testo IT</label>'
-      +'<textarea id="edit-text-it" style="width:100%;height:120px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#e0e0e0;padding:.5rem;font-size:.82rem;resize:vertical;line-height:1.5">'+((draft.text_it||''))+'</textarea>'
+      +'<textarea id="edit-text-it" style="width:100%;height:'+(isOther?'70':'120')+'px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#e0e0e0;padding:.5rem;font-size:.82rem;resize:vertical;line-height:1.5">'+((draft.text_it||''))+'</textarea>'
       +'</div>'
       +'<div style="margin-bottom:1rem">'
       +'<label style="font-size:.75rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Testo ES</label>'
-      +'<textarea id="edit-text-es" style="width:100%;height:80px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#e0e0e0;padding:.5rem;font-size:.82rem;resize:vertical;line-height:1.5">'+((draft.text_es||''))+'</textarea>'
+      +'<textarea id="edit-text-es" style="width:100%;height:70px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#e0e0e0;padding:.5rem;font-size:.82rem;resize:vertical;line-height:1.5">'+((draft.text_es||''))+'</textarea>'
       +'</div>'
       +'<div style="display:flex;gap:.5rem">'
       +'<button onclick="socialSalvaModifica(\''+draftId+'\')" style="flex:1;background:#2C5282;border:none;border-radius:7px;color:#F6AD55;padding:.6rem;font-size:.85rem;font-weight:600;cursor:pointer">💾 Salva</button>'
@@ -2532,10 +2677,11 @@ function socialModificaDraft(draftId, triggerBtn) {
 }
 
 function socialSalvaModifica(draftId) {
-  var textIt = (document.getElementById('edit-text-it')||{value:''}).value;
-  var textEs = (document.getElementById('edit-text-es')||{value:''}).value;
+  var textIt   = (document.getElementById('edit-text-it')||{value:''}).value;
+  var textEs   = (document.getElementById('edit-text-es')||{value:''}).value;
+  var textMain = (document.getElementById('edit-text-main')||{value:''}).value;
   fetch('/api/social/draft/edit',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({draft_id:draftId,text_it:textIt,text_es:textEs})
+    body:JSON.stringify({draft_id:draftId,text_it:textIt,text_es:textEs,text_main:textMain||undefined})
   }).then(function(r){return r.json();}).then(function(d){
     if(d.ok){
       socialChiudiModal();
@@ -2558,6 +2704,59 @@ function _socialModalOverlay(content, onclose) {
 function socialChiudiModal() {
   var m = document.getElementById('social-modal'); if(m) m.remove();
   var c = document.getElementById('social-modal-container'); if(c) c.innerHTML='';
+}
+
+function socialApriPubblicaOra() {
+  var cont = document.getElementById('social-modal-container');
+  if(!cont) return;
+  var temi = ['SALARY_TRAP','TREND_MOBILIARE','VALUE_INTRO','5_FILTRI','EVFCF','PB_ROE','CASE_STUDY','ETF_SCREENING','FONDI_SCREENING','TEAM','LAUNCH','WEALTHOS_PROMO'];
+  var lingue = ['IT','ES','EN','FR','DE'];
+  var temiOpts = temi.map(function(t){return '<option value="'+t+'">'+t+'</option>';}).join('');
+  var lingueOpts = lingue.map(function(l){return '<option value="'+l+'">'+l+'</option>';}).join('');
+  var canali = ['linkedin','facebook','brevo'];
+  var canaliChk = canali.map(function(ch){
+    return '<label style="display:flex;align-items:center;gap:.4rem;font-size:.85rem;cursor:pointer">'
+      +'<input type="checkbox" id="pub-ch-'+ch+'" checked style="accent-color:#F6AD55"> '+ch+'</label>';
+  }).join('');
+  var html = '<h3 style="color:#68D391;margin-bottom:.3rem;font-size:1rem">🚀 Pubblica Ora</h3>'
+    +'<p style="color:rgba(255,255,255,.4);font-size:.78rem;margin-bottom:1rem">Genera e pubblica immediatamente un post sui canali selezionati.</p>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem">'
+    +'<div><label style="font-size:.75rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">Tema</label>'
+    +'<select id="pub-tema" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.5rem;color:#e0e0e0;font-size:.88rem;outline:none">'+temiOpts+'</select></div>'
+    +'<div><label style="font-size:.75rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">Lingua</label>'
+    +'<select id="pub-lang" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.5rem;color:#e0e0e0;font-size:.88rem;outline:none">'+lingueOpts+'</select></div>'
+    +'</div>'
+    +'<div style="margin-bottom:1rem"><label style="font-size:.75rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.5rem">Canali</label>'
+    +'<div style="display:flex;gap:1rem;flex-wrap:wrap">'+canaliChk+'</div></div>'
+    +'<div style="display:flex;gap:.5rem">'
+    +'<button id="btn-pub-ora" onclick="socialEseguiPubblicaOra()" style="flex:1;background:#276749;border:none;border-radius:7px;color:#68D391;padding:.7rem;font-size:.88rem;font-weight:700;cursor:pointer">🚀 Pubblica Subito</button>'
+    +'<button onclick="socialChiudiModal()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:7px;color:rgba(255,255,255,.5);padding:.7rem .9rem;font-size:.88rem;cursor:pointer">Annulla</button>'
+    +'</div><div id="pub-ora-msg" style="margin-top:.7rem;font-size:.82rem"></div>';
+  cont.innerHTML = _socialModalOverlay(html,'socialChiudiModal()');
+}
+
+function socialEseguiPubblicaOra() {
+  var tema = (document.getElementById('pub-tema')||{value:''}).value;
+  var lang = (document.getElementById('pub-lang')||{value:'IT'}).value;
+  var btn  = document.getElementById('btn-pub-ora');
+  var msg  = document.getElementById('pub-ora-msg');
+  if(!tema){ if(msg) msg.innerHTML='<span style="color:#FC8181">Seleziona un tema</span>'; return; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Generazione in corso...'; }
+  if(msg) msg.innerHTML='<span style="color:rgba(255,255,255,.4)">Generazione testo e pubblicazione...</span>';
+  fetch('/api/social/genera',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({theme:tema,lang:lang})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(btn){ btn.disabled=false; btn.textContent='🚀 Pubblica Subito'; }
+    if(d.ok){
+      if(msg) msg.innerHTML='<span style="color:#68D391">✅ Pubblicato! Draft: '+d.draft_id+'</span>';
+      setTimeout(function(){ socialChiudiModal(); renderSocial(); }, 1500);
+    } else {
+      if(msg) msg.innerHTML='<span style="color:#FC8181">❌ '+(d.msg||'Errore sconosciuto')+'</span>';
+    }
+  }).catch(function(e){
+    if(btn){ btn.disabled=false; btn.textContent='🚀 Pubblica Subito'; }
+    if(msg) msg.innerHTML='<span style="color:#FC8181">❌ '+e.message+'</span>';
+  });
 }
 
 function renderWhatsappSub() {
@@ -2633,7 +2832,7 @@ var PIPELINE_COLS = [
   {stato:'ATTIVO',           label:'Abbonato',         color:'#68D391', source:'clienti'},
 ];
 
-var INTERESSE_COLOR = {Azioni:'#4A90D9',ETF:'#68D391',Fondi:'#F6AD55',Tutti:'#a78bfa'};
+var INTERESSE_COLOR = {Azioni:'#4A90D9',ETF:'#68D391',Fondi:'#F6AD55',Tutti:'#a78bfa',WealthOS:'#c9a84c'};
 
 function renderPipelineKanban(){
   var board = document.getElementById('pipeline-board');
@@ -3193,6 +3392,98 @@ setInterval(tick,1000); tick();
 // ═══════════════════════════════════════════════
 // TABS
 // ═══════════════════════════════════════════════
+// ── EMAIL LOG ──────────────────────────────────────────────────────────────
+var _elogData = {};
+function loadEmailLog(){
+  fetch('/api/email-log').then(function(r){return r.json();}).then(function(d){
+    _elogData = d;
+    var total = 0, ok = 0;
+    Object.values(d).forEach(function(arr){ total+=arr.length; arr.forEach(function(e){ if(e.status==='OK')ok++; }); });
+    var s = document.getElementById('elog-stats');
+    if(s) s.innerHTML =
+      '<div style="background:rgba(44,82,130,.2);border:1px solid #2C5282;border-radius:8px;padding:.6rem 1rem;font-size:.84rem">' +
+        '<span style="color:#90cdf4">Destinatari:</span> <strong>' + Object.keys(d).length + '</strong>' +
+      '</div>' +
+      '<div style="background:rgba(104,211,145,.1);border:1px solid #276749;border-radius:8px;padding:.6rem 1rem;font-size:.84rem">' +
+        '<span style="color:#68D391">Invii OK:</span> <strong>' + ok + ' / ' + total + '</strong>' +
+      '</div>';
+    elogRender();
+  }).catch(function(){});
+}
+function elogRender(){
+  var filterType   = (document.getElementById('elog-filter-type')   || {}).value || '';
+  var filterStatus = (document.getElementById('elog-filter-status') || {}).value || '';
+  var rows = '';
+  var alt = false;
+  Object.keys(_elogData).sort().forEach(function(email){
+    var entries = _elogData[email];
+    if(filterType)   entries = entries.filter(function(e){ return e.report_type===filterType; });
+    if(filterStatus) entries = entries.filter(function(e){ return e.status.startsWith(filterStatus); });
+    if(!entries.length) return;
+    entries = entries.slice(-20).reverse();
+    entries.forEach(function(e, i){
+      var bg = alt ? 'rgba(255,255,255,.02)' : 'rgba(0,0,0,.1)';
+      var sc = e.status==='OK'?'#68D391':'#FC8181';
+      rows += '<tr style="background:' + bg + '">' +
+        '<td style="padding:.4rem .7rem;font-size:.8rem;color:#90cdf4">' + (i===0?email:'') + '</td>' +
+        '<td style="padding:.4rem .7rem;font-size:.8rem">' + (e.nome||'') + '</td>' +
+        '<td style="padding:.4rem .7rem;font-size:.8rem;font-family:monospace">' + (e.report_type||'') + ' ' + (e.piano||'') + '</td>' +
+        '<td style="padding:.4rem .7rem;font-size:.8rem;color:' + sc + ';font-weight:700">' + e.status + '</td>' +
+        '<td style="padding:.4rem .7rem;font-size:.75rem;color:#64748b">' + (e.ts||'') + '</td>' +
+        '</tr>';
+      alt = !alt;
+    });
+  });
+  var t = document.getElementById('elog-table');
+  if(!t) return;
+  t.innerHTML = rows ? '<table><thead><tr>' +
+    '<th>Email</th><th>Nome</th><th>Report</th><th>Stato</th><th>Data/Ora</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' :
+    '<p style="color:#64748b;font-size:.84rem">Nessun invio registrato con i filtri selezionati.</p>';
+}
+
+// ── TICKER FREQUENCY ───────────────────────────────────────────────────────
+var _tfData = {};
+function loadTickerFreq(){
+  fetch('/api/ticker-frequency').then(function(r){return r.json();}).then(function(d){
+    _tfData = d;
+    tfRender();
+  }).catch(function(){});
+}
+function tfRender(){
+  var asset = (document.getElementById('tf-asset') || {}).value || 'AZIONI';
+  var piano = (document.getElementById('tf-piano') || {}).value || 'BASIC';
+  var minDays = parseInt((document.getElementById('tf-min') || {}).value || '1');
+  var planData = ((_tfData[asset]||{})[piano])||{};
+  var entries = Object.keys(planData).map(function(tk){
+    return {ticker:tk, nome:planData[tk].nome||'', count:planData[tk].count||0, last:planData[tk].last_date||''};
+  }).filter(function(e){ return e.count >= minDays; }).sort(function(a,b){ return b.count-a.count; });
+  var rows = '';
+  entries.forEach(function(e, i){
+    var bg = i%2===0?'rgba(0,0,0,.1)':'rgba(255,255,255,.02)';
+    var col = e.count>=5?'#68D391':(e.count>=3?'#F6AD55':'#94a3b8');
+    var bar = Math.min(100, e.count*10);
+    rows += '<tr style="background:' + bg + '">' +
+      '<td style="padding:.45rem .8rem;font-size:.8rem;color:#64748b">' + (i+1) + '</td>' +
+      '<td style="padding:.45rem .8rem;font-family:monospace;font-weight:700;font-size:.88rem;color:#90cdf4">' + e.ticker + '</td>' +
+      '<td style="padding:.45rem .8rem;font-size:.8rem">' + (e.nome?e.nome.substring(0,35):'') + '</td>' +
+      '<td style="padding:.45rem .8rem">' +
+        '<div style="display:flex;align-items:center;gap:.5rem">' +
+          '<div style="width:' + bar + 'px;height:8px;background:' + col + ';border-radius:4px;min-width:4px"></div>' +
+          '<span style="color:' + col + ';font-weight:700;font-size:.85rem">' + e.count + 'gg</span>' +
+        '</div>' +
+      '</td>' +
+      '<td style="padding:.45rem .8rem;font-size:.75rem;color:#64748b">' + (e.last?e.last.substring(0,4)+'/'+e.last.substring(4,6)+'/'+e.last.substring(6):'') + '</td>' +
+      '</tr>';
+  });
+  var t = document.getElementById('tf-table');
+  if(!t) return;
+  t.innerHTML = rows ? '<table><thead><tr>' +
+    '<th>#</th><th>Ticker</th><th>Nome</th><th>Stabilita (giorni)</th><th>Ultima Data</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' :
+    '<p style="color:#64748b;font-size:.84rem">Nessun dato disponibile. Il file ticker_frequency.json verra generato dopo il prossimo run notturno.</p>';
+}
+
 function switchTab(el,id){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
@@ -3207,7 +3498,10 @@ function switchTab(el,id){
     if(id==='database') loadDatabase();
     if(id==='kb') loadKbFiles();
     if(id==='settori') loadSettori(false);
+    if(id==='emaillog') loadEmailLog();
+    if(id==='tickerfreq') loadTickerFreq();
     if(id==='analytics') renderAnalytics();
+    if(id==='fatture') loadFatture();
   }
 }
 

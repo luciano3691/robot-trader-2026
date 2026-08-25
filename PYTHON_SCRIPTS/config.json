@@ -1,5 +1,5 @@
 {
-  "base_url": "https://plaza-gothic-barcode.ngrok-free.dev",
+  "base_url": "https://trader.fuerteventurecapital.com",
   "fattura": {
     "intestatario": "Fuerte Venture Capital SL",
     "iban": "ES83 2100 1513 7202 0070 3406",
@@ -67,13 +67,11 @@
     "_note": "Tutti i campi con stringa vuota sono PLACEHOLDER da configurare",
     "brevo": {
       "api_key": "",
-      "smtp_login": "info@fuerteventurecapital.com",
-      "smtp_password": "",
-      "sender_email": "marketing@fuerteventurecapital.com",
-      "sender_name": "Fuerte Venture Capital",
-      "list_ids": [3],
-      "admin_email": "rioluc63@gmail.com",
-      "base_url": "http://localhost:8080"
+      "list_ids": [
+        3
+      ],
+      "from_email": "info@fuerteventurecapital.com",
+      "from_name": "Fuerte Venture Capital"
     },
     "linkedin": {
       "client_id": "",
@@ -84,8 +82,8 @@
     "meta": {
       "app_id": "",
       "app_secret": "",
-      "redirect_uri": "https://plaza-gothic-barcode.ngrok-free.dev/api/meta/callback",
-      "page_id": "61591196613530",
+      "redirect_uri": "https://trader.fuerteventurecapital.com/api/meta/callback",
+      "page_id": "1092335337305997",
       "ig_user_id": ""
     },
     "anthropic": {
@@ -95,12 +93,12 @@
   "scoring_weights": {
     "azioni": {
       "BASIC": {
-        "Dividend Yield": 35,
+        "Dividend Yield": 45,
         "P/B": 10,
         "ROE": 20,
-        "Var_1D_%": 25,
+        "Var_1D_%": 0,
         "EV/FCF": 10,
-        "Net Debt/EBITDA": 0
+        "Net Debt/EBITDA": 15
       },
       "PRO": {
         "EV/FCF": 35,
@@ -160,5 +158,18 @@
       }
     }
   },
-  "admin_password": ""
+  "admin_password": "",
+  "stripe": {
+    "price_ids": {
+      "azioni_basic": "price_1U7Vs8CcGj4bOSJuQZNhm4Zb",
+      "azioni_pro": "price_1U7Vs8CcGj4bOSJu6ljx1jhj",
+      "azioni_value": "price_1U7Vs9CcGj4bOSJuhLzi6nT7",
+      "etf_basic": "price_1U7Vs9CcGj4bOSJuUzvIYGIG",
+      "etf_pro": "price_1U7VsACcGj4bOSJuNLAIXZF4",
+      "etf_value": "price_1U7VsACcGj4bOSJuFeQVJmZO",
+      "fondi_basic": "price_1U7VsBCcGj4bOSJux8cl1WRc",
+      "fondi_pro": "price_1U7VsCCcGj4bOSJuGEkyajkZ",
+      "fondi_value": "price_1U7VsCCcGj4bOSJuGRvLb0Yc"
+    }
+  }
 }

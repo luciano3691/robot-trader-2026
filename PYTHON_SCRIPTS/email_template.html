@@ -10,7 +10,7 @@
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    
+
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #FB923C 0%, #FBBF24 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
@@ -18,35 +18,41 @@
                             <p style="margin: 5px 0 0 0; color: #ffffff; font-size: 14px; opacity: 0.95;">Report {TIPO} &mdash; Piano {PIANO}</p>
                         </td>
                     </tr>
-                    
+
                     <!-- Saluto Personale -->
                     <tr>
                         <td style="padding: 40px 30px 20px 30px;">
                             <h2 style="margin: 0 0 20px 0; color: #1E40AF; font-size: 20px; font-weight: 600;">Ciao {NOME},</h2>
                             <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                                Come abbonato al servizio <strong>{TIPO} {PIANO}</strong>, ti inviamo il report aggiornato al <strong>{DATA}</strong>.
+                                Il report <strong>{TIPO} {PIANO}</strong> del <strong>{DATA}</strong> &egrave; pronto.
+                                Trovi il <strong>PDF allegato</strong> a questa email.
                             </p>
                             <p style="margin: 0 0 15px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                                Il sistema ha analizzato <strong>{NUM_TICKER} strumenti</strong> e ha selezionato i migliori candidati secondo i nostri criteri di screening.
+                                Il sistema ha analizzato <strong>{NUM_TICKER} strumenti</strong> e selezionato
+                                i migliori candidati secondo i criteri del piano <strong>{PIANO}</strong>.
                             </p>
                         </td>
                     </tr>
-                    
-                    <!-- Contenuto Report -->
+
+                    <!-- Box PDF -->
                     <tr>
                         <td style="padding: 0 30px 30px 30px;">
-                            <div style="background-color: #F3F4F6; border-left: 4px solid #FB923C; padding: 20px; border-radius: 4px;">
-                                <h3 style="margin: 0 0 15px 0; color: #1E40AF; font-size: 16px; font-weight: 600;">📊 Cosa contiene il report:</h3>
-                                <ul style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.8;">
-                                    <li><strong>Dashboard</strong> - Statistiche globali e breakdown per categoria</li>
-                                    <li><strong>Top 50 per Score</strong> - I migliori strumenti selezionati</li>
-                                    <li><strong>Selezionati</strong> - Tutti gli strumenti che hanno superato i filtri</li>
-                                    <li><strong>Scartati per Motivo</strong> - Analisi degli esclusi (5 categorie)</li>
+                            <div style="background-color: #EFF6FF; border-left: 4px solid #1E40AF; border-radius: 4px; padding: 20px 24px;">
+                                <h3 style="margin: 0 0 12px 0; color: #1E40AF; font-size: 15px; font-weight: 700;">📄 Cosa trovi nel PDF allegato</h3>
+                                <ul style="margin: 0; padding-left: 20px; color: #374151; font-size: 14px; line-height: 1.9;">
+                                    <li>Classifica <strong>Top 20 / Top 50 per Score</strong> &mdash; ordinata dal migliore al peggiore</li>
+                                    <li>Per ogni strumento: <strong>metriche chiave del piano</strong> (P/B, ROE, EV/FCF per Azioni &middot; TER, Sharpe, Performance per ETF/Fondi)</li>
+                                    <li><strong>Score 0&ndash;100</strong> sintetico &mdash; pi&ugrave; alto = migliore</li>
+                                    <li>Nota riepilogativa: quanti strumenti hanno superato i filtri su {NUM_TICKER} analizzati</li>
                                 </ul>
+                                <p style="margin: 14px 0 0 0; color: #6B7280; font-size: 12px; font-style: italic;">
+                                    Il PDF &egrave; ottimizzato per la stampa A4 e la lettura su smartphone.
+                                    Per domande sul report scrivi a <a href="mailto:marketing@fuerteventurecapital.com" style="color: #1E40AF;">marketing@fuerteventurecapital.com</a>
+                                </p>
                             </div>
                         </td>
                     </tr>
-                    
+
                     <!-- CTA Analisi Settoriale & Mercati -->
                     <tr>
                         <td style="padding: 0 30px 30px 30px;">
@@ -56,7 +62,7 @@
                                     Incluso nel tuo abbonamento: accedi alla mappa interattiva dei <strong style="color:#e0e0e0">22 settori GICS</strong> (USA &amp; Europa) e dei <strong style="color:#e0e0e0">21 mercati globali</strong> con dati di momentum aggiornati in tempo reale.
                                 </p>
                                 <ul style="margin: 0 0 18px 0; padding-left: 18px; color: #a0b0c8; font-size: 13px; line-height: 1.8;">
-                                    <li><strong style="color:#e0e0e0">Card settoriali</strong> colorate verde/rosso in base al momentum mensile (1G · 1S · 1M · 3M · 1A)</li>
+                                    <li><strong style="color:#e0e0e0">Card settoriali</strong> colorate verde/rosso in base al momentum mensile (1G &middot; 1S &middot; 1M &middot; 3M &middot; 1A)</li>
                                     <li><strong style="color:#e0e0e0">Semaforo nazioni</strong> 🟢🟡🔴 per 21 paesi con indici reali da Yahoo Finance</li>
                                     <li><strong style="color:#e0e0e0">ETF consigliati</strong> per ogni settore e mercato con TER e link diretto</li>
                                     <li><strong style="color:#e0e0e0">Drill-down</strong> sui titoli del tuo screener per ogni settore con Score e variazioni</li>
@@ -80,13 +86,13 @@
                             <div style="background: linear-gradient(135deg, #1a2744, #0d1b35); border: 1px solid rgba(159,122,234,.4); border-radius: 8px; padding: 22px 24px;">
                                 <h3 style="margin: 0 0 10px 0; color: #9F7AEA; font-size: 16px; font-weight: 700;">🧠 Profilo Investitore MiFID II</h3>
                                 <p style="margin: 0 0 14px 0; color: #c0cce0; font-size: 14px; line-height: 1.6;">
-                                    Hai già compilato il tuo <strong style="color:#e0e0e0">Profilo Investitore</strong>? In 7 domande e meno di 3 minuti analizziamo i tuoi obiettivi, orizzonte temporale e tolleranza al rischio per costruire il <strong style="color:#F6AD55">portafoglio su misura</strong> per te.
+                                    Hai gi&agrave; compilato il tuo <strong style="color:#e0e0e0">Profilo Investitore</strong>? In 7 domande e meno di 3 minuti analizziamo i tuoi obiettivi, orizzonte temporale e tolleranza al rischio per costruire il <strong style="color:#F6AD55">portafoglio su misura</strong> per te.
                                 </p>
                                 <ul style="margin: 0 0 18px 0; padding-left: 18px; color: #a0b0c8; font-size: 13px; line-height: 1.8;">
-                                    <li><strong style="color:#e0e0e0">5 profili</strong>: Difensivo · Prudente · Bilanciato · Dinamico · Aggressivo</li>
-                                    <li><strong style="color:#e0e0e0">Allocazione personalizzata</strong> per asset class (Liquidità, Obbligazioni, ETF, Azioni, Oro, Fondi)</li>
+                                    <li><strong style="color:#e0e0e0">5 profili</strong>: Difensivo &middot; Prudente &middot; Bilanciato &middot; Dinamico &middot; Aggressivo</li>
+                                    <li><strong style="color:#e0e0e0">Allocazione personalizzata</strong> per asset class (Liquidit&agrave;, Obbligazioni, ETF, Azioni, Oro, Fondi)</li>
                                     <li><strong style="color:#e0e0e0">Grafico a torta</strong> interattivo con il portafoglio consigliato per il tuo profilo</li>
-                                    <li>Salvato nel tuo profilo — aggiornabile in qualsiasi momento</li>
+                                    <li>Salvato nel tuo profilo &mdash; aggiornabile in qualsiasi momento</li>
                                 </ul>
                                 <div style="text-align: center;">
                                     <a href="{URL_PROFILO}" style="display: inline-block; background: linear-gradient(135deg, #9F7AEA, #805AD5); color: #fff; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 7px; text-decoration: none; letter-spacing: 0.3px;">
@@ -106,7 +112,7 @@
                             <div style="border-top: 1px solid #E5E7EB; padding-top: 30px;">
                                 <h3 style="margin: 0 0 15px 0; color: #1E40AF; font-size: 18px; font-weight: 600;">🤖 Robot Trader 2026</h3>
                                 <p style="margin: 0 0 12px 0; color: #374151; font-size: 14px; line-height: 1.6;">
-                                    <strong>Robot Trader 2026</strong> è un servizio di screening automatico che analizza quotidianamente migliaia di strumenti finanziari (azioni, ETF e fondi) utilizzando criteri quantitativi oggettivi.
+                                    <strong>Robot Trader 2026</strong> &egrave; un servizio di screening automatico che analizza quotidianamente migliaia di strumenti finanziari (azioni, ETF e fondi) utilizzando criteri quantitativi oggettivi.
                                 </p>
                                 <p style="margin: 0 0 12px 0; color: #374151; font-size: 14px; line-height: 1.6;">
                                     Il sistema applica filtri rigorosi su metriche fondamentali e genera report strutturati per facilitare l'analisi e il monitoraggio del mercato.
@@ -117,7 +123,7 @@
                             </div>
                         </td>
                     </tr>
-                    
+
                     <!-- Disclaimer Legale -->
                     <tr>
                         <td style="padding: 0 30px 30px 30px;">
@@ -127,18 +133,18 @@
                                     <strong>I contenuti di questo report NON costituiscono consulenza finanziaria, raccomandazioni di investimento o sollecitazione all'acquisto/vendita di strumenti finanziari.</strong>
                                 </p>
                                 <p style="margin: 0 0 10px 0; color: #78350F; font-size: 13px; line-height: 1.6;">
-                                    I dati e le analisi sono forniti esclusivamente <strong>a scopo informativo</strong> e sono basati su criteri di screening automatico. Le informazioni contenute potrebbero contenere errori o imprecisioni e non sono aggiornate in tempo reale.
+                                    I dati e le analisi sono forniti esclusivamente <strong>a scopo informativo</strong> e sono basati su criteri di screening automatico. Le informazioni contenute potrebbero contenere errori o imprecisioni.
                                 </p>
                                 <p style="margin: 0 0 10px 0; color: #78350F; font-size: 13px; line-height: 1.6;">
                                     <strong>Gli investimenti comportano rischi</strong>, inclusa la possibile perdita totale o parziale del capitale investito. Le performance passate non sono indicative di risultati futuri.
                                 </p>
                                 <p style="margin: 0; color: #78350F; font-size: 13px; line-height: 1.6;">
-                                    Prima di prendere qualsiasi decisione di investimento, <strong>consulta sempre un consulente finanziario abilitato</strong> che possa valutare la tua situazione specifica, obiettivi, esperienza e tolleranza al rischio.
+                                    Prima di prendere qualsiasi decisione di investimento, <strong>consulta sempre un consulente finanziario abilitato</strong>.
                                 </p>
                             </div>
                         </td>
                     </tr>
-                    
+
                     <!-- Footer -->
                     <tr>
                         <td style="background-color: #F9FAFB; padding: 30px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #E5E7EB;">
@@ -154,7 +160,7 @@
                             </p>
                         </td>
                     </tr>
-                    
+
                 </table>
             </td>
         </tr>

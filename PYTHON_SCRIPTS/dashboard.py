@@ -101,6 +101,8 @@ def _fmt_it(n):
 def _fmt_en(n):
     return f"{n:,}"
 FATTURE_DIR   = os.path.join(os.path.dirname(BASE_DIR), "FATTURE")
+REPORTS_PDF_DIR = os.path.join(os.path.dirname(BASE_DIR), "REPORTS_PDF")
+os.makedirs(REPORTS_PDF_DIR, exist_ok=True)
 FATTURE_COUNTER = os.path.join(BASE_DIR, "fatture_counter.json")
 ORDINI_DIR    = os.path.join(BASE_DIR, "ORDINI")
 PARAMETRI_FILE= os.path.join(BASE_DIR, "parametri.json")
@@ -295,7 +297,7 @@ ADMIN_SESSION_TIMEOUT  = 8  * 3600  # 8 ore — scade dal momento del login
 CLIENT_SESSION_TIMEOUT = 24 * 3600  # 24 ore — finestra scorrevole sull'ultimo accesso
 
 
-from assets import FUERTE_LOGO_B64
+from assets import FUERTE_LOGO_B64, PWA_ICON_192_B64, PWA_ICON_512_B64
 
 
 # ─── BREVO SMTP (per invio credenziali B2C) ──────────────────
@@ -625,7 +627,7 @@ def _invia_email_credenziali(nome, email, piani_label, password_temp, pdf_bytes=
       </tr>
       <tr>
         <td style="background:#0F172A;padding:18px 24px;text-align:center;font-size:11px;color:#556;line-height:1.9">
-          <strong style="color:#8899aa">Fuerte Venture Capital SL</strong> &middot; NIF: B23881691<br>
+          <strong style="color:#8899aa">Fuerte Venture Capital SL</strong> &middot; CIF B23881691<br>
           Calle Puipana 3, 35640 Villaverde, Las Palmas, España<br>
           <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">info@fuerteventurecapital.com</a>
           &nbsp;&middot;&nbsp;
@@ -730,7 +732,7 @@ def _invia_email_nuovo_piano(nome, email, asset_label, livello, pdf_bytes=None, 
       </tr>
       <tr>
         <td style="background:#0F172A;padding:18px 24px;text-align:center;font-size:11px;color:#556;line-height:1.9">
-          <strong style="color:#8899aa">Fuerte Venture Capital SL</strong> &middot; NIF: B23881691<br>
+          <strong style="color:#8899aa">Fuerte Venture Capital SL</strong> &middot; CIF B23881691<br>
           Calle Puipana 3, 35640 Villaverde, Las Palmas, España<br>
           <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">info@fuerteventurecapital.com</a>
           &nbsp;&middot;&nbsp;
@@ -829,7 +831,7 @@ def _invia_email_early_adopter(nome, email, piani_list):
       </tr>
     </table>
     <div style="text-align:center;margin-bottom:28px">
-      <a href="mailto:newcapitalfuerte@gmail.com?subject=Attivazione%20Early%20Adopter"
+      <a href="mailto:info@fuerteventurecapital.com?subject=Attivazione%20Early%20Adopter"
          style="background:#F6AD55;color:#0a0f1e;padding:14px 40px;border-radius:8px;font-weight:700;font-size:15px;text-decoration:none;display:inline-block">
         ✉️ Attiva l'offerta — rispondi a questa email
       </a>
@@ -852,7 +854,7 @@ def _invia_email_early_adopter(nome, email, piani_list):
         payload = json.dumps({
             "sender":      {"name": BREVO_SENDER_NAME, "email": BREVO_SENDER_EMAIL},
             "to":          [{"email": email, "name": nome}],
-            "replyTo":     {"email": "newcapitalfuerte@gmail.com"},
+            "replyTo":     {"email": "info@fuerteventurecapital.com"},
             "subject":     "Robot Trader 2026 è live — la tua offerta riservata",
             "htmlContent": corpo,
         }).encode("utf-8")
@@ -1384,7 +1386,7 @@ def genera_fattura_pdf(cliente, numero_fattura):
     pdf.set_font('Helvetica', 'B', 10)
     pdf.set_text_color(*DARK)
     pdf.cell(85, 5, 'Fuerte Venture Capital SL')
-    for i, r in enumerate(['NIF: B23881691', 'Calle Puipana 3, 35640 Villaverde', 'Las Palmas, España', 'info@fuerteventurecapital.com', 'www.fuerteventurecapital.com']):
+    for i, r in enumerate(['CIF B23881691', 'Calle Puipana 3, 35640 Villaverde', 'Las Palmas, España', 'info@fuerteventurecapital.com', 'www.fuerteventurecapital.com']):
         pdf.set_xy(15, y0+11+i*4.5)
         pdf.set_font('Helvetica', '', 8.5)
         pdf.set_text_color(*GRAY)
@@ -1528,7 +1530,7 @@ def genera_fattura_pdf(cliente, numero_fattura):
     pdf.set_font('Helvetica', '', 7)
     pdf.set_text_color(*GRAY)
     pdf.cell(0, 5,
-        'Fuerte Venture Capital SL  ·  NIF: B23881691  ·  Calle Puipana 3, 35640 Villaverde, Las Palmas, España'
+        'Fuerte Venture Capital SL  ·  CIF B23881691  ·  Calle Puipana 3, 35640 Villaverde, Las Palmas, España'
         '  ·  info@fuerteventurecapital.com  ·  www.fuerteventurecapital.com',
         align='C')
 
@@ -1815,6 +1817,26 @@ def _latest_plan(tipo, piano):
         'fondi':  ['FONDI_Screener_*.xlsx',  'value_screener_fondi_*.xlsx'],
     }
     return _latest(fallback.get(tipo, []))
+
+def _latest_plan_pdf(tipo, piano):
+    piano = (piano or "BASIC").upper()
+    prefix_map = {
+        "azioni": f"AZIONI_{piano}_Report_",
+        "etf":    f"ETF_{piano}_Report_",
+        "fondi":  f"FONDI_{piano}_Report_",
+    }
+    prefix = prefix_map.get(tipo)
+    if not prefix:
+        return None
+    try:
+        files = sorted([
+            ff for ff in os.listdir(REPORTS_PDF_DIR)
+            if ff.startswith(prefix) and ff.endswith(".pdf")
+        ])
+        return os.path.join(REPORTS_PDF_DIR, files[-1]) if files else None
+    except Exception:
+        return None
+
 
 def _count_sheet(f):
     """Legge il conteggio righe dal foglio Selezionati o Top N di un Excel."""
@@ -2383,29 +2405,52 @@ from html_admin import HTML
 
 
 
-# ─── STRIPE CHECKOUT (placeholder — inserire chiavi Stripe) ──
-STRIPE_SECRET_KEY = ""   # sk_live_... oppure sk_test_...
-STRIPE_PRICE_IDS  = {    # price_... da Stripe Dashboard
-    "azioni_basic":"", "azioni_pro":"", "azioni_value":"",
-    "etf_basic":"",    "etf_pro":"",    "etf_value":"",
-    "fondi_basic":"",  "fondi_pro":"",  "fondi_value":"",
+# ─── STRIPE — chiavi da .env + price_ids da config.json ─────
+import os as _os_stripe
+STRIPE_SECRET_KEY     = _os_stripe.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET = _os_stripe.getenv('STRIPE_WEBHOOK_SECRET', '')
+
+def _load_stripe_price_ids():
+    try:
+        with open(os.path.join(BASE_DIR, 'config.json'), encoding='utf-8') as _f:
+            return json.load(_f).get('stripe', {}).get('price_ids', {})
+    except Exception:
+        return {}
+
+STRIPE_PRICE_IDS = _load_stripe_price_ids()
+
+# Prezzi mensili (€) per ogni asset × piano — fonte: read_servizi()
+_PREZZI_MENSILI = {
+    ('azioni','basic'):29, ('azioni','pro'):39, ('azioni','value'):59,
+    ('etf','basic'):29,    ('etf','pro'):39,    ('etf','value'):59,
+    ('fondi','basic'):29,  ('fondi','pro'):39,  ('fondi','value'):59,
+}
+_ASSET_LABEL_IT = {
+    'azioni':'Screener Azioni', 'etf':'Screener ETF',
+    'fondi':'Screener Fondi',   'fondi_eu':'Screener Fondi EU',
 }
 
-def create_checkout_session(asset, tier):
+def create_checkout_session(asset, tier, email_prefill=''):
     if not STRIPE_SECRET_KEY:
-        return {"error": "Stripe non ancora configurato. Inserire STRIPE_SECRET_KEY in dashboard.py"}
+        return {"error": "Stripe non ancora configurato"}
     try:
         import urllib.request, urllib.parse
         price_id = STRIPE_PRICE_IDS.get(f"{asset}_{tier}", "")
         if not price_id:
-            return {"error": f"Price ID mancante per {asset} {tier}"}
-        payload = urllib.parse.urlencode({
+            return {"error": f"Price ID mancante per {asset} {tier} — configurare in config.json"}
+        params = {
             "mode": "subscription",
             "line_items[0][price]": price_id,
             "line_items[0][quantity]": "1",
-            "success_url": BASE_URL + "/landing?success=1",
+            "success_url": BASE_URL + "/landing?success=1&session_id={CHECKOUT_SESSION_ID}",
             "cancel_url":  BASE_URL + "/landing?cancel=1",
-        }).encode()
+            "metadata[asset]": asset,
+            "metadata[tier]":  tier,
+            "locale": "it",
+        }
+        if email_prefill:
+            params["customer_email"] = email_prefill
+        payload = urllib.parse.urlencode(params).encode()
         req = urllib.request.Request(
             "https://api.stripe.com/v1/checkout/sessions",
             data=payload,
@@ -2416,6 +2461,159 @@ def create_checkout_session(asset, tier):
             return {"url": session["url"]}
     except Exception as e:
         return {"error": str(e)}
+
+
+# ─── STRIPE WEBHOOK — verifica firma + gestione eventi ──────
+import hmac as _hmac, hashlib as _hashlib
+
+def _verify_stripe_signature(body_bytes: bytes, sig_header: str, secret: str) -> bool:
+    """Verifica firma HMAC-SHA256 del webhook Stripe."""
+    try:
+        parts = {}
+        for kv in sig_header.split(','):
+            if '=' in kv:
+                k, v = kv.strip().split('=', 1)
+                parts[k] = v
+        ts = parts.get('t', '')
+        v1 = parts.get('v1', '')
+        signed = f"{ts}.{body_bytes.decode('utf-8')}"
+        expected = _hmac.new(secret.encode(), signed.encode(), _hashlib.sha256).hexdigest()
+        return _hmac.compare_digest(expected, v1)
+    except Exception:
+        return False
+
+
+def _handle_stripe_webhook(body_bytes: bytes, sig_header: str) -> dict:
+    """Processa evento Stripe: subscription + pagamento → crea client + fattura + email."""
+    if not STRIPE_WEBHOOK_SECRET:
+        return {'ok': False, 'msg': 'Webhook secret non configurato'}
+    if not _verify_stripe_signature(body_bytes, sig_header, STRIPE_WEBHOOK_SECRET):
+        return {'ok': False, 'msg': 'Firma webhook non valida'}
+
+    event = json.loads(body_bytes)
+    etype = event.get('type', '')
+    obj   = event.get('data', {}).get('object', {})
+
+    if etype == 'checkout.session.completed':
+        _stripe_on_checkout_completed(obj)
+    elif etype == 'customer.subscription.deleted':
+        _stripe_on_subscription_deleted(obj)
+    elif etype == 'invoice.payment_failed':
+        _stripe_on_payment_failed(obj)
+
+    return {'ok': True}
+
+
+def _stripe_on_checkout_completed(session: dict):
+    """Nuovo abbonamento pagato: crea cliente, genera fattura, invia credenziali."""
+    details   = session.get('customer_details') or {}
+    email     = details.get('email') or session.get('customer_email') or ''
+    nome_full = details.get('name') or ''
+    nome      = nome_full.split()[0] if nome_full else email.split('@')[0]
+    cognome   = ' '.join(nome_full.split()[1:]) if len(nome_full.split()) > 1 else ''
+    metadata  = session.get('metadata') or {}
+    asset     = metadata.get('asset', '')
+    tier      = metadata.get('tier', '')
+    stripe_sub_id = session.get('subscription', '')
+    stripe_cus_id = session.get('customer', '')
+
+    if not email or not asset or not tier:
+        return
+
+    # Leggi clienti esistenti
+    try:
+        with open(CLIENTI_FILE, encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception:
+        data = {'clienti': [], 'tester': []}
+
+    # Cerca cliente esistente (per upgrade piano)
+    clienti = data.get('clienti', [])
+    cliente_esistente = next((c for c in clienti if c.get('email', '').lower() == email.lower()), None)
+
+    import random, string as _string
+    pw_temp = ''.join(random.choices(_string.ascii_letters + _string.digits, k=12))
+
+    if cliente_esistente:
+        # Aggiorna piano esistente
+        piano_key = f'piano_{asset}'
+        vecchio_piano = cliente_esistente.get(piano_key, 'NONE')
+        cliente_esistente[piano_key] = tier.upper()
+        if stripe_sub_id:
+            cliente_esistente[f'stripe_sub_{asset}'] = stripe_sub_id
+        if stripe_cus_id:
+            cliente_esistente['stripe_customer_id'] = stripe_cus_id
+        save_clienti(data)
+        # Genera fattura per upgrade
+        numero = _prossimo_numero_fattura()
+        pdf_bytes = genera_fattura_pdf(cliente_esistente, numero)
+        if pdf_bytes:
+            _salva_fattura(pdf_bytes, numero)
+        _invia_email_nuovo_piano(
+            nome=cliente_esistente.get('nome', nome),
+            email=email,
+            asset_label=_ASSET_LABEL_IT.get(asset, asset),
+            livello=tier.upper(),
+            pdf_bytes=pdf_bytes,
+            numero_fattura=numero,
+        )
+    else:
+        # Nuovo cliente
+        nuovo = {
+            'nome': nome, 'cognome': cognome, 'email': email,
+            'password': pw_temp,
+            f'piano_{asset}': tier.upper(),
+            'piano_etf': 'NONE', 'piano_fondi': 'NONE', 'piano_azioni': 'NONE',
+            'piano_ordini': 'NONE',
+            'stripe_customer_id': stripe_cus_id,
+            f'stripe_sub_{asset}': stripe_sub_id,
+            'dati_fiscali': {},
+        }
+        nuovo[f'piano_{asset}'] = tier.upper()
+        clienti.append(nuovo)
+        data['clienti'] = clienti
+        save_clienti(data)
+        # Genera fattura
+        numero = _prossimo_numero_fattura()
+        pdf_bytes = genera_fattura_pdf(nuovo, numero)
+        if pdf_bytes:
+            _salva_fattura(pdf_bytes, numero)
+        # Email credenziali + fattura
+        piani_label = f'{_ASSET_LABEL_IT.get(asset, asset)} {tier.upper()}'
+        _invia_email_credenziali(
+            nome=nome, email=email,
+            piani_label=piani_label,
+            password_temp=pw_temp,
+            pdf_bytes=pdf_bytes,
+            numero_fattura=numero,
+        )
+
+
+def _stripe_on_subscription_deleted(sub: dict):
+    """Abbonamento cancellato: sospendi piano cliente."""
+    meta      = sub.get('metadata') or {}
+    asset     = meta.get('asset', '')
+    cus_id    = sub.get('customer', '')
+    sub_id    = sub.get('id', '')
+    if not cus_id and not sub_id:
+        return
+    try:
+        with open(CLIENTI_FILE, encoding='utf-8') as f:
+            data = json.load(f)
+        for c in data.get('clienti', []):
+            if c.get('stripe_customer_id') == cus_id or c.get(f'stripe_sub_{asset}') == sub_id:
+                if asset:
+                    c[f'piano_{asset}'] = 'NONE'
+                break
+        save_clienti(data)
+    except Exception:
+        pass
+
+
+def _stripe_on_payment_failed(inv: dict):
+    """Pagamento fallito: log + notifica admin."""
+    email = inv.get('customer_email', '')
+    print(f'[STRIPE] Pagamento fallito per {email}', flush=True)
 
 
 # ─── LOGIN PAGE ─────────────────────────────────────────────
@@ -2467,6 +2665,8 @@ LANDING_HTML = r"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Robot Trader 2026 — Fuerte Venture Capital</title>
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <style>
 :root{--blu:#2C5282;--oro:#F6AD55;--oro2:#B3975A;--dark:#0F172A;--champ:#FDFAF5}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -2645,106 +2845,19 @@ footer p{color:rgba(255,255,255,.3);font-size:.78rem;line-height:1.8}
 
 <!-- REGISTRAZIONE -->
 <section id="registrazione" class="reg-section">
-  <div class="reg-inner">
-    <h2 data-t="reg_title">Iscriviti al <span>Servizio</span></h2>
-    <p data-t="reg_sub">Compila il modulo per accedere al servizio di screening quantitativo. Riceverai le credenziali di accesso e la fattura via email in pochi minuti.</p>
-    <div class="reg-form" id="reg-form-box">
-
-      <div class="reg-section-label">Dati Personali</div>
-      <div class="reg-row">
-        <div class="reg-field">
-          <label data-t="reg_nome">Nome *</label>
-          <input id="reg-nome" type="text" placeholder="Mario">
-        </div>
-        <div class="reg-field">
-          <label data-t="reg_cognome">Cognome *</label>
-          <input id="reg-cognome" type="text" placeholder="Rossi">
-        </div>
-      </div>
-      <div class="reg-field">
-        <label data-t="reg_email">Email *</label>
-        <input id="reg-email" type="email" placeholder="mario.rossi@email.com">
-      </div>
-      <div class="reg-row">
-        <div class="reg-field">
-          <label data-t="reg_tel">Telefono *</label>
-          <input id="reg-tel" type="tel" placeholder="+39 333 1234567">
-        </div>
-        <div class="reg-field">
-          <label data-t="reg_paese">Paese *</label>
-          <select id="reg-paese">
-            <option value="">— seleziona —</option>
-            <option value="IT">🇮🇹 Italia</option>
-            <option value="ES">🇪🇸 Spagna</option>
-            <option value="FR">🇫🇷 Francia</option>
-            <option value="DE">🇩🇪 Germania</option>
-            <option value="UK">🇬🇧 Regno Unito</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="reg-section-label">Dati Fiscali</div>
-      <div class="reg-row">
-        <div class="reg-field">
-          <label data-t="reg_cf">Codice Fiscale / NIE / Tax ID *</label>
-          <input id="reg-cf" type="text" placeholder="RSSMRA80A01H501U" style="font-family:monospace;letter-spacing:1px;text-transform:uppercase" oninput="onCfPivaInput()">
-        </div>
-        <div class="reg-field">
-          <label data-t="reg_piva" id="reg-piva-label">P.IVA <span style="opacity:.5;font-size:.75rem" id="reg-piva-note">(se azienda)</span></label>
-          <input id="reg-piva" type="text" placeholder="IT12345678901" style="font-family:monospace" oninput="onCfPivaInput()">
-        </div>
-      </div>
-      <div style="font-size:.72rem;color:rgba(246,173,85,.6);margin:-.4rem 0 .9rem;letter-spacing:.2px" data-t="reg_cf_hint">Inserisci il Codice Fiscale (persona fisica) <em>oppure</em> la P.IVA (azienda/professionista). Almeno uno dei due è obbligatorio.</div>
-      <div class="reg-field">
-        <label data-t="reg_indirizzo">Indirizzo *</label>
-        <input id="reg-indirizzo" type="text" placeholder="Via Roma 1">
-      </div>
-      <div style="display:grid;grid-template-columns:110px 1fr;gap:.8rem;margin-bottom:.8rem">
-        <div class="reg-field" style="margin-bottom:0">
-          <label data-t="reg_cap">CAP *</label>
-          <input id="reg-cap" type="text" placeholder="00100">
-        </div>
-        <div class="reg-field" style="margin-bottom:0">
-          <label data-t="reg_citta">Città *</label>
-          <input id="reg-citta" type="text" placeholder="Roma">
-        </div>
-      </div>
-      <div class="reg-field">
-        <label data-t="reg_nascita">Data di nascita <span style="opacity:.5;font-size:.75rem">(opzionale)</span></label>
-        <input id="reg-nascita" type="date">
-      </div>
-
-      <div class="reg-section-label">Servizi di Interesse</div>
-      <div class="reg-field">
-        <label data-t="reg_interesse">Seleziona i servizi *</label>
-        <div class="reg-checks">
-          <label class="reg-check"><input type="checkbox" id="reg-azioni"  value="azioni">  📈 <strong>Azioni</strong> <span class="reg-check-desc">Screener quantitativo su oltre 3.000 titoli azionari globali</span></label>
-          <label class="reg-check"><input type="checkbox" id="reg-etf"    value="etf">    📦 <strong>ETF</strong> <span class="reg-check-desc">Selezione automatica su oltre 670 ETF europei armonizzati</span></label>
-          <label class="reg-check"><input type="checkbox" id="reg-fondi"  value="fondi">  🏦 <strong>Fondi</strong> <span class="reg-check-desc">Analisi quantitativa su fondi comuni e SICAV</span></label>
-          <label class="reg-check"><input type="checkbox" id="reg-ordini" value="ordini"> 📋 <strong>Order Builder</strong> <span class="reg-check-desc">Genera istruzioni di acquisto pronte per il tuo intermediario bancario o broker</span></label>
-        </div>
-      </div>
-      <div class="reg-field">
-        <label data-t="reg_note">Note <span style="opacity:.5;font-size:.75rem">(opzionale)</span></label>
-        <input id="reg-note" type="text" placeholder="Domande o informazioni aggiuntive...">
-      </div>
-
-      <div class="reg-disclaimer">
-        <strong>Servizio Informativo SaaS · Non Consulenza Finanziaria</strong>
-        <span data-t="reg_disclaimer">Con questa iscrizione accedi a un servizio di screening quantitativo automatico a carattere esclusivamente informativo. I dati e i report forniti non costituiscono consulenza finanziaria, raccomandazione di investimento o sollecitazione all'acquisto. Gli investimenti comportano rischi, inclusa la possibile perdita del capitale. Fuerte Venture Capital SL non svolge attività di gestione patrimoniale né di intermediazione finanziaria.</span>
-      </div>
-      <label class="reg-gdpr">
-        <input type="checkbox" id="reg-gdpr">
-        <span data-t="reg_gdpr_text">Ho letto e accetto l'<a href="/privacy" target="_blank">Informativa sulla Privacy</a> e acconsento al trattamento dei miei dati personali ai sensi del Reg. UE 2016/679 (GDPR). *</span>
-      </label>
-      <button class="reg-submit" onclick="inviaRegistrazione()" data-t="reg_invia">INVIA RICHIESTA →</button>
-      <div class="reg-err" id="reg-err"></div>
-    </div>
-    <div class="reg-ok" id="reg-ok">
-      <img src="data:image/png;base64,__LOGO_B64__" alt="Fuerte Venture Capital" style="height:52px;width:auto;border-radius:10px;margin-bottom:1.2rem">
-      <div style="font-size:2rem;margin-bottom:.6rem">✅</div>
-      <div data-t="reg_ok" style="font-size:1.05rem;font-weight:700;color:#68D391;margin-bottom:.5rem">Registrazione completata! Controlla la tua email.</div>
-      <div style="font-size:.8rem;color:#888;margin-top:.6rem">Fuerte Venture Capital SL &middot; <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">info@fuerteventurecapital.com</a></div>
+  <div class="reg-inner" style="text-align:center;max-width:560px;margin:0 auto">
+    <h2 style="font-size:2rem;font-weight:900;color:#fff;margin-bottom:.8rem">Pronto a iniziare?</h2>
+    <p style="color:rgba(255,255,255,.55);font-size:1rem;line-height:1.7;margin-bottom:2rem">
+      Seleziona il piano nella sezione Prezzi e clicca <strong style="color:#F6AD55">Acquista</strong>.<br>
+      Sarai reindirizzato a Stripe per il pagamento sicuro. Le credenziali arrivano via email in pochi minuti.
+    </p>
+    <button onclick="document.getElementById('piani').scrollIntoView({behavior:'smooth'})"
+      style="background:#F6AD55;color:#0a0f1e;font-size:16px;font-weight:900;padding:18px 48px;border-radius:10px;border:none;cursor:pointer;letter-spacing:.5px;box-shadow:0 4px 24px rgba(246,173,85,.35)">
+      SCEGLI IL TUO PIANO &uarr;
+    </button>
+    <div style="margin-top:1.6rem;color:rgba(255,255,255,.3);font-size:.78rem;display:flex;align-items:center;justify-content:center;gap:.5rem">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Pagamento sicuro con Stripe &middot; Nessun dato carta salvato sui nostri server
     </div>
   </div>
 </section>
@@ -2760,9 +2873,10 @@ footer p{color:rgba(255,255,255,.3);font-size:.78rem;line-height:1.8}
     <img src="data:image/png;base64,__LOGO_B64__" alt="FVC" style="height:28px;width:auto;border-radius:7px;display:block">
     <span class="footer-name">ROBOT TRADER 2026</span>
   </div>
-  <p>Fuerte Venture Capital SL &middot; NIF: B23881691</p>
+  <p>Fuerte Venture Capital SL &middot; CIF B23881691</p>
   <p>Calle Puipana 3, 35640 Villaverde, Las Palmas, España</p>
   <p><a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">info@fuerteventurecapital.com</a> &middot; <a href="https://www.fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">www.fuerteventurecapital.com</a></p>
+  <p style="margin-top:.5rem"><a href="https://www.linkedin.com/company/fuerte-venture-capital" style="color:#F6AD55;text-decoration:none">LinkedIn</a> &nbsp;&middot;&nbsp; <a href="https://www.facebook.com/profile.php?id=1092335337305997" style="color:#F6AD55;text-decoration:none">Facebook</a> &nbsp;&middot;&nbsp; <a href="https://www.instagram.com/fuerteventurecapital" style="color:#F6AD55;text-decoration:none">Instagram</a></p>
   <p data-t="footer_legal"></p>
   <p style="margin-top:.4rem;font-size:.72rem;opacity:.4">© 2026 FUERTE VENTURE CAPITAL SL. ALL RIGHTS RESERVED.</p>
   <a href="/login" class="admin-link">⚙ admin</a>
@@ -2974,7 +3088,7 @@ function setLang(l){
 }
 
 function scrollToPlans(){
-  document.getElementById('registrazione').scrollIntoView({behavior:'smooth'});
+  document.getElementById('piani').scrollIntoView({behavior:'smooth'});
 }
 
 function showAsset(a,btn){
@@ -3011,7 +3125,7 @@ function checkout(a,tier){
     // Stripe non configurato: scorri al form e preseleziona l'asset
     var cb = document.getElementById('reg-'+a);
     if(cb){ cb.checked=true; }
-    document.getElementById('registrazione').scrollIntoView({behavior:'smooth'});
+    document.getElementById('piani').scrollIntoView({behavior:'smooth'});
   });
 }
 
@@ -3174,7 +3288,7 @@ input:focus{{border-color:#F6AD55}}
     <button class="btn" type="submit">Accedi</button>
   </form>
   <div class="footer"><a href="/reset-password" style="color:#F6AD55;text-decoration:none">Password dimenticata?</a><br>
-  <span style="font-size:.68rem;color:#333">Dati trattati ai sensi del Reg. UE 2016/679 (GDPR) da Fuerte Venture Capital SL · NIF: B23881691</span></div>
+  <span style="font-size:.68rem;color:#333">Dati trattati ai sensi del Reg. UE 2016/679 (GDPR) da Fuerte Venture Capital SL · CIF B23881691</span></div>
 </div>
 </body></html>"""
 
@@ -4687,7 +4801,7 @@ def _build_grazie_page() -> str:
   <p>Le tue <strong style="color:#e2e8f0">credenziali di accesso</strong> e la <strong style="color:#e2e8f0">fattura</strong> sono state inviate alla tua email.</p>
   <p style="margin-top:.8rem">Controlla la tua casella email, inclusa la cartella <strong>spam</strong>.</p>
   <a href="/" class="back">← Torna alla home</a>
-  <div class="footer-note">Fuerte Venture Capital SL · NIF: B23881691 · Calle Puipana 3, 35640 Villaverde, Las Palmas, España<br>
+  <div class="footer-note">Fuerte Venture Capital SL · CIF B23881691 · Calle Puipana 3, 35640 Villaverde, Las Palmas, España<br>
   <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">info@fuerteventurecapital.com</a> · <a href="https://www.fuerteventurecapital.com" style="color:#F6AD55;text-decoration:none">www.fuerteventurecapital.com</a><br>
   © 2026 Fuerte Venture Capital SL. All rights reserved.</div>
 </div>
@@ -5642,9 +5756,15 @@ def _build_area_clienti(email):
         f = _latest_plan(asset, p)
         fname = os.path.basename(f) if f else None
         if fname:
-            dl = (f'<a href="/api/report/{asset}" '
-                  f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
-                  f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica</a>')
+            _fpdf = _latest_plan_pdf(asset, p)
+            if _fpdf:
+                dl = (f'<a href="/api/report-pdf/{asset}" '
+                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
+                      f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica PDF</a>')
+            else:
+                dl = (f'<a href="/api/report/{asset}" '
+                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
+                      f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica</a>')
             info = f'<span style="font-size:.78rem;color:#888">{fname}</span>'
         else:
             dl = '<span style="color:#555;font-size:.82rem">Nessun report disponibile</span>'
@@ -6045,7 +6165,7 @@ h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-tra
     I report forniti da Fuerte Screener sono elaborati automaticamente a scopo esclusivamente informativo e <strong style="color:#aaa">non costituiscono consulenza finanziaria</strong>, raccomandazione di investimento o sollecitazione. Gli investimenti comportano rischi, inclusa la possibile perdita del capitale. Prima di qualsiasi decisione, consulta un consulente finanziario abilitato.
   </div>
   <div style="padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.06);font-size:.72rem;color:#444;text-align:center;line-height:1.9">
-    <strong style="color:#667">Fuerte Venture Capital SL</strong> &middot; NIF: B23881691<br>
+    <strong style="color:#667">Fuerte Venture Capital SL</strong> &middot; CIF B23881691<br>
     Calle Puipana 3, 35640 Villaverde, Las Palmas, España<br>
     <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55">info@fuerteventurecapital.com</a>
     &nbsp;&middot;&nbsp;
@@ -7092,6 +7212,26 @@ Contatta il supporto per attivare il tuo piano.</p>
             self.end_headers()
             self.wfile.write(data)
             return
+        if p.startswith('/api/report-pdf/') and _is_client_auth(self):
+            _asset = p.split('/')[-1]
+            _email = CLIENT_SESSIONS.get(_get_client_token(self), '')
+            _db = read_clienti()
+            _c = next((x for grp in _db.values() for x in grp if x.get('email','').lower()==_email.lower()), None)
+            _piano = _c.get(f'piano_{_asset}', 'NONE') if _c else 'NONE'
+            if _piano == 'NONE':
+                self.send_error(403); return
+            _fpdf = _latest_plan_pdf(_asset, _piano)
+            if not _fpdf:
+                self.send_error(404, 'PDF non disponibile'); return
+            with open(_fpdf, 'rb') as _fh: _pdata = _fh.read()
+            _fname_out = f'RT2026_{_asset.upper()}_{_piano}_{datetime.now().strftime("%Y%m%d")}.pdf'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/pdf')
+            self.send_header('Content-Disposition', f'attachment; filename="{_fname_out}"')
+            self.send_header('Content-Length', str(len(_pdata)))
+            self.end_headers()
+            self.wfile.write(_pdata)
+            return
         # ── Scarica fattura (cliente autenticato) ────────────────
         if p == '/api/mia-fattura' and _is_client_auth(self):
             email = CLIENT_SESSIONS.get(_get_client_token(self), '')
@@ -7129,11 +7269,33 @@ Contatta il supporto per attivare il tuo piano.</p>
             from urllib.parse import unquote_plus
             settore = unquote_plus(qs_params.get('s',''))
             self._json(get_settori_titoli(settore)); return
+        # ── Endpoint interno WealthOS (solo localhost, no auth) ──
+        if p == '/internal/next-invoice-number':
+            if self.client_address[0] not in ('127.0.0.1', '::1') and not self.client_address[0].startswith('172.18.'):
+                self.send_error(403); return
+            self._json({'numero': _prossimo_numero_fattura()})
+            return
+        # ── File statici pubblici (no auth) ────────────────────
+        if p.startswith('/static/'):
+            _sfile = os.path.join(BASE_DIR, 'static', p[8:].lstrip('/'))
+            if os.path.isfile(_sfile):
+                import mimetypes as _mmt2
+                _ct2, _ = _mmt2.guess_type(_sfile)
+                with open(_sfile, 'rb') as _sf2:
+                    _sd2 = _sf2.read()
+                self.send_response(200)
+                self.send_header('Content-Type', _ct2 or 'application/octet-stream')
+                self.send_header('Content-Length', str(len(_sd2)))
+                self.end_headers()
+                self.wfile.write(_sd2)
+            else:
+                self.send_error(404)
+            return
         # ── Rotte admin (richiede sessione) ────────────────────
         if not _is_auth(self):
             _redirect(self, '/login'); return
         if p in ('/admin', '/admin/'):
-            self._html(HTML.replace('__BASE_URL__', BASE_URL))  # console admin
+            self._html(HTML.replace('__BASE_URL__', BASE_URL).replace('__FUERTE_LOGO__', FUERTE_LOGO_B64))  # console admin
         elif p == '/api/status':
             self._json(get_status())
         elif p == '/api/kb-status' and _is_auth(self):
@@ -7215,6 +7377,22 @@ Contatta il supporto per attivare il tuo piano.</p>
             self.end_headers()
             self.wfile.write(csv_data)
             return
+        elif p == '/api/fatture' and _is_auth(self):
+            fatture = []
+            if os.path.isdir(FATTURE_DIR):
+                for fname in sorted(os.listdir(FATTURE_DIR), reverse=True):
+                    if fname.endswith('.pdf'):
+                        numero = fname[:-4]
+                        fpath = os.path.join(FATTURE_DIR, fname)
+                        stat = os.stat(fpath)
+                        import datetime as _dt
+                        data_str = _dt.datetime.fromtimestamp(stat.st_mtime).strftime('%d/%m/%Y')
+                        fatture.append({
+                            'numero': numero,
+                            'data': data_str,
+                            'size_kb': round(stat.st_size / 1024, 1),
+                        })
+            self._json(fatture); return
         elif p.startswith('/api/fattura/') and _is_auth(self):
             numero = p.split('/')[-1]
             path = os.path.join(FATTURE_DIR, f"{numero}.pdf")
@@ -7228,6 +7406,24 @@ Contatta il supporto per attivare il tuo piano.</p>
             self.send_header('Content-Length', str(len(data)))
             self.end_headers()
             self.wfile.write(data)
+            return
+        elif p == '/api/email-log' and _is_auth(self):
+            import json as _ej
+            _elog_path = os.path.join(BASE_DIR, 'email_log.json')
+            if os.path.exists(_elog_path):
+                with open(_elog_path, encoding='utf-8') as _ef:
+                    self._json(_ej.load(_ef))
+            else:
+                self._json({})
+            return
+        elif p == '/api/ticker-frequency' and _is_auth(self):
+            import json as _tfj
+            _tf_path = os.path.join(BASE_DIR, 'ticker_frequency.json')
+            if os.path.exists(_tf_path):
+                with open(_tf_path, encoding='utf-8') as _tff:
+                    self._json(_tfj.load(_tff))
+            else:
+                self._json({})
             return
         elif p == '/api/database' and _is_auth(self):
             try:
@@ -7310,11 +7506,18 @@ Contatta il supporto per attivare il tuo piano.</p>
                 meta_cfg = _cfg.get('social', {}).get('meta', {})
                 li_configurato   = bool(li_cfg.get('client_id')   or os.getenv('LINKEDIN_CLIENT_ID'))
                 meta_configurato = bool(meta_cfg.get('app_id')    or os.getenv('META_APP_ID'))
+                brevo_cfg  = _cfg.get('social', {}).get('brevo', {})
+                brevo_key  = brevo_cfg.get('api_key', '') or _brevo_api_key()
+                brevo_lists= brevo_cfg.get('list_ids', [])
+                wa_token   = os.getenv('WHATSAPP_TOKEN', '')
+                wa_phone   = os.getenv('WHATSAPP_PHONE_NUMBER_ID', '')
                 self._json({
                     'ok': True,
                     'linkedin':  {'connesso': bool(li_token),  'configurato': li_configurato,  'member_id': tokens.get('linkedin',{}).get('member_id','')},
                     'facebook':  {'connesso': bool(meta_token), 'configurato': meta_configurato, 'page_name': tokens.get('meta',{}).get('page_name',''), 'page_id': tokens.get('meta',{}).get('page_id','')},
                     'instagram': {'connesso': bool(meta_token and meta_ig), 'ig_user_id': meta_ig},
+                    'brevo':     {'configurato': bool(brevo_key), 'list_ids': brevo_lists},
+                    'whatsapp':  {'configurato': bool(wa_token and wa_phone), 'token_presente': bool(wa_token)},
                 })
             except Exception as e:
                 self._json({'ok': False, 'error': str(e)})
@@ -7572,8 +7775,9 @@ Contatta il supporto per attivare il tuo piano.</p>
                 req = json.loads(_raw) if _raw else {}
                 force_theme = req.get('theme')
                 force_date  = req.get('date')
+                force_lang  = req.get('lang')
                 from social_automation import run as _sa_run
-                result = _sa_run(force_theme=force_theme, force_date=force_date)
+                result = _sa_run(force_theme=force_theme, force_date=force_date, force_lang=force_lang)
                 if result:
                     self._json({'ok': True, 'draft_id': result.get('draft_id'), 'msg': 'Draft generato con successo'})
                 else:
@@ -7591,8 +7795,10 @@ Contatta il supporto per attivare il tuo piano.</p>
                 draft = load_draft(draft_id)
                 if not draft:
                     self._json({'ok': False, 'msg': 'Draft non trovato'}); return
-                if text_it: draft['text_it'] = text_it
-                if text_es: draft['text_es'] = text_es
+                text_main = req.get('text_main', '')
+                if text_it:   draft['text_it']   = text_it
+                if text_es:   draft['text_es']   = text_es
+                if text_main: draft['text_main'] = text_main
                 draft['updated_at'] = datetime.now().isoformat()
                 save_draft(draft)
                 self._json({'ok': True})
@@ -7925,9 +8131,28 @@ Contatta il supporto per attivare il tuo piano.</p>
         if p == '/api/checkout':
             try:
                 req = json.loads(self._body())
-                self._json(create_checkout_session(req.get('asset',''), req.get('tier','')))
+                self._json(create_checkout_session(
+                    req.get('asset',''), req.get('tier',''),
+                    email_prefill=req.get('email',''),
+                ))
             except Exception as e:
                 self._json({'error': str(e)})
+            return
+        # ── Webhook Stripe ─────────────────────────────────────
+        if p == '/webhooks/stripe':
+            try:
+                body_b = self.rfile.read(int(self.headers.get('Content-Length', 0)))
+                sig    = self.headers.get('Stripe-Signature', '')
+                result = _handle_stripe_webhook(body_b, sig)
+                if result.get('ok'):
+                    self._json({'ok': True})
+                else:
+                    self.send_response(400)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(result).encode())
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)})
             return
         # ── Conti bancari cliente ──────────────────────────────
         if p in ('/api/ordine/conti', '/api/ordine/conti/delete'):
