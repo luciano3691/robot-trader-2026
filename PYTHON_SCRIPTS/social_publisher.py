@@ -422,11 +422,47 @@ class LinkedInService:
     def _get_member_sub(self) -> Optional[str]:
         return _tokens().get('linkedin', {}).get('member_sub', '') or None
 
+    def _upload_image(self, image_url: str, author_urn: str) -> Optional[str]:
+        """Scarica immagine da URL pubblico e la carica su LinkedIn. Restituisce imageUrn o None."""
+        try:
+            # 1. Inizializza upload
+            init_r = requests.post(
+                f"{self.API_BASE}/rest/images?action=initializeUpload",
+                json={"initializeUploadRequest": {"owner": author_urn}},
+                headers=self._headers(), timeout=15
+            )
+            if init_r.status_code != 200:
+                _log(f"LinkedIn initializeUpload FALLITO: {init_r.status_code} {init_r.text[:200]}")
+                return None
+            upload_data = init_r.json().get("value", {})
+            upload_url  = upload_data.get("uploadUrl", "")
+            image_urn   = upload_data.get("image", "")
+            if not upload_url or not image_urn:
+                return None
+            # 2. Scarica immagine
+            img_r = requests.get(image_url, timeout=15)
+            if img_r.status_code != 200:
+                return None
+            # 3. Carica su LinkedIn
+            put_r = requests.put(upload_url, data=img_r.content,
+                                 headers={"Content-Type": img_r.headers.get("Content-Type", "image/png")},
+                                 timeout=30)
+            if put_r.status_code not in (200, 201):
+                _log(f"LinkedIn PUT image FALLITO: {put_r.status_code}")
+                return None
+            _log(f"LinkedIn immagine caricata: {image_urn}")
+            return image_urn
+        except Exception as e:
+            _log(f"LinkedIn _upload_image errore: {e}")
+            return None
+
     def publish_post(self, text: str, url: Optional[str] = None,
                      url_title: Optional[str] = None,
                      url_desc: Optional[str] = None,
-                     lang: str = "IT") -> dict:
-        """Pubblica sul profilo personale Luciano Manicardi (w_member_social)."""
+                     lang: str = "IT",
+                     image_url: Optional[str] = None) -> dict:
+        """Pubblica sul profilo personale Luciano Manicardi (w_member_social).
+        Se image_url è fornito, carica l'immagine su LinkedIn e la allega al post."""
         if not self.ready():
             _log("LinkedIn: non configurato (token o member_sub mancante)")
             return {"ok": False, "detail": "LinkedIn non configurato"}
@@ -444,7 +480,12 @@ class LinkedInService:
             "lifecycleState":           "PUBLISHED",
             "isReshareDisabledByAuthor": False,
         }
-        if url:
+        # Immagine ha priorità sul link article
+        img_src = image_url or DEFAULT_CHANNEL_IMAGES.get("linkedin")
+        image_urn = self._upload_image(img_src, author_urn) if img_src else None
+        if image_urn:
+            body["content"] = {"media": {"id": image_urn}}
+        elif url:
             body["content"] = {
                 "article": {
                     "source":      url,
