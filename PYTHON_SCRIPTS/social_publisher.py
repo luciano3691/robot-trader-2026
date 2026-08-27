@@ -248,7 +248,15 @@ def _save_last_li_post(post_id: str, text: str) -> None:
     _save_tokens(tokens)
 
 
-def _notifica_amplificatori(post_id: str, post_text: str) -> None:
+_COMMENTO_PER_LINGUA = {
+    "IT": "Strumento interessante per chi vuole investire con metodo — ho testato i report e la selezione è molto disciplinata. 📊",
+    "ES": "Herramienta interesante para inversores con método — he probado los informes y la selección es muy disciplinada. 📊",
+    "EN": "Really interesting tool for disciplined investors — I've tested the reports and the stock selection methodology is solid. 📊",
+    "FR": "Outil intéressant pour investir avec méthode — j'ai testé les rapports et la sélection est très rigoureuse. 📊",
+    "DE": "Interessantes Tool für disziplinierte Investoren — ich habe die Berichte getestet und die Aktienauswahl ist sehr solide. 📊",
+}
+
+def _notifica_amplificatori(post_id: str, post_text: str, lang: str = "IT") -> None:
     """Invia email agli amplificatori subito dopo un post LinkedIn."""
     try:
         with open(CONFIG_FILE, encoding='utf-8') as _f:
@@ -269,10 +277,7 @@ def _notifica_amplificatori(post_id: str, post_text: str) -> None:
 
     post_url = f"https://www.linkedin.com/feed/update/{post_id}/"
     preview  = post_text[:120].replace('\n', ' ').strip()
-    commento_suggerito = (
-        "Strumento interessante per chi vuole investire con metodo — "
-        "ho testato i report e la selezione è molto disciplinata. 📊"
-    )
+    commento_suggerito = _COMMENTO_PER_LINGUA.get(lang.upper(), _COMMENTO_PER_LINGUA["EN"])
 
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
@@ -419,7 +424,8 @@ class LinkedInService:
 
     def publish_post(self, text: str, url: Optional[str] = None,
                      url_title: Optional[str] = None,
-                     url_desc: Optional[str] = None) -> dict:
+                     url_desc: Optional[str] = None,
+                     lang: str = "IT") -> dict:
         """Pubblica sul profilo personale Luciano Manicardi (w_member_social)."""
         if not self.ready():
             _log("LinkedIn: non configurato (token o member_sub mancante)")
@@ -452,7 +458,7 @@ class LinkedInService:
             post_id = r.headers.get("x-restli-id", "")
             _log(f"LinkedIn post pubblicato: {post_id}")
             _save_last_li_post(post_id, text)
-            _notifica_amplificatori(post_id, text)
+            _notifica_amplificatori(post_id, text, lang)
             return {"ok": True, "post_id": post_id}
         _log(f"LinkedIn post FALLITO: {r.status_code} {r.text[:300]}")
         return {"ok": False, "status": r.status_code, "detail": r.text}
