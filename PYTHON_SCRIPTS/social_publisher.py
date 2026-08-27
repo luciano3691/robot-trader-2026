@@ -288,16 +288,20 @@ class LinkedInService:
         _log(f"LinkedIn token salvato (scade in {data.get('expires_in', '?')}s)")
         return {"ok": True}
 
+    def _get_member_sub(self) -> Optional[str]:
+        return _tokens().get('linkedin', {}).get('member_sub', '') or None
+
     def publish_post(self, text: str, url: Optional[str] = None,
                      url_title: Optional[str] = None,
                      url_desc: Optional[str] = None) -> dict:
-        """Pubblica sulla Company Page di Fuerte Venture Capital."""
+        """Pubblica sul profilo personale Luciano Manicardi (w_member_social)."""
         if not self.ready():
-            _log("LinkedIn: non configurato (token o org_id mancante)")
+            _log("LinkedIn: non configurato (token o member_sub mancante)")
             return {"ok": False, "detail": "LinkedIn non configurato"}
-        org_urn = f"urn:li:organization:{self.org_id}"
+        member_sub = self._get_member_sub()
+        author_urn = f"urn:li:person:{member_sub}" if member_sub else f"urn:li:organization:{self.org_id}"
         body: dict = {
-            "author":      org_urn,
+            "author":      author_urn,
             "commentary":  text,
             "visibility":  "PUBLIC",
             "distribution": {
@@ -333,7 +337,7 @@ class LinkedInService:
             "Authorization":              f"Bearer {self._get_token()}",
             "Content-Type":               "application/json",
             "X-Restli-Protocol-Version":  "2.0.0",
-            "LinkedIn-Version":           "202401",
+            "LinkedIn-Version":           "202601",
         }
 
 
