@@ -299,19 +299,218 @@ Robot Trader 2026 también analiza fondos de inversión:
 
 #ScreeningFondos #FondosInversión #RobotTrader""",
     },
+    "SALARY_TRAP": {
+        "IT": """💸 Il Tuo Stipendio Ti Tradisce Ogni Mese
+
+Ogni mese il tuo stipendio arriva, e ogni mese il potere d'acquisto scende.
+
+L'inflazione erode quello che non investi.
+Il conto corrente non ti protegge.
+
+La soluzione non è lavorare di più — è far lavorare i tuoi soldi con metodo.
+
+Robot Trader 2026 analizza ogni notte 3.072 azioni su 23 mercati globali.
+Risultato: le opportunità migrate a valore, pronte ogni mattina alle 07:00.
+
+Smetti di lasciare i tuoi risparmi fermi.
+
+Scopri come → https://trader.fuerteventurecapital.com
+
+#InvestireConMetodo #ValueInvesting #FinanzaPersonale""",
+        "ES": """💸 Tu Sueldo Te Traiciona Cada Mes
+
+Cada mes llega tu sueldo, y cada mes baja tu poder adquisitivo.
+
+La inflación erosiona lo que no inviertes.
+La cuenta corriente no te protege.
+
+La solución no es trabajar más — es hacer trabajar tu dinero con método.
+
+Robot Trader 2026 analiza cada noche 3.072 acciones en 23 mercados globales.
+Resultado: las mejores oportunidades de valor, listas cada mañana a las 07:00.
+
+Deja de tener tus ahorros parados.
+
+Descubre cómo → https://trader.fuerteventurecapital.com
+
+#InvertirConMétodo #ValueInvesting #FinanzasPersonales""",
+        "EN": """💸 Your Salary Is Betraying You Every Month
+
+Every month your paycheck arrives, and every month your purchasing power drops.
+
+Inflation erodes what you don't invest.
+A savings account doesn't protect you.
+
+The solution isn't working harder — it's making your money work with a system.
+
+Robot Trader 2026 analyzes 3,072 stocks across 23 global markets every night.
+Result: the best value opportunities, ready every morning at 07:00.
+
+Stop leaving your savings idle.
+
+Discover how → https://trader.fuerteventurecapital.com
+
+#InvestWithMethod #ValueInvesting #PersonalFinance""",
+        "FR": """💸 Votre Salaire Vous Trahit Chaque Mois
+
+Chaque mois votre salaire arrive, et chaque mois votre pouvoir d'achat baisse.
+
+L'inflation érode ce que vous n'investissez pas.
+Un compte courant ne vous protège pas.
+
+La solution n'est pas de travailler plus — c'est de faire travailler votre argent avec méthode.
+
+Robot Trader 2026 analyse chaque nuit 3 072 actions sur 23 marchés mondiaux.
+Résultat : les meilleures opportunités value, prêtes chaque matin à 07h00.
+
+Arrêtez de laisser votre épargne dormir.
+
+Découvrez comment → https://trader.fuerteventurecapital.com
+
+#InvestirAvecMéthode #ValueInvesting #FinancesPersonnelles""",
+        "DE": """💸 Ihr Gehalt Verrät Sie Jeden Monat
+
+Jeden Monat kommt Ihr Gehalt, und jeden Monat sinkt Ihre Kaufkraft.
+
+Inflation zehrt auf, was Sie nicht investieren.
+Ein Girokonto schützt Sie nicht.
+
+Die Lösung ist nicht mehr arbeiten — sondern Ihr Geld mit System arbeiten lassen.
+
+Robot Trader 2026 analysiert jede Nacht 3.072 Aktien auf 23 globalen Märkten.
+Ergebnis: die besten Value-Chancen, jeden Morgen um 07:00 Uhr bereit.
+
+Hören Sie auf, Ihre Ersparnisse stilllegen zu lassen.
+
+Mehr erfahren → https://trader.fuerteventurecapital.com
+
+#InvestierenMitSystem #ValueInvesting #Persönlichefinanzen""",
+    },
+    "WEALTHOS_PROMO": {
+        "IT": """🏛️ WealthOS — Il Tuo Patrimonio, Finalmente Sotto Controllo
+
+Conti bancari sparsi. Investimenti su 3 piattaforme diverse. ETF, azioni, liquidità.
+
+Sai esattamente quanto vali oggi?
+
+WealthOS aggrega tutto in un unico cruscotto:
+✅ Patrimonio netto in tempo reale
+✅ Allocazione per asset class e valuta
+✅ Performance storica e proiezioni
+✅ Integrazione con Robot Trader 2026
+
+Non è un conto bancario. Non è un robo-advisor.
+È il tuo ufficio di analisi personale.
+
+Scopri WealthOS → https://trader.fuerteventurecapital.com
+
+#WealthOS #PatrimonioPersonale #FinanzaPrivata""",
+        "ES": """🏛️ WealthOS — Tu Patrimonio, Por Fin Bajo Control
+
+Cuentas bancarias dispersas. Inversiones en 3 plataformas diferentes. ETFs, acciones, liquidez.
+
+¿Sabes exactamente cuánto vales hoy?
+
+WealthOS lo agrega todo en un único panel:
+✅ Patrimonio neto en tiempo real
+✅ Asignación por clase de activo y divisa
+✅ Rendimiento histórico y proyecciones
+✅ Integración con Robot Trader 2026
+
+No es una cuenta bancaria. No es un robo-advisor.
+Es tu oficina de análisis personal.
+
+Descubre WealthOS → https://trader.fuerteventurecapital.com
+
+#WealthOS #PatrimonioPersonal #FinanzaPrivada""",
+        "EN": """🏛️ WealthOS — Your Wealth, Finally Under Control
+
+Bank accounts scattered. Investments on 3 different platforms. ETFs, stocks, cash.
+
+Do you know exactly what you're worth today?
+
+WealthOS aggregates everything into a single dashboard:
+✅ Real-time net worth
+✅ Asset class and currency allocation
+✅ Historical performance and projections
+✅ Integration with Robot Trader 2026
+
+Not a bank account. Not a robo-advisor.
+Your personal analysis office.
+
+Discover WealthOS → https://trader.fuerteventurecapital.com
+
+#WealthOS #PersonalWealth #PrivateFinance""",
+    },
+    "TREND_MOBILIARE": {
+        "IT": """📊 Il Mercato Si Muove — Stai Guardando o Stai Agendo?
+
+Ogni settimana i mercati offrono opportunità.
+Ogni settimana la maggior parte degli investitori le lascia passare.
+
+Non perché non esistano — ma perché non hanno un sistema per trovarle.
+
+Robot Trader 2026 monitora ogni notte:
+📈 3.072 azioni su 23 mercati globali
+📦 678 ETF con Sharpe e performance 1Y
+🏦 1.087 fondi comuni con criteri quantitativi
+
+Il risultato? Una lista ordinata per score — ogni mattina alle 07:00.
+
+Il mercato non aspetta. Tu hai un sistema?
+
+#TrendDiMercato #ValueInvesting #QuantitativeFinance""",
+        "ES": """📊 El Mercado Se Mueve — ¿Estás Mirando o Actuando?
+
+Cada semana los mercados ofrecen oportunidades.
+Cada semana la mayoría de los inversores las deja pasar.
+
+No porque no existan — sino porque no tienen un sistema para encontrarlas.
+
+Robot Trader 2026 monitoriza cada noche:
+📈 3.072 acciones en 23 mercados globales
+📦 678 ETFs con Sharpe y rendimiento 1Y
+🏦 1.087 fondos de inversión con criterios cuantitativos
+
+¿El resultado? Una lista ordenada por score — cada mañana a las 07:00.
+
+El mercado no espera. ¿Tienes un sistema?
+
+#TendenciaMercado #ValueInvesting #FinanzaCuantitativa""",
+        "EN": """📊 Markets Are Moving — Are You Watching or Acting?
+
+Every week markets offer opportunities.
+Every week most investors let them pass.
+
+Not because they don't exist — but because they have no system to find them.
+
+Robot Trader 2026 monitors every night:
+📈 3,072 stocks across 23 global markets
+📦 678 ETFs with Sharpe ratio and 1Y performance
+🏦 1,087 mutual funds with quantitative criteria
+
+The result? A ranked list by score — every morning at 07:00.
+
+Markets don't wait. Do you have a system?
+
+#MarketTrends #ValueInvesting #QuantitativeFinance""",
+    },
 }
 
 # Tema → prompt Claude (per generazione AI)
 CLAUDE_PROMPTS: dict[str, str] = {
-    "VALUE_INTRO": "value investing quantitativo — introduzione ai 5 filtri EV/FCF, P/B, ROE, ND/EBITDA, Score",
-    "5_FILTRI":    "spiegazione dettagliata dei 5 filtri usati dallo screener Robot Trader 2026",
-    "EVFCF":       "EV/FCF ratio — perché è il filtro più importante nel value investing",
-    "PB_ROE":      "combinazione P/B e ROE — come identificare aziende solide a sconto",
-    "CASE_STUDY":  "come funziona lo screener Robot Trader 2026 — esempio concreto con dati reali",
-    "ETF_SCREENING": "screening ETF — criteri TER, Sharpe, Volume, replica fisica, accumulazione",
-    "TEAM":        "team Fuerte Venture Capital — esperienza e mission dietro Robot Trader 2026",
-    "LAUNCH":      "lancio Robot Trader 2026 — piani BASIC/PRO/VALUE e come iniziare",
-    "FONDI_SCREENING": "screening fondi comuni — 1087 fondi, 36 famiglie, criteri filtro",
+    "VALUE_INTRO":      "value investing quantitativo — introduzione ai 5 filtri EV/FCF, P/B, ROE, ND/EBITDA, Score",
+    "5_FILTRI":         "spiegazione dettagliata dei 5 filtri usati dallo screener Robot Trader 2026",
+    "EVFCF":            "EV/FCF ratio — perché è il filtro più importante nel value investing",
+    "PB_ROE":           "combinazione P/B e ROE — come identificare aziende solide a sconto",
+    "CASE_STUDY":       "come funziona lo screener Robot Trader 2026 — esempio concreto con dati reali",
+    "ETF_SCREENING":    "screening ETF — criteri TER, Sharpe, Volume, replica fisica, accumulazione",
+    "TEAM":             "team Fuerte Venture Capital — esperienza e mission dietro Robot Trader 2026",
+    "LAUNCH":           "lancio Robot Trader 2026 — piani BASIC/PRO/VALUE e come iniziare",
+    "FONDI_SCREENING":  "screening fondi comuni — 1087 fondi, 36 famiglie, criteri filtro",
+    "SALARY_TRAP":      "lo stipendio perde valore senza investimento — invito ad agire con Robot Trader 2026",
+    "WEALTHOS_PROMO":   "WealthOS — patrimonio netto aggregato, dashboard personale, integrazione RT2026",
+    "TREND_MOBILIARE":  "trend di mercato settimanale — il sistema RT2026 trova opportunità che altri perdono",
 }
 
 SYSTEM_PROMPT = """Sei il content creator di Fuerte Venture Capital SL, una società di investimento spagnola.
