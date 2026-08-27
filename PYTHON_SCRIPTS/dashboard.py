@@ -403,8 +403,9 @@ def _campagna_batch_daily(forzato=False):
                 return
 
             # 5. Genera corpo email
-            text = _gp(tema, lang)
-            html_body = _beh(text, None, lang)
+            text      = _gp(tema, lang)
+            img_url   = giorno.get('image_url') or None
+            html_body = _beh(text, img_url, lang)
 
             # 6. Invia una per una (rate: ~1 secondo tra ogni email per rispettare API)
             inviati_ok  = []
