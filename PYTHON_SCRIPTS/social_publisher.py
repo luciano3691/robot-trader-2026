@@ -700,7 +700,7 @@ _EMAIL_FOOTER = {
 
 
 def _build_email_html(text: str, image_url: Optional[str], lang: str) -> str:
-    """Genera email HTML branded FVC — dark bg, gold accent, logo, CTA."""
+    """Genera email HTML branded FVC — dark bg, gold accent, logo, CTA, selettore lingua."""
     lang = lang.upper()
     cta      = _EMAIL_CTA.get(lang, _EMAIL_CTA["EN"])
     footer   = _EMAIL_FOOTER.get(lang, _EMAIL_FOOTER["EN"])
@@ -718,6 +718,16 @@ def _build_email_html(text: str, image_url: Optional[str], lang: str) -> str:
         </td>
       </tr>"""
 
+    # Selettore lingua — link alla landing con ?lang=XX (funziona in tutti i client email)
+    _langs = [("IT","it"),("ES","es"),("EN","en"),("FR","fr"),("DE","de")]
+    lang_btns = " &nbsp; ".join(
+        f'<a href="{site_url}/?lang={lc}" style="display:inline-block;padding:3px 9px;border-radius:4px;'
+        f'font-size:11px;font-weight:700;letter-spacing:.5px;text-decoration:none;'
+        + (f'background:#F6AD55;color:#0a0f1e' if lc == lang else f'border:1px solid rgba(246,173,85,.4);color:rgba(246,173,85,.7)')
+        + f'">{lk}</a>'
+        for lk, lc in _langs
+    )
+
     return f"""<!DOCTYPE html>
 <html lang="{lang.lower()}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -727,11 +737,16 @@ def _build_email_html(text: str, image_url: Optional[str], lang: str) -> str:
     <table width="560" cellpadding="0" cellspacing="0"
            style="background:#111827;border-radius:12px;border:1px solid rgba(246,173,85,.2);overflow:hidden;max-width:560px">
 
-      <!-- Header blu -->
+      <!-- Header blu con logo + selettore lingua -->
       <tr>
         <td style="background:#2C5282;padding:20px 32px">
-          <img src="{logo_url}" alt="Fuerte Venture Capital" height="40"
-               style="display:block;height:40px">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><img src="{logo_url}" alt="Fuerte Venture Capital" height="40"
+                       style="display:block;height:40px"></td>
+              <td align="right" style="vertical-align:middle">{lang_btns}</td>
+            </tr>
+          </table>
         </td>
       </tr>
 

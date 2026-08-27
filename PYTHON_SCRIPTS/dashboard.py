@@ -290,6 +290,169 @@ def _trial_check_loop():
 _t_trial = threading.Thread(target=_trial_check_loop, daemon=True, name='trial-check')
 _t_trial.start()
 
+# ─── CAMPAGNA EMAIL — INVIO BATCH AUTOMATICO 250/GIORNO ─────
+CAMPAGNA_CAL_FILE     = os.path.join(BASE_DIR, 'campagna_email_calendar.json')
+CAMPAGNA_TRACKER_FILE = os.path.join(BASE_DIR, 'campagna_invii_tracker.json')
+_campagna_lock        = threading.Lock()
+
+def _campagna_load_tracker():
+    try:
+        with open(CAMPAGNA_TRACKER_FILE, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+def _campagna_save_tracker(data):
+    tmp = CAMPAGNA_TRACKER_FILE + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, CAMPAGNA_TRACKER_FILE)
+
+def _campagna_send_one(email, nome, subject, html_body):
+    """Invia una singola email transazionale via Brevo REST API."""
+    import urllib.request as _ur2
+    import ssl as _ssl2
+    key = _brevo_api_key()
+    if not key:
+        return False
+    ctx = _ssl2.create_default_context()
+    payload = json.dumps({
+        'sender':      {'name': BREVO_SENDER_NAME, 'email': BREVO_SENDER_EMAIL},
+        'to':          [{'email': email, 'name': nome or ''}],
+        'replyTo':     {'email': BREVO_SENDER_EMAIL},
+        'subject':     subject,
+        'htmlContent': html_body,
+    }).encode('utf-8')
+    req = _ur2.Request(
+        'https://api.brevo.com/v3/smtp/email',
+        data=payload,
+        headers={'api-key': key, 'Content-Type': 'application/json', 'Accept': 'application/json'},
+    )
+    try:
+        with _ur2.urlopen(req, timeout=15, context=ctx) as resp:
+            return resp.status in (200, 201, 202)
+    except Exception as e:
+        print(f'[CAMPAGNA] Errore Brevo a {email}: {e}', flush=True)
+        return False
+
+def _campagna_batch_daily(forzato=False):
+    """Esegue il batch giornaliero: invia 250 email ai prospect non ancora contattati."""
+    with _campagna_lock:
+        try:
+            today = datetime.now().strftime('%Y-%m-%d')
+            mese_key = datetime.now().strftime('%Y-%m')
+
+            # 1. Leggi calendario
+            if not os.path.exists(CAMPAGNA_CAL_FILE):
+                print('[CAMPAGNA] campagna_email_calendar.json non trovato — skip', flush=True)
+                return
+            with open(CAMPAGNA_CAL_FILE, encoding='utf-8') as f:
+                cal = json.load(f)
+
+            # 2. Trova il giorno di oggi
+            giorno = None
+            camp_idx = None
+            g_idx    = None
+            for ci, camp in enumerate(cal.get('campagne', [])):
+                for gi, g in enumerate(camp['giorni']):
+                    if g['data'] == today:
+                        giorno   = g
+                        camp_idx = ci
+                        g_idx    = gi
+                        break
+                if giorno:
+                    break
+
+            if not giorno:
+                print(f'[CAMPAGNA] Nessun giorno programmato per oggi ({today}) — skip', flush=True)
+                return
+
+            if giorno.get('stato') == 'inviato' and not forzato:
+                print(f'[CAMPAGNA] Batch {today} già inviato — skip', flush=True)
+                return
+
+            tema    = giorno.get('tema', '')
+            lang    = giorno.get('lang', 'IT')
+            subject = giorno.get('soggetto', 'Fuerte Venture Capital')
+            batch   = giorno.get('batch_size', 250)
+
+            # 3. Carica tracker — set di email già inviate questo mese
+            tracker = _campagna_load_tracker()
+            mese_data = tracker.get(mese_key, {'inviati': [], 'batch_count': 0})
+            gia_inviati = set(mese_data.get('inviati', []))
+
+            # 4. Seleziona prospect con email non ancora contattati
+            from content_generator import generate_post as _gp
+            from social_publisher import _build_email_html as _beh
+            try:
+                tutti = read_prospect()
+            except Exception:
+                tutti = []
+            eleggibili = [
+                p for p in tutti
+                if p.get('email', '').strip()
+                and p.get('email', '').strip() not in gia_inviati
+            ]
+            batch_oggi = eleggibili[:batch]
+
+            if not batch_oggi:
+                print(f'[CAMPAGNA] Nessun prospect disponibile per {today} — segno inviato uguale', flush=True)
+                cal['campagne'][camp_idx]['giorni'][g_idx]['stato'] = 'inviato'
+                with open(CAMPAGNA_CAL_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(cal, f, indent=2, ensure_ascii=False)
+                return
+
+            # 5. Genera corpo email
+            text = _gp(tema, lang)
+            html_body = _beh(text, None, lang)
+
+            # 6. Invia una per una (rate: ~1 secondo tra ogni email per rispettare API)
+            inviati_ok  = []
+            inviati_err = []
+            for p in batch_oggi:
+                email = p['email'].strip()
+                nome  = f"{p.get('nome','')} {p.get('cognome','')}".strip() or email
+                ok = _campagna_send_one(email, nome, subject, html_body)
+                if ok:
+                    inviati_ok.append(email)
+                else:
+                    inviati_err.append(email)
+                time.sleep(0.5)  # 500ms tra invii per non saturare Brevo
+
+            # 7. Aggiorna tracker
+            mese_data['inviati']     = list(gia_inviati | set(inviati_ok))
+            mese_data['batch_count'] = mese_data.get('batch_count', 0) + 1
+            tracker[mese_key] = mese_data
+            _campagna_save_tracker(tracker)
+
+            # 8. Marca giorno come inviato nel calendario
+            cal['campagne'][camp_idx]['giorni'][g_idx]['stato']       = 'inviato'
+            cal['campagne'][camp_idx]['giorni'][g_idx]['n_inviati']   = len(inviati_ok)
+            cal['campagne'][camp_idx]['giorni'][g_idx]['n_errori']    = len(inviati_err)
+            with open(CAMPAGNA_CAL_FILE, 'w', encoding='utf-8') as f:
+                json.dump(cal, f, indent=2, ensure_ascii=False)
+
+            print(f'[CAMPAGNA] {today} completato: {len(inviati_ok)} OK / {len(inviati_err)} ERR — tema={tema} lang={lang}', flush=True)
+
+        except Exception as e:
+            print(f'[CAMPAGNA] Errore batch giornaliero: {e}', flush=True)
+
+def _campagna_scheduler_loop():
+    """Daemon che alle 09:00 ogni giorno lancia il batch da 250 email."""
+    import datetime as _dt
+    while True:
+        now    = _dt.datetime.now()
+        target = now.replace(hour=9, minute=0, second=0, microsecond=0)
+        if now >= target:
+            target += _dt.timedelta(days=1)
+        secs = (target - now).total_seconds()
+        print(f'[CAMPAGNA] Prossimo batch alle 09:00 ({int(secs//3600)}h {int((secs%3600)//60)}m)', flush=True)
+        time.sleep(max(secs, 1))
+        _campagna_batch_daily()
+
+_t_campagna = threading.Thread(target=_campagna_scheduler_loop, daemon=True, name='campagna-email')
+_t_campagna.start()
+
 # ─── LOCK SCRITTURA FILE CONDIVISI ──────────────────────────
 _clienti_lock  = threading.Lock()
 _fatture_lock  = threading.Lock()
@@ -3232,7 +3395,12 @@ function inviaRegistrazione(){
 fetch('/api/servizi').then(function(r){return r.json();}).then(function(sv){
   servizi=sv; renderPlans();
 });
-setLang('it');
+// Legge ?lang=XX dall'URL (es. link dai bottoni email) e attiva la lingua
+(function(){
+  var p = new URLSearchParams(window.location.search).get('lang');
+  var valid = ['it','en','de','fr','es'];
+  setLang(valid.includes(p) ? p : 'it');
+})();
 </script>
 </body>
 </html>"""
@@ -7600,6 +7768,25 @@ Contatta il supporto per attivare il tuo piano.</p>
                 self._json(result)
             except Exception as e:
                 self._json({'ok': False, 'msg': str(e)})
+
+        elif p == '/api/campagna/forza-invio-oggi' and _is_auth(self):
+            try:
+                threading.Thread(
+                    target=_campagna_batch_daily,
+                    kwargs={'forzato': True},
+                    daemon=True,
+                    name='campagna-forza'
+                ).start()
+                self._json({'ok': True, 'msg': 'Batch avviato in background — verifica log e ricarica il calendario tra qualche minuto'})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+
+        elif p == '/api/campagna/tracker' and _is_auth(self):
+            try:
+                tracker = _campagna_load_tracker()
+                self._json({'ok': True, 'tracker': tracker})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)})
 
         elif p == '/api/linkedin/connect' and _is_auth(self):
             try:

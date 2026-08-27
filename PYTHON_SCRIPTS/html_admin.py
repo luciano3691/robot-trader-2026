@@ -588,6 +588,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
               <option value="2026-12">Dicembre 2026 — WEALTHOS (IT)</option>
             </select>
             <button class="btn btn-re" onclick="loadCampagna()">↺</button>
+            <button class="btn" onclick="forzaInvioOggi()" style="background:#276749;color:#68D391;border:none;border-radius:6px;padding:.38rem .8rem;font-size:.8rem;font-weight:600;cursor:pointer">⚡ Forza oggi</button>
           </div>
         </div>
 
@@ -2047,13 +2048,19 @@ function loadCampagna() {
       var btnInvia = canSend
         ? '<button onclick="inviaCampagna(\''+mese+'\',\''+g.data+'\')" style="background:#276749;border:none;border-radius:5px;color:#68D391;padding:.2rem .55rem;font-size:.72rem;font-weight:600;cursor:pointer">▶ Invia</button>'
         : '<span style="opacity:.25;font-size:.72rem">—</span>';
+      var statoExtra = '';
+      if(g.stato === 'inviato' && g.n_inviati != null) {
+        statoExtra = '<br><span style="font-size:.68rem;color:rgba(104,211,145,.6)">' + g.n_inviati + ' ok';
+        if(g.n_errori) statoExtra += ' / <span style="color:#ef4444">' + g.n_errori + ' err</span>';
+        statoExtra += '</span>';
+      }
       html += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+rowBg+'">';
       html += '<td style="padding:.38rem .7rem;font-family:monospace;font-size:.8rem;color:rgba(255,255,255,.7)">'+g.data+'</td>';
       html += '<td style="padding:.38rem .7rem;text-align:center;font-size:.8rem;opacity:.6">S'+g.settimana+'</td>';
       html += '<td style="padding:.38rem .7rem;font-size:.78rem;color:#e0e0e0">'+(VARIANTE_LABEL[g.variante]||g.variante)+'</td>';
       html += '<td style="padding:.38rem .7rem;font-size:.77rem;color:rgba(255,255,255,.65);max-width:280px">'+g.soggetto+'</td>';
       html += '<td style="padding:.38rem .7rem;text-align:center;font-size:.8rem;opacity:.6">250</td>';
-      html += '<td style="padding:.38rem .7rem;text-align:center"><span style="color:'+col+';font-size:.75rem">'+icon+' '+g.stato+'</span></td>';
+      html += '<td style="padding:.38rem .7rem;text-align:center"><span style="color:'+col+';font-size:.75rem">'+icon+' '+g.stato+statoExtra+'</span></td>';
       html += '<td style="padding:.38rem .7rem;text-align:center">'+btnInvia+'</td>';
       html += '</tr>';
     });
@@ -2080,6 +2087,22 @@ function inviaCampagna(mese, data_giorno) {
   }).catch(function(e){
     showMsg('crm-msg', '❌ Errore di rete: ' + e.message, 'err');
   });
+}
+
+function forzaInvioOggi() {
+  var oggi = new Date().toISOString().slice(0,10);
+  if(!confirm('Avviare il batch automatico per OGGI (' + oggi + ')?\n\nIl sistema invierà fino a 250 email ai prospect non ancora contattati questo mese.\nL\'operazione viene eseguita in background — ricarica il calendario tra 2-3 minuti.')) return;
+  fetch('/api/campagna/forza-invio-oggi', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){
+        showMsg('crm-msg', '⚡ Batch avviato — ricarica tra 2-3 minuti per vedere i risultati', 'ok');
+        setTimeout(loadCampagna, 3000);
+      } else {
+        showMsg('crm-msg', '❌ ' + (d.msg || 'Errore avvio batch'), 'err');
+      }
+    }).catch(function(e){
+      showMsg('crm-msg', '❌ Errore di rete: ' + e.message, 'err');
+    });
 }
 
 function importaProspectBrevo() {
