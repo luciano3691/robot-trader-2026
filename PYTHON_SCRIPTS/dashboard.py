@@ -437,8 +437,38 @@ def _campagna_batch_daily(forzato=False):
         except Exception as e:
             print(f'[CAMPAGNA] Errore batch giornaliero: {e}', flush=True)
 
+def _campagna_social_post():
+    """Pubblica su LinkedIn+Facebook il post campagna del giorno (10:00 UTC)."""
+    try:
+        today = datetime.now().strftime('%Y-%m-%d')
+        # Trova entry campagna di oggi nel social_calendar.json
+        social_path = os.path.join(BASE_DIR, 'social_calendar.json')
+        with open(social_path, encoding='utf-8') as f:
+            social = json.load(f)
+        entry = next((e for e in social.get('calendar', [])
+                      if e.get('date') == today and e.get('source') == 'campagna'), None)
+        if not entry:
+            print(f'[CAMPAGNA-SOCIAL] Nessun post campagna per oggi ({today}) — skip', flush=True)
+            return
+        from content_generator import generate_post as _gp
+        from social_publisher import publish_to_all_channels as _pub
+        text = _gp(entry['theme'], entry['lang'])
+        draft = {
+            'text_main': text,
+            'lang':      entry['lang'],
+            'theme':     entry['theme'],
+            'channels':  entry.get('channels', ['linkedin', 'facebook']),
+            'article_url': entry.get('article_url', 'https://www.fuerteventurecapital.com'),
+            'image_url': entry.get('image_url'),
+        }
+        results = _pub(draft)
+        ok_ch = [ch for ch, r in results.items() if isinstance(r, dict) and r.get('ok')]
+        print(f'[CAMPAGNA-SOCIAL] {today} → {entry["theme"]} {entry["lang"]} — OK: {ok_ch}', flush=True)
+    except Exception as e:
+        print(f'[CAMPAGNA-SOCIAL] Errore: {e}', flush=True)
+
 def _campagna_scheduler_loop():
-    """Daemon che alle 09:00 ogni giorno lancia il batch da 250 email."""
+    """Daemon: alle 09:00 email batch, alle 10:00 social post."""
     import datetime as _dt
     while True:
         now    = _dt.datetime.now()
@@ -446,9 +476,13 @@ def _campagna_scheduler_loop():
         if now >= target:
             target += _dt.timedelta(days=1)
         secs = (target - now).total_seconds()
-        print(f'[CAMPAGNA] Prossimo batch alle 09:00 ({int(secs//3600)}h {int((secs%3600)//60)}m)', flush=True)
+        print(f'[CAMPAGNA] Prossimo batch email 09:00 / social 10:00 ({int(secs//3600)}h {int((secs%3600)//60)}m)', flush=True)
         time.sleep(max(secs, 1))
+        # 09:00 — email
         _campagna_batch_daily()
+        # 10:00 — social (60 min dopo)
+        time.sleep(3600)
+        _campagna_social_post()
 
 _t_campagna = threading.Thread(target=_campagna_scheduler_loop, daemon=True, name='campagna-email')
 _t_campagna.start()
