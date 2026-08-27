@@ -572,8 +572,50 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
 
     <!-- ─── Campagne Email ─── -->
     <div id="crm-campagne" class="crm-sub" style="display:none">
+
+      <!-- ── Calendario 4 mesi ───────────────────────────── -->
+      <div class="box" style="margin-bottom:1.2rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem">
+          <div>
+            <h3 style="margin:0;color:#F6AD55;font-size:1rem">📧 Calendario Campagne — Sett · Ott · Nov · Dic 2026</h3>
+            <span style="font-size:.76rem;opacity:.5">250 email/giorno · 30.500 email totali · 4 temi mensili</span>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <select id="camp-mese-sel" onchange="loadCampagna()" style="background:#0a0f1e;border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:.4rem .7rem;color:#e0e0e0;font-size:.82rem;outline:none">
+              <option value="2026-09">Settembre 2026 — SALARY TRAP (IT)</option>
+              <option value="2026-10">Ottobre 2026 — WEALTHOS (ES)</option>
+              <option value="2026-11">Novembre 2026 — TREND MOBILIARE (EN)</option>
+              <option value="2026-12">Dicembre 2026 — WEALTHOS (IT)</option>
+            </select>
+            <button class="btn btn-re" onclick="loadCampagna()">↺</button>
+          </div>
+        </div>
+
+        <!-- KPI mese selezionato -->
+        <div id="camp-kpi" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin-bottom:1rem"></div>
+
+        <!-- Tabella giornaliera -->
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr style="background:#2C5282">
+              <th style="padding:.45rem .7rem;text-align:left;font-size:.76rem;white-space:nowrap">Data</th>
+              <th style="padding:.45rem .7rem;text-align:center;font-size:.76rem">Sett.</th>
+              <th style="padding:.45rem .7rem;text-align:left;font-size:.76rem">Variante</th>
+              <th style="padding:.45rem .7rem;text-align:left;font-size:.76rem">Soggetto email</th>
+              <th style="padding:.45rem .7rem;text-align:center;font-size:.76rem">Batch</th>
+              <th style="padding:.45rem .7rem;text-align:center;font-size:.76rem">Stato</th>
+              <th style="padding:.45rem .7rem;text-align:center;font-size:.76rem">Invia</th>
+            </tr></thead>
+            <tbody id="camp-tbody">
+              <tr><td colspan="7" style="padding:2rem;opacity:.4;text-align:center">Caricamento...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Brevo storico + azioni lancio ──────────────── -->
       <div id="campagne-content">
-        <div style="opacity:.5;padding:1.5rem;text-align:center">Caricamento...</div>
+        <div style="opacity:.5;padding:1rem;text-align:center;font-size:.85rem">Caricamento campagne Brevo...</div>
       </div>
     </div>
 
@@ -1850,7 +1892,7 @@ function switchCrmTab(el, tab) {
   _crmSubActive = tab;
   if(tab === 'clienti' && !_clienti) loadClienti();
   if(tab === 'pipeline') loadPipelineData();
-  if(tab === 'campagne') renderCampagne();
+  if(tab === 'campagne') { renderCampagne(); loadCampagna(); }
   if(tab === 'social') renderSocial();
   if(tab === 'whatsapp') renderWhatsappSub();
   if(tab === 'prospect') loadProspect();
@@ -1945,6 +1987,99 @@ function inviaEarlyAdopter() {
       if(btn){ btn.disabled = false; btn.textContent = '📩 Invia a Tester ora'; }
       alert('Errore di rete: '+e);
     });
+}
+
+var _campagna_data = null;
+
+function loadCampagna() {
+  var sel = document.getElementById('camp-mese-sel');
+  var mese = sel ? sel.value : '2026-09';
+  var tbody = document.getElementById('camp-tbody');
+  var kpi   = document.getElementById('camp-kpi');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="padding:1.5rem;opacity:.4;text-align:center">Caricamento...</td></tr>';
+
+  fetch('/api/campagna/calendario').then(function(r){return r.json();}).then(function(d){
+    if(!d.ok){ if(tbody) tbody.innerHTML='<tr><td colspan="7" style="color:#ef4444;padding:1rem">'+d.error+'</td></tr>'; return; }
+    _campagna_data = d.campagne || [];
+    var camp = _campagna_data.find(function(c){return c.mese === mese;});
+    if(!camp){ if(tbody) tbody.innerHTML='<tr><td colspan="7" style="opacity:.4;padding:1rem;text-align:center">Mese non trovato</td></tr>'; return; }
+
+    // KPI
+    if(kpi){
+      var inviati   = camp.giorni.filter(function(g){return g.stato==='inviato';}).length;
+      var oggi_g    = camp.giorni.filter(function(g){return g.stato==='oggi';}).length;
+      var programmati = camp.giorni.filter(function(g){return g.stato==='programmato';}).length;
+      var TEMA_LABELS = {'SALARY_TRAP':'SALARY TRAP','WEALTHOS_PROMO':'WEALTHOS','TREND_MOBILIARE':'TREND MOBILIARE'};
+      kpi.innerHTML =
+        '<div style="background:rgba(246,173,85,.08);border:1px solid rgba(246,173,85,.2);border-radius:8px;padding:.65rem 1rem">'
+          +'<div style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em">Tema</div>'
+          +'<div style="font-size:.95rem;font-weight:700;color:#F6AD55;margin-top:.2rem">'+(TEMA_LABELS[camp.tema]||camp.tema)+'</div>'
+          +'<div style="font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.1rem">'+camp.lang_principale+'</div>'
+        +'</div>'
+        +'<div style="background:rgba(104,211,145,.07);border:1px solid rgba(104,211,145,.2);border-radius:8px;padding:.65rem 1rem">'
+          +'<div style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em">Inviati</div>'
+          +'<div style="font-size:1.3rem;font-weight:700;color:#68D391;margin-top:.2rem">'+inviati+'</div>'
+          +'<div style="font-size:.72rem;color:rgba(255,255,255,.35)">× 250 = '+(inviati*250).toLocaleString()+' email</div>'
+        +'</div>'
+        +'<div style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);border-radius:8px;padding:.65rem 1rem">'
+          +'<div style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em">Programmati</div>'
+          +'<div style="font-size:1.3rem;font-weight:700;color:#60a5fa;margin-top:.2rem">'+programmati+'</div>'
+          +'<div style="font-size:.72rem;color:rgba(255,255,255,.35)">rimanenti del mese</div>'
+        +'</div>'
+        +'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.65rem 1rem">'
+          +'<div style="font-size:.7rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em">Totale mese</div>'
+          +'<div style="font-size:1.3rem;font-weight:700;color:#e0e0e0;margin-top:.2rem">'+camp.totale_email.toLocaleString()+'</div>'
+          +'<div style="font-size:.72rem;color:rgba(255,255,255,.35)">'+camp.giorni.length+' gg × 250/gg</div>'
+        +'</div>';
+    }
+
+    // Tabella giorni
+    var STATO_COLOR = {inviato:'#68D391', oggi:'#F6AD55', programmato:'#60a5fa', scaduto:'rgba(255,255,255,.25)'};
+    var STATO_ICON  = {inviato:'✅', oggi:'📅', programmato:'🕐', scaduto:'—'};
+    var VARIANTE_LABEL = {PAIN_HOOK:'🎯 Pain Hook', SOLUTION:'💡 Soluzione', SOCIAL_PROOF:'📣 Prova Sociale', CTA:'🚀 CTA'};
+    var html = '';
+    camp.giorni.forEach(function(g){
+      var col = STATO_COLOR[g.stato] || 'rgba(255,255,255,.4)';
+      var icon = STATO_ICON[g.stato] || '—';
+      var isOggi = g.stato === 'oggi';
+      var rowBg  = isOggi ? 'background:rgba(246,173,85,.04);' : '';
+      var canSend = (g.stato === 'programmato' || g.stato === 'oggi');
+      var btnInvia = canSend
+        ? '<button onclick="inviaCampagna(\''+mese+'\',\''+g.data+'\')" style="background:#276749;border:none;border-radius:5px;color:#68D391;padding:.2rem .55rem;font-size:.72rem;font-weight:600;cursor:pointer">▶ Invia</button>'
+        : '<span style="opacity:.25;font-size:.72rem">—</span>';
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+rowBg+'">';
+      html += '<td style="padding:.38rem .7rem;font-family:monospace;font-size:.8rem;color:rgba(255,255,255,.7)">'+g.data+'</td>';
+      html += '<td style="padding:.38rem .7rem;text-align:center;font-size:.8rem;opacity:.6">S'+g.settimana+'</td>';
+      html += '<td style="padding:.38rem .7rem;font-size:.78rem;color:#e0e0e0">'+(VARIANTE_LABEL[g.variante]||g.variante)+'</td>';
+      html += '<td style="padding:.38rem .7rem;font-size:.77rem;color:rgba(255,255,255,.65);max-width:280px">'+g.soggetto+'</td>';
+      html += '<td style="padding:.38rem .7rem;text-align:center;font-size:.8rem;opacity:.6">250</td>';
+      html += '<td style="padding:.38rem .7rem;text-align:center"><span style="color:'+col+';font-size:.75rem">'+icon+' '+g.stato+'</span></td>';
+      html += '<td style="padding:.38rem .7rem;text-align:center">'+btnInvia+'</td>';
+      html += '</tr>';
+    });
+    if(tbody) tbody.innerHTML = html;
+
+  }).catch(function(e){
+    if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="color:#ef4444;padding:1rem">Errore: '+e.message+'</td></tr>';
+  });
+}
+
+function inviaCampagna(mese, data_giorno) {
+  if(!confirm('Inviare l\'email del ' + data_giorno + ' a 250 destinatari?')) return;
+  fetch('/api/campagna/invia', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({mese: mese, data: data_giorno})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.ok){
+      showMsg('crm-msg', '✅ Email inviate: ' + data_giorno + ' — batch 250', 'ok');
+      loadCampagna();
+    } else {
+      showMsg('crm-msg', '❌ ' + (d.msg || 'Errore invio'), 'err');
+    }
+  }).catch(function(e){
+    showMsg('crm-msg', '❌ Errore di rete: ' + e.message, 'err');
+  });
 }
 
 function importaProspectBrevo() {

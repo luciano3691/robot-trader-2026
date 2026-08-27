@@ -7546,6 +7546,61 @@ Contatta il supporto per attivare il tuo piano.</p>
                 self._json({'ok': True, 'calendario': cal})
             except Exception as e:
                 self._json({'ok': False, 'error': str(e)})
+        elif p == '/api/campagna/calendario' and _is_auth(self):
+            try:
+                cal_path = os.path.join(BASE_DIR, 'campagna_email_calendar.json')
+                if not os.path.exists(cal_path):
+                    self._json({'ok': False, 'error': 'campagna_email_calendar.json non trovato'}); return
+                with open(cal_path, encoding='utf-8') as _f:
+                    data = json.load(_f)
+                today = datetime.now().strftime('%Y-%m-%d')
+                for campagna in data.get('campagne', []):
+                    for g in campagna.get('giorni', []):
+                        if g.get('stato') == 'programmato' and g.get('data', '') < today:
+                            g['stato'] = 'scaduto'
+                        elif g.get('data', '') == today:
+                            g['stato'] = 'oggi'
+                self._json({'ok': True, 'campagne': data.get('campagne', [])})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)})
+
+        elif p == '/api/campagna/invia' and _is_auth(self):
+            try:
+                req = json.loads(self._body())
+                mese  = req.get('mese', '')
+                data_giorno = req.get('data', '')
+                if not mese or not data_giorno:
+                    self._json({'ok': False, 'msg': 'Parametri mancanti'}); return
+                cal_path = os.path.join(BASE_DIR, 'campagna_email_calendar.json')
+                with open(cal_path, encoding='utf-8') as _f:
+                    cal_data = json.load(_f)
+                giorno = None
+                for camp in cal_data.get('campagne', []):
+                    if camp['mese'] == mese:
+                        for g in camp['giorni']:
+                            if g['data'] == data_giorno:
+                                giorno = g
+                                break
+                if not giorno:
+                    self._json({'ok': False, 'msg': f'Giorno {data_giorno} non trovato in {mese}'}); return
+                from social_publisher import BrevoService
+                brevo = BrevoService()
+                from content_generator import generate_post
+                text = generate_post(giorno['tema'], giorno['lang'])
+                from social_publisher import _build_email_html
+                html_body = _build_email_html(text, None, giorno['lang'])
+                result = brevo.send_newsletter_campaign(
+                    subject=giorno['soggetto'],
+                    html_content=html_body,
+                )
+                if result.get('ok'):
+                    giorno['stato'] = 'inviato'
+                    with open(cal_path, 'w', encoding='utf-8') as _f:
+                        json.dump(cal_data, _f, indent=2, ensure_ascii=False)
+                self._json(result)
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+
         elif p == '/api/linkedin/connect' and _is_auth(self):
             try:
                 from social_publisher import LinkedInService
