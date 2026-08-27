@@ -90,6 +90,11 @@
       "api_key": ""
     }
   },
+  "amplificatori": [
+    {"nome": "Luciano",    "email": "luciano.manicardi@lineexpress.it"},
+    {"nome": "Luciano",    "email": "rioluc63@gmail.com"},
+    {"nome": "Elisabetta", "email": "newfrontiers65@gmail.com"}
+  ],
   "scoring_weights": {
     "azioni": {
       "BASIC": {

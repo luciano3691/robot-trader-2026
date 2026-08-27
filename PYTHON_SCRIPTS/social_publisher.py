@@ -237,6 +237,129 @@ class BrevoService:
             return False
 
 
+# ── AMPLIFICATORI ─────────────────────────────────────────────────────────────
+
+def _save_last_li_post(post_id: str, text: str) -> None:
+    """Salva l'ultimo post LinkedIn in social_tokens.json per recupero manuale."""
+    tokens = _tokens()
+    tokens['linkedin']['last_post_id']   = post_id
+    tokens['linkedin']['last_post_text'] = text[:200]
+    tokens['linkedin']['last_post_at']   = datetime.now().isoformat()
+    _save_tokens(tokens)
+
+
+def _notifica_amplificatori(post_id: str, post_text: str) -> None:
+    """Invia email agli amplificatori subito dopo un post LinkedIn."""
+    cfg = _cfg()
+    amplificatori = cfg.get('amplificatori', [])
+    if not amplificatori:
+        return
+
+    smtp_host  = os.getenv('BREVO_SMTP_HOST', 'smtp.gmail.com')
+    smtp_port  = int(os.getenv('BREVO_SMTP_PORT', 587))
+    smtp_login = os.getenv('BREVO_SMTP_LOGIN', '')
+    smtp_pwd   = os.getenv('BREVO_SMTP_PASSWORD', '')
+    sender     = os.getenv('BREVO_SENDER_EMAIL', 'marketing@fuerteventurecapital.com')
+    if not smtp_login or not smtp_pwd:
+        _log("[Amplificatori] SMTP non configurato — skip")
+        return
+
+    post_url = f"https://www.linkedin.com/feed/update/{post_id}/"
+    preview  = post_text[:120].replace('\n', ' ').strip()
+    commento_suggerito = (
+        "Strumento interessante per chi vuole investire con metodo — "
+        "ho testato i report e la selezione è molto disciplinata. 📊"
+    )
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0a0f1e;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f1e;padding:24px 0">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0"
+           style="background:#111827;border-radius:10px;border:1px solid rgba(246,173,85,.25);overflow:hidden">
+      <tr>
+        <td style="background:#2C5282;padding:18px 32px">
+          <div style="font-size:13px;font-weight:700;color:#F6AD55;letter-spacing:1px">
+            🚀 ROBOT TRADER 2026 — POST LIVE SU LINKEDIN
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:28px 32px">
+          <p style="color:#e0e0e0;font-size:15px;margin:0 0 8px">
+            <strong style="color:#F6AD55">Azione richiesta entro 30 minuti</strong>
+          </p>
+          <p style="color:#aaa;font-size:13px;margin:0 0 20px">
+            Il post è appena andato live. L'algoritmo LinkedIn premia l'engagement
+            nelle prime 60 minuti — ogni like e commento adesso vale 10x.
+          </p>
+
+          <div style="background:#0a0f1e;border-radius:8px;padding:16px 20px;margin-bottom:20px;
+                      border:1px solid rgba(255,255,255,.08)">
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+              Anteprima post
+            </div>
+            <div style="font-size:13px;color:#c0cce0;line-height:1.6">{preview}…</div>
+          </div>
+
+          <div style="text-align:center;margin-bottom:20px">
+            <a href="{post_url}"
+               style="background:#F6AD55;color:#0a0f1e;padding:12px 36px;border-radius:8px;
+                      text-decoration:none;font-weight:700;font-size:14px;display:inline-block">
+              👍 Vai al Post LinkedIn →
+            </a>
+          </div>
+
+          <div style="background:rgba(246,173,85,.06);border:1px solid rgba(246,173,85,.2);
+                      border-radius:8px;padding:14px 18px;margin-bottom:16px">
+            <div style="font-size:11px;color:#F6AD55;font-weight:700;text-transform:uppercase;
+                        letter-spacing:.8px;margin-bottom:8px">
+              💬 Commento suggerito (copia e incolla)
+            </div>
+            <div style="font-size:13px;color:#c0cce0;line-height:1.6;font-style:italic">
+              "{commento_suggerito}"
+            </div>
+          </div>
+
+          <ol style="color:#aaa;font-size:13px;line-height:2;padding-left:20px;margin:0">
+            <li>Clicca il bottone qui sopra</li>
+            <li>Metti <strong style="color:#e0e0e0">Like</strong> al post</li>
+            <li>Scrivi il commento suggerito (o uno tuo)</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#0F172A;padding:14px 24px;text-align:center;
+                   font-size:11px;color:#556">
+          Fuerte Venture Capital SL · Sistema automatico RT2026
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+    try:
+        for destinatario in amplificatori:
+            email_addr = destinatario.get('email', '')
+            nome       = destinatario.get('nome', 'Ciao')
+            if not email_addr:
+                continue
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = "🚀 Post LinkedIn LIVE — azione entro 30 min"
+            msg["From"]    = f"Robot Trader 2026 <{sender}>"
+            msg["To"]      = f"{nome} <{email_addr}>"
+            msg.attach(MIMEText(html, "html", "utf-8"))
+            with smtplib.SMTP(smtp_host, smtp_port, timeout=15) as s:
+                s.ehlo(); s.starttls()
+                s.login(smtp_login, smtp_pwd)
+                s.sendmail(sender, [email_addr], msg.as_string())
+            _log(f"[Amplificatori] Notifica inviata a {email_addr}")
+    except Exception as e:
+        _log(f"[Amplificatori] Errore invio: {e}")
+
+
 # ── LINKEDIN ──────────────────────────────────────────────────────────────────
 
 class LinkedInService:
@@ -325,6 +448,8 @@ class LinkedInService:
         if r.status_code in (200, 201):
             post_id = r.headers.get("x-restli-id", "")
             _log(f"LinkedIn post pubblicato: {post_id}")
+            _save_last_li_post(post_id, text)
+            _notifica_amplificatori(post_id, text)
             return {"ok": True, "post_id": post_id}
         _log(f"LinkedIn post FALLITO: {r.status_code} {r.text[:300]}")
         return {"ok": False, "status": r.status_code, "detail": r.text}
