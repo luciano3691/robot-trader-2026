@@ -211,6 +211,8 @@ def _validate_str(s, max_len=200):
         s = str(s) if s is not None else ''
     return s.strip()[:max_len]
 
+ADMIN_SESSION_TIMEOUT  = 8  * 3600  # 8 ore — scade dal momento del login
+CLIENT_SESSION_TIMEOUT = 24 * 3600  # 24 ore — finestra scorrevole sull'ultimo accesso
 def _persist_sessions():
     """Salva sessioni attive su file (sopravvivono al riavvio)."""
     try:
@@ -293,8 +295,6 @@ _clienti_lock  = threading.Lock()
 _fatture_lock  = threading.Lock()
 _prospect_lock = threading.Lock()
 
-ADMIN_SESSION_TIMEOUT  = 8  * 3600  # 8 ore — scade dal momento del login
-CLIENT_SESSION_TIMEOUT = 24 * 3600  # 24 ore — finestra scorrevole sull'ultimo accesso
 
 
 from assets import FUERTE_LOGO_B64, PWA_ICON_192_B64, PWA_ICON_512_B64

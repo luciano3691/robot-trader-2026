@@ -161,15 +161,15 @@
   "admin_password": "",
   "stripe": {
     "price_ids": {
-      "azioni_basic": "price_1U7Vs8CcGj4bOSJuQZNhm4Zb",
-      "azioni_pro": "price_1U7Vs8CcGj4bOSJu6ljx1jhj",
-      "azioni_value": "price_1U7Vs9CcGj4bOSJuhLzi6nT7",
-      "etf_basic": "price_1U7Vs9CcGj4bOSJuUzvIYGIG",
-      "etf_pro": "price_1U7VsACcGj4bOSJuNLAIXZF4",
-      "etf_value": "price_1U7VsACcGj4bOSJuFeQVJmZO",
-      "fondi_basic": "price_1U7VsBCcGj4bOSJux8cl1WRc",
-      "fondi_pro": "price_1U7VsCCcGj4bOSJuGEkyajkZ",
-      "fondi_value": "price_1U7VsCCcGj4bOSJuGRvLb0Yc"
+      "azioni_basic": "price_1U7gi02QVjaGzlSwaG7PonKy",
+      "azioni_pro": "price_1U7gi02QVjaGzlSw7DuBInkc",
+      "azioni_value": "price_1U7gi02QVjaGzlSwRn1frt90",
+      "etf_basic": "price_1U7gi02QVjaGzlSw17ITD28H",
+      "etf_pro": "price_1U7gi02QVjaGzlSwS0EGPPhS",
+      "etf_value": "price_1U7gi02QVjaGzlSw9N1Pm1rt",
+      "fondi_basic": "price_1U7gi02QVjaGzlSwAk13Z10D",
+      "fondi_pro": "price_1U7gi02QVjaGzlSwVzqmgea9",
+      "fondi_value": "price_1U7gi02QVjaGzlSwv8XkNggS"
     }
   }
 }
