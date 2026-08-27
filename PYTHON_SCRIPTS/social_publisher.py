@@ -250,8 +250,11 @@ def _save_last_li_post(post_id: str, text: str) -> None:
 
 def _notifica_amplificatori(post_id: str, post_text: str) -> None:
     """Invia email agli amplificatori subito dopo un post LinkedIn."""
-    cfg = _cfg()
-    amplificatori = cfg.get('amplificatori', [])
+    try:
+        with open(CONFIG_FILE, encoding='utf-8') as _f:
+            amplificatori = json.load(_f).get('amplificatori', [])
+    except Exception:
+        amplificatori = []
     if not amplificatori:
         return
 
