@@ -16,6 +16,12 @@ from email.mime.text import MIMEText
 from typing import Optional
 
 try:
+    from content_generator import generate_post as _gen_post
+except ImportError:
+    def _gen_post(theme: str, lang: str = "IT") -> str:  # type: ignore[misc]
+        return ""
+
+try:
     from dotenv import load_dotenv as _load_dotenv
     _load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 except ImportError:
@@ -667,61 +673,171 @@ class MetaService:
 
 # ── Helper pubblico: pubblica su tutti i canali configurati ───────────────────
 
+# Oggetto email per canale Brevo — nella lingua del mercato target
+_EMAIL_SUBJECT = {
+    "IT": "📊 Robot Trader 2026 — Nuovo aggiornamento per te",
+    "ES": "📊 Robot Trader 2026 — Nueva actualización para ti",
+    "EN": "📊 Robot Trader 2026 — New update for you",
+    "FR": "📊 Robot Trader 2026 — Nouvelle mise à jour pour vous",
+    "DE": "📊 Robot Trader 2026 — Neues Update für Sie",
+}
+
+_EMAIL_CTA = {
+    "IT": "Scopri Robot Trader 2026",
+    "ES": "Descubre Robot Trader 2026",
+    "EN": "Discover Robot Trader 2026",
+    "FR": "Découvrir Robot Trader 2026",
+    "DE": "Robot Trader 2026 entdecken",
+}
+
+_EMAIL_FOOTER = {
+    "IT": "Hai ricevuto questa email perché sei iscritto alla newsletter di Fuerte Venture Capital.",
+    "ES": "Recibiste este correo porque estás suscrito al boletín de Fuerte Venture Capital.",
+    "EN": "You received this email because you are subscribed to the Fuerte Venture Capital newsletter.",
+    "FR": "Vous recevez cet e-mail car vous êtes abonné à la newsletter de Fuerte Venture Capital.",
+    "DE": "Sie erhalten diese E-Mail, weil Sie den Newsletter von Fuerte Venture Capital abonniert haben.",
+}
+
+
+def _build_email_html(text: str, image_url: Optional[str], lang: str) -> str:
+    """Genera email HTML branded FVC — dark bg, gold accent, logo, CTA."""
+    lang = lang.upper()
+    cta      = _EMAIL_CTA.get(lang, _EMAIL_CTA["EN"])
+    footer   = _EMAIL_FOOTER.get(lang, _EMAIL_FOOTER["EN"])
+    logo_url = "https://trader.fuerteventurecapital.com/static/logo_fvc_email.png"
+    site_url = "https://trader.fuerteventurecapital.com"
+    text_html = text.replace('\n', '<br>')
+
+    img_block = ""
+    if image_url:
+        img_block = f"""
+      <tr>
+        <td style="padding:0 0 24px">
+          <img src="{image_url}" alt="Robot Trader 2026"
+               style="width:100%;max-width:560px;border-radius:8px;display:block">
+        </td>
+      </tr>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="{lang.lower()}">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0f1e;font-family:'Helvetica Neue',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0f1e;padding:32px 0">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0"
+           style="background:#111827;border-radius:12px;border:1px solid rgba(246,173,85,.2);overflow:hidden;max-width:560px">
+
+      <!-- Header blu -->
+      <tr>
+        <td style="background:#2C5282;padding:20px 32px">
+          <img src="{logo_url}" alt="Fuerte Venture Capital" height="40"
+               style="display:block;height:40px">
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td style="padding:32px 32px 8px">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            {img_block}
+            <tr>
+              <td style="color:#e2e8f0;font-size:15px;line-height:1.8;white-space:pre-wrap">
+                {text_html}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- CTA -->
+      <tr>
+        <td align="center" style="padding:8px 32px 32px">
+          <a href="{site_url}"
+             style="display:inline-block;background:#F6AD55;color:#0a0f1e;font-weight:700;
+                    font-size:14px;padding:14px 32px;border-radius:6px;text-decoration:none;
+                    letter-spacing:.5px">
+            {cta} →
+          </a>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background:#0a0f1e;padding:20px 32px;border-top:1px solid rgba(246,173,85,.15)">
+          <p style="margin:0;font-size:11px;color:#4a5568;line-height:1.6">
+            {footer}<br>
+            <a href="{site_url}" style="color:#F6AD55;text-decoration:none">trader.fuerteventurecapital.com</a>
+            &nbsp;·&nbsp; Fuerte Venture Capital SL
+          </p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+
 def publish_to_all_channels(draft: dict) -> dict:
     """
     Pubblica un draft approvato su tutti i canali attivi.
+    Usa la lingua del draft (campo 'lang') per tutti i canali.
     Ritorna dict con risultato per canale.
     """
     results  = {}
     channels = draft.get('channels', ['linkedin', 'facebook', 'instagram'])
-    text_it  = draft.get('text_it', '')
-    text_es  = draft.get('text_es', '')
+    lang     = draft.get('lang', 'IT').upper()
+    theme    = draft.get('theme', '')
+
+    # Testo nella lingua corretta del calendario
+    if lang == 'IT':
+        text_main = draft.get('text_it') or _gen_post(theme, 'IT')
+    elif lang == 'ES':
+        text_main = draft.get('text_es') or _gen_post(theme, 'ES')
+    else:
+        text_main = draft.get('text_main') or _gen_post(theme, lang)
+
     image_url   = draft.get('image_url')
     article_url = draft.get('article_url')
 
-    # URL immagine per canale: usa quello del draft se presente, altrimenti il logo FVC di default
-    fb_image  = draft.get('facebook_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['facebook']
-    ig_image  = draft.get('instagram_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['instagram']
+    fb_image = draft.get('facebook_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['facebook']
+    ig_image = draft.get('instagram_image_url') or image_url or DEFAULT_CHANNEL_IMAGES['instagram']
+    li_image = draft.get('linkedin_image_url')  or image_url or DEFAULT_CHANNEL_IMAGES['linkedin']
 
-    # Brevo newsletter (testo IT come corpo email)
+    # Brevo newsletter — branded FVC template nella lingua del mercato
     if 'brevo' in channels:
-        brevo = BrevoService()
-        html_body = f"""
-<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;padding:32px 24px">
-  <h2 style="color:#2C5282">Fuerte Venture Capital — Aggiornamento</h2>
-  <div style="white-space:pre-wrap;line-height:1.7;color:#2d3748">{text_it}</div>
-  <hr style="border:none;border-top:1px solid #e2e8f0;margin:28px 0">
-  <p style="font-size:.8rem;color:#a0aec0">
-    Robot Trader 2026 · <a href="https://www.fuerteventurecapital.com">www.fuerteventurecapital.com</a>
-  </p>
-</div>"""
+        brevo   = BrevoService()
+        subject = _EMAIL_SUBJECT.get(lang, _EMAIL_SUBJECT["EN"])
+        html_body = _build_email_html(text_main, image_url, lang)
         results['brevo'] = brevo.send_newsletter_campaign(
-            subject=f"[Robot Trader] {draft['theme']} — {draft['date']}",
+            subject=subject,
             html_content=html_body,
         )
 
-    # LinkedIn (Company Page — testo IT)
+    # LinkedIn — testo + immagine nella lingua corretta
     if 'linkedin' in channels:
         li = LinkedInService()
         results['linkedin'] = li.publish_post(
-            text=text_it,
+            text=text_main,
             url=article_url,
+            lang=lang,
+            image_url=li_image,
         )
 
-    # Facebook (testo IT + logo FVC 851×315)
+    # Facebook — testo + immagine nella lingua corretta
     if 'facebook' in channels:
         meta = MetaService()
         results['facebook'] = meta.publish_facebook(
-            text=text_it,
+            text=text_main,
             url=article_url,
             image_url=fb_image,
         )
 
-    # Instagram (testo IT + logo FVC 1080×566 — deve essere URL pubblico)
+    # Instagram — testo + immagine nella lingua corretta
     if 'instagram' in channels:
         meta = MetaService()
-        results['instagram'] = meta.publish_instagram(text=text_it, image_url=ig_image)
+        results['instagram'] = meta.publish_instagram(text=text_main, image_url=ig_image)
 
     ok_count = sum(1 for v in results.values() if v.get('ok'))
-    _log(f"Pubblicazione draft {draft['draft_id']}: {ok_count}/{len(results)} canali OK")
+    _log(f"Pubblicazione draft {draft['draft_id']} [{lang}]: {ok_count}/{len(results)} canali OK")
     return results
