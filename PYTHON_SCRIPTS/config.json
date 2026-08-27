@@ -55,8 +55,8 @@
   "whatsapp": {
     "_note": "Meta WhatsApp Cloud API — business.facebook.com → WhatsApp Business",
     "token": "",
-    "phone_number_id": "1098859536651515",
-    "waba_id": "1451835150031737",
+    "phone_number_id": "927143660475118",
+    "waba_id": "826811716568247",
     "api_version": "v20.0",
     "templates": {
       "screener_pronto": "screener_pronto",
