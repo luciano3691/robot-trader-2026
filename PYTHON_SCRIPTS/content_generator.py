@@ -251,7 +251,7 @@ Piano BASIC → indici principali · Top 20
 Piano PRO → universo completo · Top 50
 Piano VALUE → filtri più ampi · turnaround inclusi
 
-Primo passo: registrati su www.fuerteventurecapital.com
+Primo passo: registrati su https://trader.fuerteventurecapital.com
 
 #RobotTrader #ValueInvesting #Launching""",
         "ES": """🚀 Robot Trader 2026 — Disponible Ahora
@@ -265,7 +265,7 @@ Plan BASIC → índices principales · Top 20
 Plan PRO → universo completo · Top 50
 Plan VALUE → filtros más amplios · turnaround incluidos
 
-Primer paso: regístrate en www.fuerteventurecapital.com
+Primer paso: regístrate en https://trader.fuerteventurecapital.com
 
 #RobotTrader #ValueInvesting #Lanzamiento""",
     },
@@ -366,7 +366,7 @@ def _call_claude(theme: str, lang: str, api_key: str) -> Optional[str]:
         f"TEMA: {tema_desc}\n\n"
         f"PRODOTTO: Robot Trader 2026 — screener value investing automatico\n"
         f"AUDIENCE: Investitori retail, imprenditori, professionisti finanziari\n"
-        f"CTA: Invita a scoprire www.fuerteventurecapital.com o a commentare\n\n"
+        f"CTA: Invita a scoprire https://trader.fuerteventurecapital.com o a commentare\n\n"
         f"Scrivi SOLO il testo del post, pronto per la pubblicazione."
     )
     headers = {
