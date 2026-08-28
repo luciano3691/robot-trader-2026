@@ -6201,21 +6201,20 @@ def _build_area_clienti(email):
             return (f'<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem;'
                     f'display:flex;align-items:center;margin-bottom:.6rem">'
                     f'<span style="color:#444">{icon} {label} — nessun piano attivo</span></div>')
-        f = _latest_plan(asset, p)
-        fname = os.path.basename(f) if f else None
-        if fname:
-            _fpdf = _latest_plan_pdf(asset, p)
-            if _fpdf:
-                dl = (f'<a href="/api/report-pdf/{asset}" '
-                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
-                      f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica PDF</a>')
-            else:
-                dl = (f'<a href="/api/report/{asset}" '
-                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
-                      f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica</a>')
-            info = f'<span style="font-size:.78rem;color:#888">{fname}</span>'
+        _fpdf = _latest_plan_pdf(asset, p)
+        f     = _latest_plan(asset, p)
+        if _fpdf:
+            dl    = (f'<a href="/api/report-pdf/{asset}" '
+                     f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
+                     f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica PDF</a>')
+            info  = f'<span style="font-size:.78rem;color:#888">{os.path.basename(_fpdf)}</span>'
+        elif f:
+            dl    = (f'<a href="/api/report/{asset}" '
+                     f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
+                     f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica</a>')
+            info  = f'<span style="font-size:.78rem;color:#888">{os.path.basename(f)}</span>'
         else:
-            dl = '<span style="color:#555;font-size:.82rem">Nessun report disponibile</span>'
+            dl   = '<span style="color:#555;font-size:.82rem">Nessun report disponibile</span>'
             info = ''
         return (f'<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem;'
                 f'display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem">'

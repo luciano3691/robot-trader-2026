@@ -44,13 +44,15 @@ def _nome_col_idx(headers):
 def build_frequency(lookback_days=30):
     """
     Analizza i file Excel degli ultimi `lookback_days` giorni.
-    Ritorna dict: {asset_class: {piano: {ticker: {count, nome, dates, last_date}}}}
+    Ritorna dict: {asset_class: {piano: {_meta: {total_days}, ticker: {count, nome, dates, last_date}}}}
+    _meta.total_days = numero di report elaborati → usato per calcolare FREQ%
     """
     if load_workbook is None:
         print('[ticker_freq] openpyxl non disponibile')
         return {}
 
-    freq = {}
+    freq       = {}
+    dates_seen = {}   # {asset_class: {piano: set(date_str)}}
 
     try:
         files = sorted(os.listdir(REPORTS_DIR))
@@ -73,6 +75,9 @@ def build_frequency(lookback_days=30):
                 continue
         except Exception:
             pass
+
+        # Traccia data elaborata per total_days
+        dates_seen.setdefault(asset_class, {}).setdefault(piano, set()).add(date_str)
 
         fpath = os.path.join(REPORTS_DIR, fname)
         try:
@@ -126,6 +131,12 @@ def build_frequency(lookback_days=30):
 
         except Exception as e:
             print(f'[ticker_freq] errore {fname}: {e}')
+
+    # Aggiungi _meta.total_days per ogni asset/piano
+    for ac in freq:
+        for piano in freq[ac]:
+            total = len(dates_seen.get(ac, {}).get(piano, set()))
+            freq[ac][piano]['_meta'] = {'total_days': max(total, 1)}
 
     return freq
 

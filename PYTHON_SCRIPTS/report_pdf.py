@@ -6,8 +6,13 @@ Aggiunge:
   - nota ticker stabili (frequenza da ticker_frequency.json)
   - pagina 2: Scheda Ordine stampabile (Task 4)
 """
-import io, os, urllib.request
+import io, os, base64 as _b64lib, urllib.request
 from datetime import datetime
+
+try:
+    from assets import FUERTE_LOGO_B64 as _LOGO_B64
+except ImportError:
+    _LOGO_B64 = None
 
 try:
     from fpdf import FPDF
@@ -32,10 +37,17 @@ _LOGO_PATH = '/tmp/fvc_logo_report.png'
 
 def _get_logo():
     if not os.path.exists(_LOGO_PATH):
-        try:
-            urllib.request.urlretrieve(_LOGO_URL, _LOGO_PATH)
-        except Exception:
-            return None
+        if _LOGO_B64:
+            try:
+                with open(_LOGO_PATH, 'wb') as _f:
+                    _f.write(_b64lib.b64decode(_LOGO_B64.strip()))
+            except Exception:
+                pass
+        if not os.path.exists(_LOGO_PATH):
+            try:
+                urllib.request.urlretrieve(_LOGO_URL, _LOGO_PATH)
+            except Exception:
+                return None
     return _LOGO_PATH if os.path.exists(_LOGO_PATH) else None
 
 
@@ -69,100 +81,92 @@ _BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 _FREQ_FILE = os.path.join(_BASE_DIR, 'ticker_frequency.json')
 
 def _load_freq_map(asset_class, piano):
-    """Ritorna {ticker_upper: count} dal file ticker_frequency.json."""
+    """Ritorna ({ticker_upper: count}, total_days) dal file ticker_frequency.json."""
     import json
     try:
         if os.path.exists(_FREQ_FILE):
             with open(_FREQ_FILE, encoding='utf-8') as f:
                 data = json.load(f)
-            return {
+            plan_data = data.get(asset_class, {}).get(piano, {})
+            total_days = plan_data.get('_meta', {}).get('total_days', 1)
+            freq_map = {
                 tk.upper(): info.get('count', 0)
-                for tk, info in data.get(asset_class, {}).get(piano, {}).items()
+                for tk, info in plan_data.items()
+                if tk != '_meta'
             }
+            return freq_map, max(total_days, 1)
     except Exception:
         pass
-    return {}
+    return {}, 1
 
 
 # ── Configurazione colonne ────────────────────────────────────────────────────
 # Ogni voce: (keyword_header, larghezza_mm, align, formatter|None)
 # keyword_header speciale: '#' = contatore riga; 'FREQ' = frequenza ticker
+# Layout landscape A4 → usable width = 297-12-12 = 273mm
 
-_AZIONI_BASIC = [
-    ('#',            8,  'C', None),
-    ('Ticker',      22,  'L', None),
-    ('Nome',        60,  'L', None),
-    ('Mercato',     22,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        14,  'C', None),
-    ('Settore',     34,  'L', None),
-]
-
-_AZIONI_PRO = [
-    ('#',            8,  'C', None),
-    ('Ticker',      22,  'L', None),
-    ('Nome',        52,  'L', None),
-    ('Mercato',     22,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        12,  'C', None),
-    ('Prezzo',      18,  'R', _fmt_float),
-    ('Var 1D %',    14,  'R', None),
-    ('Perf 1M %',   11,  'R', None),
-    ('Perf 3M %',   11,  'R', None),
-]
-
-_AZIONI_VALUE = [
-    ('#',            8,  'C', None),
-    ('Ticker',      22,  'L', None),
-    ('Nome',        52,  'L', None),
-    ('Mercato',     22,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        12,  'C', None),
-    ('Prezzo',      16,  'R', _fmt_float),
-    ('Perf 1M %',   13,  'R', None),
-    ('Perf 3M %',   13,  'R', None),
-    ('Perf 6M %',   12,  'R', None),
-]
+_AZIONI_COLS = [
+    ('#',                7,  'C', None),
+    ('Ticker',          14,  'L', None),
+    ('Nome',            36,  'L', None),
+    ('Valuta',           9,  'C', None),
+    ('Mercato',         18,  'L', None),
+    ('Indice',          17,  'L', None),
+    ('Prezzo',          15,  'R', _fmt_float),
+    ('Var 1D %',        12,  'R', None),
+    ('Score',           11,  'C', None),
+    ('Perf 1M %',       11,  'R', None),
+    ('Perf 3M %',       11,  'R', None),
+    ('Perf 6M %',       11,  'R', None),
+    ('Perf YTD %',      11,  'R', None),
+    ('Perf 1Y %',       11,  'R', None),
+    ('P/B',             10,  'R', _fmt_float),
+    ('ROE',             10,  'R', None),
+    ('EV/FCF',          11,  'R', _fmt_float),
+    ('Net Debt/EBITDA', 14,  'R', _fmt_float),
+    ('Market Cap',      14,  'R', None),
+    ('Settore',         20,  'L', None),
+]  # total 273mm — universale BASIC/PRO/VALUE
 
 _ETF_COLS = [
-    ('#',            8,  'C', None),
-    ('Ticker',      24,  'L', None),
-    ('Nome',        76,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        12,  'C', None),
-    ('Perf 1Y %',   18,  'R', None),
-    ('Perf 6M %',   16,  'R', None),
-    ('Perf 3M %',   16,  'R', None),
-]
+    ('#',            12,  'C', None),
+    ('Ticker',       35,  'L', None),
+    ('Nome',        112,  'L', None),
+    ('Score',        23,  'C', None),
+    ('FREQ',         18,  'C', None),
+    ('Perf 1Y %',    27,  'R', None),
+    ('Perf 6M %',    24,  'R', None),
+    ('Perf 3M %',    22,  'R', None),
+]  # total 273mm
 
 _FONDI_COLS = [
-    ('#',            8,  'C', None),
-    ('Ticker',      18,  'L', None),
-    ('Nome',        62,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        12,  'C', None),
-    ('Stelle MS',   16,  'C', _stars_to_str),
-    ('Perf 1Y %',   18,  'R', None),
-    ('Perf 6M %',   14,  'R', None),
-    ('Perf 3M %',   14,  'R', None),
-]
+    ('#',            12,  'C', None),
+    ('Ticker',       28,  'L', None),
+    ('Nome',         95,  'L', None),
+    ('Score',        25,  'C', None),
+    ('FREQ',         18,  'C', None),
+    ('Stelle MS',    25,  'C', _stars_to_str),
+    ('Perf 1Y %',    28,  'R', None),
+    ('Perf 6M %',    21,  'R', None),
+    ('Perf 3M %',    21,  'R', None),
+]  # total 273mm
 
 _FONDI_EU_COLS = [
-    ('#',            8,  'C', None),
-    ('Nome',        72,  'L', None),
-    ('Gestore',     32,  'L', None),
-    ('Score',       16,  'C', None),
-    ('FREQ',        12,  'C', None),
-    ('Stelle MS',   16,  'C', _stars_to_str),
-    ('Perf 1Y %',   16,  'R', None),
-    ('Perf 6M %',   14,  'R', None),
-]
+    ('#',            12,  'C', None),
+    ('Nome',        106,  'L', None),
+    ('Gestore',      47,  'L', None),
+    ('Score',        23,  'C', None),
+    ('FREQ',         18,  'C', None),
+    ('Stelle MS',    23,  'C', _stars_to_str),
+    ('Perf 1Y %',    23,  'R', None),
+    ('Perf 6M %',    21,  'R', None),
+]  # total 273mm
 
 _PLAN_COLS = {
-    'AZIONI':   {'BASIC': _AZIONI_BASIC,   'PRO': _AZIONI_PRO,   'VALUE': _AZIONI_VALUE},
-    'ETF':      {'BASIC': _ETF_COLS,       'PRO': _ETF_COLS,     'VALUE': _ETF_COLS},
-    'FONDI':    {'BASIC': _FONDI_COLS,     'PRO': _FONDI_COLS,   'VALUE': _FONDI_COLS},
-    'FONDI_EU': {'BASIC': _FONDI_EU_COLS,  'PRO': _FONDI_EU_COLS,'VALUE': _FONDI_EU_COLS},
+    'AZIONI':   {'BASIC': _AZIONI_COLS,  'PRO': _AZIONI_COLS,  'VALUE': _AZIONI_COLS},
+    'ETF':      {'BASIC': _ETF_COLS,     'PRO': _ETF_COLS,     'VALUE': _ETF_COLS},
+    'FONDI':    {'BASIC': _FONDI_COLS,   'PRO': _FONDI_COLS,   'VALUE': _FONDI_COLS},
+    'FONDI_EU': {'BASIC': _FONDI_EU_COLS,'PRO': _FONDI_EU_COLS,'VALUE': _FONDI_EU_COLS},
 }
 
 _ASSET_LABEL = {
@@ -173,22 +177,23 @@ _ASSET_LABEL = {
 }
 
 _COL_LABEL = {
-    'Stelle MS':  'Stelle MS',
-    'Perf 1Y %':  'Perf 1A%',
-    'Perf 6M %':  'Perf 6M%',
-    'Perf 3M %':  'Perf 3M%',
-    'Perf 1M %':  'Perf 1M%',
-    'Var 1D %':   'Var 1D%',
-    'EV/FCF':     'EV/FCF',
-    'Net Debt/EBITDA': 'ND/EBITDA',
-    'FREQ':       'Freq',
+    'Stelle MS':        'Stelle MS',
+    'Perf 1Y %':        '1A%',
+    'Perf 6M %':        '6M%',
+    'Perf 3M %':        '3M%',
+    'Perf 1M %':        '1M%',
+    'Perf YTD %':       'YTD%',
+    'Var 1D %':         'Var1D%',
+    'EV/FCF':           'EV/FCF',
+    'Net Debt/EBITDA':  'ND/EBITDA',
+    'Market Cap':       'Mkt Cap',
+    'Valuta':           'Val.',
+    'FREQ':             'Freq',
 }
 
+# Troncamento: solo eccezioni — per le altre colonne si usa width/1.6 automaticamente
 _TRUNCATE_LEN = {
-    'Nome':    32,
-    'Gestore': 18,
-    'Settore': 16,
-    'Mercato': 14,
+    'Gestore': 28,
 }
 
 # Colonne ordine per pagina Scheda Ordine (larghezze per asset class)
@@ -235,29 +240,29 @@ def _find_col_idx(headers, keyword):
 
 class _ReportPDF(FPDF if FPDF else object):
     def __init__(self, title1, title2, date_str, logo_path):
-        super().__init__(orientation='P', unit='mm', format='A4')
+        super().__init__(orientation='L', unit='mm', format='A4')
         self._t1   = title1
         self._t2   = title2
         self._date = date_str
         self._logo = logo_path
-        self.set_margins(12, 15, 12)
+        self.set_margins(12, 44, 12)   # top=44 per ospitare logo quadrato 32mm
         self.set_auto_page_break(auto=True, margin=12)
 
     def header(self):
         if self._logo:
-            self.image(self._logo, x=12, y=8, w=26)
-        self.set_xy(42, 8)
-        self.set_font('Helvetica', 'B', 13)
+            self.image(self._logo, x=12, y=5, w=32)   # 32mm → finisce a y=37
+        self.set_xy(48, 8)
+        self.set_font('Helvetica', 'B', 14)
         self.set_text_color(*_BLU)
-        self.cell(0, 6, self._t1)
-        self.set_xy(42, 15)
+        self.cell(0, 7, self._t1)
+        self.set_xy(48, 18)
         self.set_font('Helvetica', '', 9)
         self.set_text_color(90, 90, 90)
         self.cell(0, 5, f'{self._t2}  |  Report del {self._date}')
         self.set_draw_color(*_BLU)
         self.set_line_width(0.4)
-        self.line(12, 23, 198, 23)
-        self.set_xy(12, 27)
+        self.line(12, 39, 285, 39)
+        self.set_xy(12, 43)
 
     def footer(self):
         self.set_y(-11)
@@ -457,6 +462,96 @@ def _pagina_ordini(pdf, data_rows, sheet_headers, asset_class, piano, date_str, 
     )
 
 
+# ── Pagina Legenda ────────────────────────────────────────────────────────────
+
+def _legend_section_header(pdf, title):
+    pdf.set_fill_color(*_BLU)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font('Helvetica', 'B', 8)
+    pdf.cell(273, 7, f'  {title}', fill=True, align='L')
+    pdf.ln()
+
+
+def _legend_row(pdf, label, desc, row_idx):
+    W_LABEL, W_DESC, LH = 58, 215, 3.5
+    pdf.set_font('Helvetica', '', 6.5)
+    words = desc.split()
+    lines, cur = 1, ''
+    for word in words:
+        test = f'{cur} {word}'.strip()
+        if pdf.get_string_width(test) > W_DESC - 3:
+            lines += 1
+            cur = word
+        else:
+            cur = test
+    h = max(lines * LH + 3, 7.5)
+
+    bg = _ROW if row_idx % 2 else (255, 255, 255)
+    y0 = pdf.get_y()
+    pdf.set_fill_color(*bg)
+    pdf.rect(12, y0, W_LABEL + W_DESC, h, 'F')
+
+    pdf.set_xy(13, y0 + 1.5)
+    pdf.set_font('Helvetica', 'B', 7)
+    pdf.set_text_color(*_BLU)
+    pdf.multi_cell(W_LABEL - 2, LH, label)
+
+    pdf.set_xy(12 + W_LABEL + 1, y0 + 1.5)
+    pdf.set_font('Helvetica', '', 6.5)
+    pdf.set_text_color(*_DARK)
+    pdf.multi_cell(W_DESC - 2, LH, desc)
+
+    pdf.set_xy(12, y0 + h)
+
+
+def _pagina_legenda(pdf, piano, asset_class):
+    """
+    Pagina 1 del report: Guida alla lettura.
+    Contiene: descrizione Score, indicatori, colonne.
+    Escluse: pesi Score, elenco fogli Excel.
+    """
+    _legend_section_header(pdf, 'LO SCORE  (0 - 100)')
+    _legend_row(pdf, "Cos'e' lo Score",
+        "Un punteggio da 0 a 100 che sintetizza la qualita' dell'azione per questo piano. "
+        "PIU' ALTO = MIGLIORE. Le azioni sono ordinate dal punteggio piu' alto al piu' basso.", 0)
+    _legend_row(pdf, 'Come si calcola',
+        "Per ogni indicatore, l'azione riceve un percentile 0-100 rispetto a tutte le altre selezionate. "
+        "I percentili vengono pesati e sommati per ottenere lo Score finale.", 1)
+    pdf.ln(3)
+
+    _legend_section_header(pdf, 'INDICATORI - COLONNE')
+    indicators = [
+        ('Ticker',
+         "Codice di borsa dell'azione (es. AAPL, NESN.SW, MC.PA)."),
+        ('Nome',
+         "Ragione sociale dell'azienda quotata."),
+        ('Val. / Mercato / Indice',
+         "Val. = divisa del prezzo (USD, EUR, GBP...) | Mercato = borsa di quotazione | "
+         "Indice = indice di appartenenza (S&P 500, NASDAQ, FTSE 100, DAX 40...)."),
+        ('Prezzo  /  Var 1D %',
+         "Prezzo corrente in valuta locale | Var. percentuale rispetto alla chiusura del giorno precedente."),
+        ('Score  (0 - 100)',
+         "Punteggio composito piu' alto = migliore. L'azione in cima e' la migliore del piano per questo screener."),
+        ('1M% / 3M% / 6M% / YTD% / 1A%',
+         "Performance del prezzo: ultimo mese / trimestre / semestre / da inizio anno / ultimo anno. Prezzi puri, senza aggiustamento dividendi."),
+        ('P/B  (Price / Book)',
+         "Prezzo / Patrimonio netto. Sottovalutata se P/B < 1. MEGLIO SE BASSO."),
+        ('ROE  (Return on Equity)',
+         "Utile netto / Patrimonio. Es. ROE = 8% = EUR 8 guadagnati per ogni EUR 100 di patrimonio. MEGLIO SE ALTO."),
+        ('EV / FCF',
+         "Enterprise Value / Free Cash Flow. Quanti anni di cassa vale l'azienda intera. MEGLIO SE BASSO."),
+        ('ND / EBITDA  (Net Debt / EBITDA)',
+         "Leva finanziaria: anni di EBITDA necessari a ripagare il debito. Negativo = cassa netta (ottimo). MEGLIO SE BASSO."),
+        ('Market Cap',
+         "Capitalizzazione = Prezzo x Azioni in circolazione. M = milioni | B = miliardi | T = trilioni (valuta locale)."),
+        ('Settore',
+         "Classificazione GICS: Technology, Healthcare, Energy, Industrials, Consumer Discretionary, "
+         "Communication Services, Basic Materials, Financials, Real Estate, Utilities."),
+    ]
+    for i, (lbl, dsc) in enumerate(indicators):
+        _legend_row(pdf, lbl, dsc, i)
+
+
 # ── Funzione pubblica ─────────────────────────────────────────────────────────
 
 def genera_report_pdf(excel_path, piano, asset_class,
@@ -512,7 +607,7 @@ def genera_report_pdf(excel_path, piano, asset_class,
         return None
 
     # Carica mappa frequenza ticker
-    freq_map = _load_freq_map(asset_class, piano)
+    freq_map, total_days = _load_freq_map(asset_class, piano)
 
     # Risolvi indici colonne nel foglio
     resolved = []
@@ -541,6 +636,12 @@ def genera_report_pdf(excel_path, piano, asset_class,
 
     logo = _get_logo()
     pdf  = _ReportPDF(title1, title2, date_str, logo)
+
+    # ── Pagina 1: Legenda ─────────────────────────────────────────────────────
+    pdf.add_page()
+    _pagina_legenda(pdf, piano, asset_class)
+
+    # ── Pagina 2: Tabella dati ────────────────────────────────────────────────
     pdf.add_page()
 
     row_h  = 6.5
@@ -578,16 +679,17 @@ def genera_report_pdf(excel_path, piano, asset_class,
                 val_str = str(ri + 1)
             elif idx == 'FREQ':
                 cnt = freq_map.get(row_ticker, 0)
-                if cnt >= 5:
+                pct = round(cnt / total_days * 100) if cnt > 0 else 0
+                if pct >= 50:
                     pdf.set_text_color(*_GRN)
                     pdf.set_font('Helvetica', 'B', 7.5)
-                elif cnt >= 3:
+                elif pct >= 25:
                     pdf.set_text_color(*_GOLD)
                     pdf.set_font('Helvetica', 'B', 7.5)
                 else:
                     pdf.set_text_color(160, 160, 160)
                     pdf.set_font('Helvetica', '', 7)
-                val_str = f'{cnt}gg' if cnt > 0 else '-'
+                val_str = f'{pct}%' if cnt > 0 else '-'
                 pdf.cell(w, row_h, val_str, align='C', fill=True)
                 pdf.set_font('Helvetica', '', 7.5)
                 pdf.set_text_color(*_DARK)
@@ -605,10 +707,9 @@ def genera_report_pdf(excel_path, piano, asset_class,
                 else:
                     val_str = str(raw)
 
-            # Troncamento
-            maxlen = _TRUNCATE_LEN.get(name)
-            if maxlen:
-                val_str = _truncate(val_str, maxlen)
+            # Troncamento: esplicito o automatico da larghezza colonna (~1.6mm/char a 7.5pt)
+            maxlen = _TRUNCATE_LEN.get(name, max(int(w / 1.6), 4))
+            val_str = _truncate(val_str, maxlen)
 
             # Score in blu grassetto
             if name == 'Score':
@@ -637,18 +738,19 @@ def genera_report_pdf(excel_path, piano, asset_class,
     pdf.ln(4)
 
     # ── Nota ticker stabili ───────────────────────────────────────────────────
-    stabili = [(tk, cnt) for tk, cnt in freq_map.items() if cnt >= 5]
-    stabili.sort(key=lambda x: -x[1])
+    stabili = [
+        (tk, cnt, round(cnt / total_days * 100))
+        for tk, cnt in freq_map.items()
+        if round(cnt / total_days * 100) >= 50
+    ]
+    stabili.sort(key=lambda x: -x[2])
     if stabili:
         pdf.set_font('Helvetica', 'B', 7)
         pdf.set_text_color(*_GRN)
-        pdf.cell(36, 4, 'Titoli stabili (>=5 gg):', align='L')
+        pdf.cell(36, 4, 'Titoli stabili (>=50%):', align='L')
         pdf.set_font('Helvetica', '', 7)
         pdf.set_text_color(*_DARK)
-        pdf.multi_cell(0, 4, '  '.join(f'{tk}({cnt}gg)' for tk, cnt in stabili[:15]), align='L')
-
-    # ── Pagina Scheda Ordine (solo AZIONI, ETF, FONDI) ───────────────────────
-    _pagina_ordini(pdf, data_rows, sheet_headers, asset_class, piano, date_str, logo)
+        pdf.multi_cell(0, 4, '  '.join(f'{tk}({pct}%)' for tk, _cnt, pct in stabili[:15]), align='L')
 
     buf = io.BytesIO()
     pdf.output(buf)

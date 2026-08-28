@@ -14,6 +14,14 @@
 
 ---
 
+## 🔴 TECNICO — Output PDF report cliente
+
+| # | Task | Dettaglio |
+|---|---|---|
+| 7 | **Fix PDF report + area cliente** | Layout/colonne non conformi alle indicazioni originali + PDF non caricato nell'area riservata per ordine bancario/piattaforma — da specificare nel dettaglio |
+
+---
+
 ## 🟡 SESSIONE PROSSIMA — Social Media
 
 | # | Task | Dettaglio |
@@ -32,6 +40,20 @@
 | 10 | WhatsApp template screener_pronto — attendere approvazione Meta |
 
 ---
+
+## ✅ COMPLETATO SESSIONE 2026-08-28 (notte)
+
+| Task | Stato |
+|---|---|
+| **report_pdf.py — PDF landscape A4** (297×210mm, 273mm usabili) | ✅ |
+| **Colonne AZIONI** — 19 colonne unificata BASIC/PRO/VALUE: Ticker,Nome,Val,Mercato,Indice,Prezzo,Var1D%,Score,1M%,3M%,6M%,YTD%,1A%,P/B,ROE,EV/FCF,ND/EBITDA,MktCap,Settore | ✅ |
+| **FREQ → %** — `pct=round(cnt/total_days*100)`, verde≥50%, oro≥25% | ✅ |
+| **ticker_frequency.py** — aggiunto `_meta.total_days` per calcolo FREQ% | ✅ |
+| **Pagina 1 = Legenda** — Score + 12 indicatori/colonne; esclusi pesi e fogli Excel | ✅ |
+| **Pagina 2 eliminata** — Scheda Ordine Bancario rimossa | ✅ |
+| **Logo FVC da assets.py** — `FUERTE_LOGO_B64` (512×512 quadrato); header 44mm per ospitarlo | ✅ |
+| **dashboard.py** — `report_row()` PDF-first (controlla PDF prima di Excel) | ✅ |
+| Deploy VPS + restart rt2026.service | ✅ |
 
 ## ✅ COMPLETATO SESSIONE 2026-08-28 (sera)
 
