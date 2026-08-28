@@ -253,11 +253,13 @@ def _needs_enrichment(profile: dict) -> bool:
 
 def _search_all(firstname: str, lastname: str, company: str) -> dict:
     """
-    Cerca con Brave Search API (se disponibile).
-    Priorità B2C: Instagram > Facebook > LinkedIn.
+    1 SOLA query per prospect con multi-site OR → risparmia 2/3 dei crediti Brave.
+    Query: "Nome Cognome" (site:linkedin.com/in OR site:instagram.com OR site:facebook.com)
     """
     name_q = f'"{firstname} {lastname}"'
     co_q   = f' "{company}"' if company else ''
+    # Unica query multi-site: 1 credito invece di 3
+    query  = f'{name_q}{co_q} (site:linkedin.com/in OR site:instagram.com OR site:facebook.com)'
 
     result = {
         'linkedin_url': '', 'linkedin_confidence': '',
@@ -265,31 +267,21 @@ def _search_all(firstname: str, lastname: str, company: str) -> dict:
         'facebook_url': '', 'facebook_confidence': '',
     }
 
-    # ── Instagram (priorità B2C) ──
-    urls = _brave_search(f'{name_q} site:instagram.com')
+    urls = _brave_search(query)
+    if BRAVE_KEY:
+        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
+
+    li_url, li_c = _extract_match(urls, r'linkedin\.com/in/[^/?#]+')
     ig_url, ig_c = _extract_match(
         urls, r'instagram\.com/(?!p/|reel/|stories/|explore/|tv/)[^/?#]+'
     )
-    result['instagram_url'], result['instagram_confidence'] = ig_url, ig_c
-    if BRAVE_KEY:
-        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
-
-    # ── Facebook ──
-    urls = _brave_search(f'{name_q}{co_q} site:facebook.com')
     fb_url, fb_c = _extract_match(
         urls, r'facebook\.com/(?!groups/|events/|pages/|photo|video|share|login|help)[^/?#]+'
     )
-    result['facebook_url'], result['facebook_confidence'] = fb_url, fb_c
-    if BRAVE_KEY:
-        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
 
-    # ── LinkedIn ──
-    urls = _brave_search(f'{name_q}{co_q} site:linkedin.com/in')
-    li_url, li_c = _extract_match(urls, r'linkedin\.com/in/[^/?#]+')
-    result['linkedin_url'], result['linkedin_confidence'] = li_url, li_c
-    if BRAVE_KEY:
-        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
-
+    result['linkedin_url'],  result['linkedin_confidence']  = li_url, li_c
+    result['instagram_url'], result['instagram_confidence'] = ig_url, ig_c
+    result['facebook_url'],  result['facebook_confidence']  = fb_url, fb_c
     return result
 
 
