@@ -380,7 +380,7 @@ class LinkedInService:
     AUTH_URL  = "https://www.linkedin.com/oauth/v2/authorization"
     TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
     API_BASE  = "https://api.linkedin.com"
-    SCOPES    = "w_organization_social r_organization_social"
+    SCOPES    = "openid profile email w_member_social w_organization_social r_organization_social"
 
     def __init__(self):
         cfg = _cfg().get('linkedin', {})
@@ -416,14 +416,25 @@ class LinkedInService:
             return {"ok": False, "status": r.status_code, "detail": r.text}
         data = r.json()
         tokens = _tokens()
+        # Recupera member_sub da userinfo per abilitare post profilo personale
+        member_sub = None
+        try:
+            ui = requests.get(f"{self.API_BASE}/v2/userinfo",
+                              headers={"Authorization": f"Bearer {data['access_token']}",
+                                       "LinkedIn-Version": "202601"}, timeout=10)
+            if ui.status_code == 200:
+                member_sub = ui.json().get("sub")
+        except Exception:
+            pass
         tokens['linkedin'] = {
             "access_token": data.get("access_token"),
             "expires_in":   data.get("expires_in", 5184000),
             "saved_at":     datetime.now().isoformat(),
+            "member_sub":   member_sub or "",
         }
         _save_tokens(tokens)
-        _log(f"LinkedIn token salvato (scade in {data.get('expires_in', '?')}s)")
-        return {"ok": True}
+        _log(f"LinkedIn token salvato — sub={member_sub} (scade in {data.get('expires_in', '?')}s)")
+        return {"ok": True, "member_sub": member_sub}
 
     def _get_member_sub(self) -> Optional[str]:
         return _tokens().get('linkedin', {}).get('member_sub', '') or None
@@ -462,18 +473,13 @@ class LinkedInService:
             _log(f"LinkedIn _upload_image errore: {e}")
             return None
 
-    def publish_post(self, text: str, url: Optional[str] = None,
-                     url_title: Optional[str] = None,
-                     url_desc: Optional[str] = None,
-                     lang: str = "IT",
-                     image_url: Optional[str] = None) -> dict:
-        """Pubblica sul profilo personale Luciano Manicardi (w_member_social).
-        Se image_url è fornito, carica l'immagine su LinkedIn e la allega al post."""
-        if not self.ready():
-            _log("LinkedIn: non configurato (token o member_sub mancante)")
-            return {"ok": False, "detail": "LinkedIn non configurato"}
-        member_sub = self._get_member_sub()
-        author_urn = f"urn:li:person:{member_sub}" if member_sub else f"urn:li:organization:{self.org_id}"
+    def _publish_to_author(self, author_urn: str, text: str,
+                           url: Optional[str], url_title: Optional[str],
+                           url_desc: Optional[str], image_url: Optional[str],
+                           lang: str) -> dict:
+        """Pubblica un post per un author_urn specifico (persona o organizzazione)."""
+        img_src   = image_url or DEFAULT_CHANNEL_IMAGES.get("linkedin")
+        image_urn = self._upload_image(img_src, author_urn) if img_src else None
         body: dict = {
             "author":      author_urn,
             "commentary":  text,
@@ -486,9 +492,6 @@ class LinkedInService:
             "lifecycleState":           "PUBLISHED",
             "isReshareDisabledByAuthor": False,
         }
-        # Immagine ha priorità sul link article
-        img_src = image_url or DEFAULT_CHANNEL_IMAGES.get("linkedin")
-        image_urn = self._upload_image(img_src, author_urn) if img_src else None
         if image_urn:
             body["content"] = {"media": {"id": image_urn}}
         elif url:
@@ -503,12 +506,48 @@ class LinkedInService:
                           json=body, headers=self._headers(), timeout=30)
         if r.status_code in (200, 201):
             post_id = r.headers.get("x-restli-id", "")
-            _log(f"LinkedIn post pubblicato: {post_id}")
-            _save_last_li_post(post_id, text)
-            _notifica_amplificatori(post_id, text, lang)
+            _log(f"LinkedIn post [{author_urn[:30]}]: {post_id}")
             return {"ok": True, "post_id": post_id}
-        _log(f"LinkedIn post FALLITO: {r.status_code} {r.text[:300]}")
+        _log(f"LinkedIn post FALLITO [{author_urn[:30]}]: {r.status_code} {r.text[:200]}")
         return {"ok": False, "status": r.status_code, "detail": r.text}
+
+    def publish_post(self, text: str, url: Optional[str] = None,
+                     url_title: Optional[str] = None,
+                     url_desc: Optional[str] = None,
+                     lang: str = "IT",
+                     image_url: Optional[str] = None) -> dict:
+        """Pubblica su profilo personale Luciano + company page FVC.
+        Richiede scope: w_member_social + w_organization_social."""
+        token = self._get_token()
+        if not token:
+            return {"ok": False, "detail": "LinkedIn token mancante"}
+
+        results = {}
+
+        # 1. Profilo personale (w_member_social)
+        member_sub = self._get_member_sub()
+        if member_sub:
+            person_urn  = f"urn:li:person:{member_sub}"
+            res_person  = self._publish_to_author(person_urn, text, url, url_title, url_desc, image_url, lang)
+            results["personal"] = res_person
+            if res_person.get("ok"):
+                _save_last_li_post(res_person["post_id"], text)
+                _notifica_amplificatori(res_person["post_id"], text, lang)
+        else:
+            results["personal"] = {"ok": False, "detail": "member_sub non in token — rifare OAuth"}
+
+        # 2. Company page (w_organization_social)
+        if self.org_id:
+            org_urn    = f"urn:li:organization:{self.org_id}"
+            res_org    = self._publish_to_author(org_urn, text, url, url_title, url_desc, image_url, lang)
+            results["company"] = res_org
+        else:
+            results["company"] = {"ok": False, "detail": "LINKEDIN_ORG_ID non configurato"}
+
+        ok_count = sum(1 for r in results.values() if r.get("ok"))
+        return {"ok": ok_count > 0, "results": results,
+                "post_id": results.get("personal", {}).get("post_id") or
+                           results.get("company",  {}).get("post_id")}
 
     def _get_token(self) -> Optional[str]:
         return _tokens().get('linkedin', {}).get('access_token', '') or None
