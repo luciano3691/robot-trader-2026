@@ -49,8 +49,9 @@ socket.getaddrinfo = _ipv4_getaddrinfo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PYTHON   = sys.executable
 
-ORCHESTRATOR_PATH      = os.path.join(BASE_DIR, 'orchestrator.py')
-SOCIAL_AUTOMATION_PATH = os.path.join(BASE_DIR, 'social_automation.py')
+ORCHESTRATOR_PATH       = os.path.join(BASE_DIR, 'orchestrator.py')
+SOCIAL_AUTOMATION_PATH  = os.path.join(BASE_DIR, 'social_automation.py')
+SOCIAL_ENRICHMENT_PATH  = os.path.join(BASE_DIR, 'social_enrichment.py')
 
 logging.basicConfig(
     level=logging.INFO,
@@ -240,6 +241,37 @@ def run_social():
     logger.info('=' * 70)
 
 
+def run_social_enrichment():
+    logger.info('=' * 70)
+    logger.info('JOB SOCIAL ENRICHMENT — INIZIO  %s' % datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
+    logger.info('=' * 70)
+    if not os.path.exists(SOCIAL_ENRICHMENT_PATH):
+        logger.warning('social_enrichment.py non trovato — job saltato')
+        return
+    try:
+        result = subprocess.run(
+            [PYTHON, SOCIAL_ENRICHMENT_PATH, '--batch', '300'],
+            cwd=BASE_DIR,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            errors='replace',
+            timeout=10800,  # 3 ore max
+            env={**os.environ, 'PYTHONIOENCODING': 'utf-8'},
+        )
+        if result.stdout:
+            logger.info('OUTPUT:\n%s' % result.stdout[-3000:])
+        if result.stderr:
+            logger.warning('STDERR:\n%s' % result.stderr[-1000:])
+        ok = result.returncode == 0
+        logger.info('JOB SOCIAL ENRICHMENT — %s' % ('COMPLETATO' if ok else 'ERRORE'))
+    except subprocess.TimeoutExpired:
+        logger.error('JOB SOCIAL ENRICHMENT — TIMEOUT dopo 3 ore')
+    except Exception as e:
+        logger.error('JOB SOCIAL ENRICHMENT — ECCEZIONE: %s' % e)
+    logger.info('=' * 70)
+
+
 if __name__ == '__main__':
     logger.info('=' * 70)
     logger.info('ROBOT TRADER 2026 — SCHEDULER DAEMON')
@@ -249,6 +281,7 @@ if __name__ == '__main__':
     logger.info('  [1] Screener completo  -> 21:00 lun-ven  (Fondi EU + Azioni + ETF+Fondi)')
     logger.info('  [2] Social             -> 08:00 lun/mer/ven')
     logger.info('  [3] Watchdog + WhatsApp -> 07:00 mar-sab')
+    logger.info('  [4] Social Enrichment  -> 02:00 dom (batch 300 prospect)')
     logger.info('')
 
     scheduler = BackgroundScheduler(timezone='Atlantic/Canary')
@@ -277,6 +310,15 @@ if __name__ == '__main__':
         id='watchdog',
         name='Watchdog + WhatsApp 07:00',
         misfire_grace_time=1800,
+        coalesce=True,
+    )
+
+    scheduler.add_job(
+        func=run_social_enrichment,
+        trigger=CronTrigger(day_of_week='sun', hour=2, minute=0, timezone='Atlantic/Canary'),
+        id='social_enrichment',
+        name='Social Enrichment 02:00 dom',
+        misfire_grace_time=3600,
         coalesce=True,
     )
 

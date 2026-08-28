@@ -228,6 +228,7 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
     <div class="tab" onclick="switchTab(this,'fatture')">&#x1F4C4; Fatture</div>
     <div class="tab" onclick="switchTab(this,'emaillog')">&#x1F4E7; Email Log</div>
     <div class="tab" onclick="switchTab(this,'tickerfreq')">&#x1F4CA; Ticker Freq.</div>
+    <div class="tab" onclick="switchTab(this,'socialenrich')">&#x1F517; Social Enrich</div>
   </div>
 
   <!-- ══════════ HOME ══════════ -->
@@ -1567,6 +1568,81 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
       </select>
     </div>
     <div id="tf-table"></div>
+  </div>
+
+  <!-- ══════════ SOCIAL ENRICHMENT ══════════ -->
+  <div id="socialenrich" class="panel">
+    <h2 style="margin-bottom:.5rem;color:#F6AD55">&#x1F517; Social Enrichment — Profili Prospect</h2>
+    <p style="font-size:.82rem;color:#94a3b8;margin-bottom:1rem">
+      Arricchimento automatico LinkedIn / Instagram / Facebook via DuckDuckGo.
+      Job: <strong style="color:#68D391">domenica 02:00</strong> — batch 300 prospect/settimana.
+      Priorita: <span style="color:#FC8181">clicker</span> &rarr; <span style="color:#F6AD55">reader</span> &rarr; cold.
+    </p>
+
+    <!-- KPI -->
+    <div id="se-kpi" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem"></div>
+
+    <!-- Filtri -->
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem;flex-wrap:wrap">
+      <select id="se-filter-prio" onchange="seRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="">Tutte le priorita</option>
+        <option value="0">Clicker</option>
+        <option value="1">Reader</option>
+        <option value="2">Cold</option>
+      </select>
+      <select id="se-filter-platform" onchange="seRender()"
+              style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem">
+        <option value="">Tutte le piattaforme</option>
+        <option value="li">Con LinkedIn</option>
+        <option value="ig">Con Instagram</option>
+        <option value="fb">Con Facebook</option>
+        <option value="none">Nessun profilo trovato</option>
+      </select>
+      <input id="se-search" type="text" placeholder="Cerca nome / email..."
+             oninput="seRender()"
+             style="background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.4rem .7rem;border-radius:6px;font-size:.82rem;width:200px">
+      <button onclick="loadSocialEnrich()"
+              style="background:#2C5282;color:#fff;border:none;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.82rem">
+        &#x21BA; Ricarica
+      </button>
+    </div>
+
+    <!-- Tabella -->
+    <div id="se-table" style="overflow-x:auto"></div>
+
+    <!-- Modal modifica URL -->
+    <div id="se-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center">
+      <div style="background:#1E293B;border:1px solid #2C5282;border-radius:12px;padding:1.5rem;width:480px;max-width:95vw">
+        <h3 style="color:#F6AD55;margin-bottom:1rem">Modifica URL Social</h3>
+        <input id="se-modal-email" type="hidden">
+        <div style="margin-bottom:.8rem">
+          <label style="font-size:.82rem;color:#94a3b8;display:block;margin-bottom:.3rem">LinkedIn URL</label>
+          <input id="se-modal-li" type="url" placeholder="https://linkedin.com/in/..."
+                 style="width:100%;background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.5rem .7rem;border-radius:6px;font-size:.85rem;box-sizing:border-box">
+        </div>
+        <div style="margin-bottom:.8rem">
+          <label style="font-size:.82rem;color:#94a3b8;display:block;margin-bottom:.3rem">Instagram URL</label>
+          <input id="se-modal-ig" type="url" placeholder="https://instagram.com/..."
+                 style="width:100%;background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.5rem .7rem;border-radius:6px;font-size:.85rem;box-sizing:border-box">
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:.82rem;color:#94a3b8;display:block;margin-bottom:.3rem">Facebook URL</label>
+          <input id="se-modal-fb" type="url" placeholder="https://facebook.com/..."
+                 style="width:100%;background:#0F172A;border:1px solid #2C5282;color:#e2e8f0;padding:.5rem .7rem;border-radius:6px;font-size:.85rem;box-sizing:border-box">
+        </div>
+        <div style="display:flex;gap:.5rem;justify-content:flex-end">
+          <button onclick="document.getElementById('se-modal').style.display='none'"
+                  style="background:#374151;color:#e2e8f0;border:none;padding:.5rem 1.2rem;border-radius:6px;cursor:pointer">
+            Annulla
+          </button>
+          <button onclick="seSaveModal()"
+                  style="background:#276749;color:#fff;border:none;padding:.5rem 1.2rem;border-radius:6px;cursor:pointer;font-weight:600">
+            Salva
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -3747,6 +3823,142 @@ function tfRender(){
     '<p style="color:#64748b;font-size:.84rem">Nessun dato disponibile. Il file ticker_frequency.json verra generato dopo il prossimo run notturno.</p>';
 }
 
+// ═══════════════════════════════════════════════
+// SOCIAL ENRICHMENT
+// ═══════════════════════════════════════════════
+var _seData = null;
+
+function loadSocialEnrich(){
+  document.getElementById('se-table').innerHTML = '<p style="color:#94a3b8;font-size:.84rem">Caricamento...</p>';
+  fetch('/api/social-profiles').then(function(r){return r.json();}).then(function(d){
+    _seData = d;
+    seRender();
+  }).catch(function(){ document.getElementById('se-table').innerHTML = '<p style="color:#FC8181">Errore caricamento.</p>'; });
+}
+
+function seRender(){
+  if(!_seData) return;
+  var prio   = (document.getElementById('se-filter-prio') || {}).value;
+  var plat   = (document.getElementById('se-filter-platform') || {}).value;
+  var search = ((document.getElementById('se-search') || {}).value || '').toLowerCase();
+
+  var entries = Object.keys(_seData).map(function(email){
+    var p = _seData[email];
+    return {email:email, firstname:p.firstname||'', lastname:p.lastname||'',
+            company:p.company||'', priority:p.priority!==undefined?p.priority:2,
+            li:p.linkedin_url||'', li_c:p.linkedin_confidence||'',
+            ig:p.instagram_url||'', ig_c:p.instagram_confidence||'',
+            fb:p.facebook_url||'', fb_c:p.facebook_confidence||'',
+            verified:p.manually_verified||false,
+            enriched:p.enriched_at||''};
+  });
+
+  // Filtri
+  if(prio !== '') entries = entries.filter(function(e){ return String(e.priority) === prio; });
+  if(plat === 'li') entries = entries.filter(function(e){ return !!e.li; });
+  else if(plat === 'ig') entries = entries.filter(function(e){ return !!e.ig; });
+  else if(plat === 'fb') entries = entries.filter(function(e){ return !!e.fb; });
+  else if(plat === 'none') entries = entries.filter(function(e){ return !e.li && !e.ig && !e.fb; });
+  if(search) entries = entries.filter(function(e){
+    return (e.firstname+' '+e.lastname+' '+e.email).toLowerCase().indexOf(search) >= 0;
+  });
+
+  // Sort: priority asc, then enriched desc
+  entries.sort(function(a,b){
+    if(a.priority !== b.priority) return a.priority - b.priority;
+    return b.enriched.localeCompare(a.enriched);
+  });
+
+  // KPI
+  var total    = Object.keys(_seData).length;
+  var withLi   = Object.values(_seData).filter(function(p){ return p.linkedin_url; }).length;
+  var withIg   = Object.values(_seData).filter(function(p){ return p.instagram_url; }).length;
+  var withFb   = Object.values(_seData).filter(function(p){ return p.facebook_url; }).length;
+  var verified = Object.values(_seData).filter(function(p){ return p.manually_verified; }).length;
+  var kpis = [
+    {label:'Arricchiti', val:total, color:'#90cdf4'},
+    {label:'LinkedIn',   val:withLi + ' (' + (total?Math.round(withLi*100/total):0) + '%)', color:'#0a66c2'},
+    {label:'Instagram',  val:withIg + ' (' + (total?Math.round(withIg*100/total):0) + '%)', color:'#e1306c'},
+    {label:'Facebook',   val:withFb + ' (' + (total?Math.round(withFb*100/total):0) + '%)', color:'#1877f2'},
+    {label:'Verificati', val:verified, color:'#68D391'},
+  ];
+  var kpiEl = document.getElementById('se-kpi');
+  if(kpiEl) kpiEl.innerHTML = kpis.map(function(k){
+    return '<div style="background:#1E293B;border:1px solid #2C5282;border-radius:8px;padding:.6rem 1rem;min-width:120px">' +
+      '<div style="font-size:.75rem;color:#94a3b8">' + k.label + '</div>' +
+      '<div style="font-size:1.2rem;font-weight:700;color:' + k.color + '">' + k.val + '</div></div>';
+  }).join('');
+
+  // Tabella
+  var prioTag = ['<span style="color:#FC8181;font-weight:700">CLICKER</span>',
+                 '<span style="color:#F6AD55;font-weight:700">READER</span>',
+                 '<span style="color:#94a3b8">COLD</span>'];
+  var confBadge = function(url, conf){
+    if(!url) return '<span style="color:#374151">—</span>';
+    var color = conf==='manual'?'#68D391':(conf==='high'?'#90cdf4':'#F6AD55');
+    return '<a href="' + url + '" target="_blank" style="color:' + color + ';font-size:.78rem;text-decoration:none;word-break:break-all">' +
+      url.replace(/https?:\/\/(www\.)?/,'').substring(0,35) + (url.length>45?'...':'') + '</a>';
+  };
+  var rows = '';
+  entries.slice(0, 500).forEach(function(e, i){
+    var bg = i%2===0?'rgba(0,0,0,.1)':'rgba(255,255,255,.02)';
+    rows += '<tr style="background:' + bg + '">' +
+      '<td style="padding:.45rem .7rem;font-size:.82rem">' + e.firstname + ' ' + e.lastname + '</td>' +
+      '<td style="padding:.45rem .7rem;font-size:.75rem;color:#64748b">' + e.email + '</td>' +
+      '<td style="padding:.45rem .7rem;font-size:.75rem;color:#94a3b8">' + (e.company||'—') + '</td>' +
+      '<td style="padding:.45rem .7rem;font-size:.75rem">' + (prioTag[e.priority]||'—') + '</td>' +
+      '<td style="padding:.45rem .7rem">' + confBadge(e.li, e.li_c) + '</td>' +
+      '<td style="padding:.45rem .7rem">' + confBadge(e.ig, e.ig_c) + '</td>' +
+      '<td style="padding:.45rem .7rem">' + confBadge(e.fb, e.fb_c) + '</td>' +
+      '<td style="padding:.45rem .7rem;font-size:.72rem;color:#64748b">' + (e.enriched?e.enriched.substring(0,10):'—') + '</td>' +
+      '<td style="padding:.45rem .7rem">' +
+        '<button onclick="seOpenModal(\'' + e.email.replace(/'/g,"\\'") + '\')" ' +
+        'style="background:#2C5282;color:#fff;border:none;padding:.25rem .6rem;border-radius:4px;cursor:pointer;font-size:.72rem">Edit</button>' +
+      '</td>' +
+      '</tr>';
+  });
+
+  var t = document.getElementById('se-table');
+  if(!t) return;
+  if(!entries.length){
+    t.innerHTML = '<p style="color:#94a3b8;font-size:.84rem;padding:1rem">Nessun profilo trovato. Il job parte domenica alle 02:00 oppure avvia manualmente: <code>python social_enrichment.py --test 5</code></p>';
+    return;
+  }
+  t.innerHTML = '<p style="font-size:.75rem;color:#64748b;margin-bottom:.4rem">Mostro ' +
+    Math.min(500,entries.length) + ' / ' + entries.length + ' profili</p>' +
+    '<table><thead><tr>' +
+    '<th>Nome</th><th>Email</th><th>Azienda</th><th>Priorita</th>' +
+    '<th>LinkedIn</th><th>Instagram</th><th>Facebook</th><th>Data</th><th></th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function seOpenModal(email){
+  var p = _seData[email] || {};
+  document.getElementById('se-modal-email').value = email;
+  document.getElementById('se-modal-li').value  = p.linkedin_url  || '';
+  document.getElementById('se-modal-ig').value  = p.instagram_url || '';
+  document.getElementById('se-modal-fb').value  = p.facebook_url  || '';
+  document.getElementById('se-modal').style.display = 'flex';
+}
+
+function seSaveModal(){
+  var email = document.getElementById('se-modal-email').value;
+  var body  = {
+    email:         email,
+    linkedin_url:  document.getElementById('se-modal-li').value.trim(),
+    instagram_url: document.getElementById('se-modal-ig').value.trim(),
+    facebook_url:  document.getElementById('se-modal-fb').value.trim(),
+  };
+  fetch('/api/social-profiles/update', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.ok){
+        document.getElementById('se-modal').style.display = 'none';
+        loadSocialEnrich();
+      } else { alert('Errore: ' + (d.msg||'sconosciuto')); }
+    }).catch(function(){ alert('Errore di rete'); });
+}
+
 function switchTab(el,id){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
@@ -3765,6 +3977,7 @@ function switchTab(el,id){
     if(id==='tickerfreq') loadTickerFreq();
     if(id==='analytics') renderAnalytics();
     if(id==='fatture') loadFatture();
+    if(id==='socialenrich') loadSocialEnrich();
   }
 }
 

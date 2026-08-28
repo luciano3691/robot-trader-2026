@@ -7873,6 +7873,14 @@ Contatta il supporto per attivare il tuo piano.</p>
             else:
                 self._json({})
             return
+        elif p == '/api/social-profiles' and _is_auth(self):
+            _sp_path = os.path.join(BASE_DIR, 'social_profiles.json')
+            if os.path.exists(_sp_path):
+                with open(_sp_path, encoding='utf-8') as _spf:
+                    self._json(json.load(_spf))
+            else:
+                self._json({})
+            return
         elif p == '/api/database' and _is_auth(self):
             try:
                 data  = get_database_data()
@@ -8248,6 +8256,33 @@ Contatta il supporto per attivare il tuo piano.</p>
                             os.remove(os.path.join(FATTURE_DIR, _fn))
                             deleted += 1
                 self._json({'ok': True, 'msg': f'Contatore azzerato. {deleted} PDF eliminati. Prossima: FVC-{datetime.now().year}-0001'})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
+        # ── Social profiles — aggiornamento manuale URL ────────
+        if p == '/api/social-profiles/update' and _is_auth(self):
+            try:
+                req   = json.loads(self._body())
+                email = req.get('email', '').strip().lower()
+                if not email:
+                    self._json({'ok': False, 'msg': 'email obbligatoria'}); return
+                _sp_path = os.path.join(BASE_DIR, 'social_profiles.json')
+                profiles = {}
+                if os.path.exists(_sp_path):
+                    with open(_sp_path, encoding='utf-8') as _f:
+                        profiles = json.load(_f)
+                p_data = profiles.get(email, {})
+                for field in ('linkedin_url', 'instagram_url', 'facebook_url'):
+                    if field in req:
+                        p_data[field] = req[field].strip()
+                        p_data[field.replace('_url', '_confidence')] = 'manual'
+                p_data['manually_verified'] = True
+                profiles[email] = p_data
+                tmp = _sp_path + '.tmp'
+                with open(tmp, 'w', encoding='utf-8') as _f:
+                    json.dump(profiles, _f, indent=2, ensure_ascii=False)
+                os.replace(tmp, _sp_path)
+                self._json({'ok': True})
             except Exception as e:
                 self._json({'ok': False, 'msg': str(e)})
             return
