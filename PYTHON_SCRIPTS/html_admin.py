@@ -1435,6 +1435,8 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
       <div style="display:flex;gap:.6rem;align-items:center">
         <span id="fat-count" style="font-size:.8rem;color:rgba(255,255,255,.4)"></span>
         <button onclick="loadFatture()" style="background:#2C5282;border:1px solid #F6AD55;color:#F6AD55;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600">&#x21BB; Aggiorna</button>
+        <button onclick="document.getElementById('modal-fat-manuale').style.display='flex'" style="background:#276749;border:none;color:#68D391;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600">+ Nuova Fattura</button>
+        <button onclick="resetContatoreFatture()" style="background:#742a2a;border:none;color:#FC8181;padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600">&#x21BA; Reset Contatore</button>
       </div>
     </div>
     <div class="tbl-wrap">
@@ -1444,6 +1446,63 @@ a.ticker:hover{text-decoration:underline;color:#ffc97a}
       </table>
     </div>
     <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:1rem">Fatture in <code>/root/FATTURE/</code> &mdash; invia al commercialista mensilmente.</p>
+  </div>
+
+  <!-- Modal Fattura Manuale -->
+  <div id="modal-fat-manuale" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:#1e293b;border:1px solid rgba(246,173,85,.3);border-radius:12px;padding:2rem;width:min(520px,94vw);max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.4rem">
+        <h3 style="margin:0;color:#F6AD55;font-size:1rem">&#x1F4C4; Nuova Fattura Manuale</h3>
+        <button onclick="document.getElementById('modal-fat-manuale').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.4rem;cursor:pointer">&times;</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">
+        <div style="grid-column:1/-1">
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Nome cliente *</label>
+          <input id="fm-nome" type="text" placeholder="Mario Rossi" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Email cliente *</label>
+          <input id="fm-email" type="email" placeholder="cliente@email.com" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Descrizione servizio *</label>
+          <input id="fm-desc" type="text" placeholder="es. Fuerte Screener - Screener Azioni" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Importo (EUR) *</label>
+          <input id="fm-importo" type="number" min="0" step="0.01" placeholder="39.00" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Data fattura</label>
+          <input id="fm-data" type="text" placeholder="28/08/2026" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Periodo</label>
+          <input id="fm-periodo" type="text" placeholder="September 2026" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">P.IVA / CF</label>
+          <input id="fm-piva" type="text" placeholder="IT12345678901" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Paese</label>
+          <input id="fm-paese" type="text" placeholder="IT" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.75rem;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem">Indirizzo</label>
+          <input id="fm-indirizzo" type="text" placeholder="Via Roma 1, 20100 Milano" style="width:100%;background:#0f172a;border:1px solid rgba(246,173,85,.25);color:#e2e8f0;padding:.55rem .8rem;border-radius:6px;font-size:.9rem;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding:.7rem;background:rgba(39,103,73,.15);border:1px solid rgba(104,211,145,.2);border-radius:6px;display:flex;align-items:center;gap:.7rem">
+        <input id="fm-email-flag" type="checkbox" style="width:16px;height:16px;accent-color:#68D391">
+        <label for="fm-email-flag" style="color:#68D391;font-size:.85rem;cursor:pointer">Invia fattura via email al cliente</label>
+      </div>
+      <div id="fm-msg" style="display:none;margin-top:.8rem;padding:.6rem .9rem;border-radius:6px;font-size:.85rem"></div>
+      <div style="display:flex;gap:.8rem;margin-top:1.4rem">
+        <button onclick="document.getElementById('modal-fat-manuale').style.display='none'" style="flex:1;background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.5);padding:.65rem;border-radius:6px;cursor:pointer;font-size:.88rem">Annulla</button>
+        <button onclick="creaFatturaManuale()" style="flex:2;background:#F6AD55;border:none;color:#0f172a;padding:.65rem;border-radius:6px;cursor:pointer;font-size:.88rem;font-weight:700">Genera Fattura PDF</button>
+      </div>
+    </div>
   </div>
 
   <div style="text-align:center;padding:1.5rem 2rem;font-size:.74rem;color:rgba(255,255,255,.28);border-top:1px solid rgba(246,173,85,.1);margin-top:2rem">
@@ -1882,6 +1941,52 @@ function loadFatture(){
       '</tr>';
     }).join('');
   }).catch(function(){tb.innerHTML='<tr><td colspan="4" style="color:#fc8181;text-align:center;padding:1rem">Errore</td></tr>';});
+}
+
+function creaFatturaManuale(){
+  var nome=document.getElementById('fm-nome').value.trim();
+  var email=document.getElementById('fm-email').value.trim();
+  var desc=document.getElementById('fm-desc').value.trim();
+  var imp=parseFloat(document.getElementById('fm-importo').value)||0;
+  var msg=document.getElementById('fm-msg');
+  if(!nome||!email||!desc||!imp){
+    msg.style.display='block';msg.style.background='rgba(114,28,36,.4)';msg.style.color='#fc8181';
+    msg.textContent='Compila i campi obbligatori: nome, email, descrizione, importo.';return;
+  }
+  var btn=document.querySelector('#modal-fat-manuale button:last-child');
+  btn.disabled=true;btn.textContent='Generazione...';
+  fetch('/api/fatture/manuale',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    nome:nome,email:email,descrizione:desc,importo:imp,
+    data_fattura:document.getElementById('fm-data').value.trim(),
+    periodo:document.getElementById('fm-periodo').value.trim(),
+    piva:document.getElementById('fm-piva').value.trim(),
+    paese:document.getElementById('fm-paese').value.trim(),
+    indirizzo:document.getElementById('fm-indirizzo').value.trim(),
+    invia_email:document.getElementById('fm-email-flag').checked
+  })}).then(function(r){return r.json();}).then(function(res){
+    btn.disabled=false;btn.textContent='Genera Fattura PDF';
+    if(res.ok){
+      msg.style.display='block';msg.style.background='rgba(39,103,73,.4)';msg.style.color='#68D391';
+      msg.innerHTML='✅ Fattura <strong>'+res.numero+'</strong> generata'+(res.email_inviata?' — email inviata.':' — email NON inviata (SMTP non configurato).');
+      loadFatture();
+      setTimeout(function(){window.open('/api/fattura/'+res.numero,'_blank');},400);
+    } else {
+      msg.style.display='block';msg.style.background='rgba(114,28,36,.4)';msg.style.color='#fc8181';
+      msg.textContent='Errore: '+(res.msg||'sconosciuto');
+    }
+  }).catch(function(e){
+    btn.disabled=false;btn.textContent='Genera Fattura PDF';
+    msg.style.display='block';msg.style.background='rgba(114,28,36,.4)';msg.style.color='#fc8181';
+    msg.textContent='Errore di rete.';
+  });
+}
+
+function resetContatoreFatture(){
+  if(!confirm('⚠️ ATTENZIONE\n\nVerranno eliminati tutti i PDF nella cartella FATTURE/ e il contatore sarà azzerato.\n\nLa prossima fattura sarà FVC-'+new Date().getFullYear()+'-0001.\n\nConfermi?')) return;
+  fetch('/api/fatture/reset-contatore',{method:'POST'}).then(function(r){return r.json();}).then(function(res){
+    if(res.ok){alert('✅ '+res.msg);loadFatture();}
+    else{alert('Errore: '+(res.msg||'sconosciuto'));}
+  });
 }
 
 function switchCrmTab(el, tab) {

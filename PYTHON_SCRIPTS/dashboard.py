@@ -1735,6 +1735,251 @@ def genera_fattura_pdf(cliente, numero_fattura):
     return bytes(pdf.output())
 
 
+def genera_fattura_manuale_pdf(dati: dict, numero_fattura: str) -> bytes:
+    """Genera PDF fattura manuale con campi liberi — stesso template di genera_fattura_pdf."""
+    nome      = dati.get('nome', '').strip()
+    email_cl  = dati.get('email', '').strip()
+    descrizione = dati.get('descrizione', 'Servizio').strip()
+    importo   = float(dati.get('importo', 0))
+    data_fattura = dati.get('data_fattura', '') or datetime.now().strftime('%d/%m/%Y')
+    periodo   = dati.get('periodo', '') or datetime.now().strftime('%B %Y').capitalize()
+    paese     = dati.get('paese', '')
+    cf        = dati.get('cf', '')
+    piva      = dati.get('piva', '')
+    indirizzo = dati.get('indirizzo', '')
+    cap       = dati.get('cap', '')
+    citta     = dati.get('citta', '')
+
+    try:
+        with open(os.path.join(BASE_DIR, 'config.json'), encoding='utf-8') as _fc:
+            _fcfg = json.load(_fc).get('fattura', {})
+    except Exception:
+        _fcfg = {}
+    _iban  = _fcfg.get('iban', '')
+    _bic   = _fcfg.get('bic', '')
+    _banca = _fcfg.get('banca', '')
+
+    BLU   = (44,  82,  130)
+    WHITE = (255, 255, 255)
+    DARK  = (20,  20,  40)
+    GRAY  = (110, 110, 120)
+    LGRAY = (243, 244, 248)
+
+    pdf = FPDF(orientation='P', unit='mm', format='A4')
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=22)
+    pdf.set_margins(15, 15, 15)
+
+    logo_path = None
+    try:
+        _b64 = FUERTE_LOGO_B64.strip()
+        _b64 += '=' * (-len(_b64) % 4)
+        logo_bytes = b64lib.b64decode(_b64)
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+            f.write(logo_bytes); logo_path = f.name
+        pdf.image(logo_path, x=15, y=14, w=54)
+    finally:
+        if logo_path and os.path.exists(logo_path):
+            os.unlink(logo_path)
+
+    pdf.set_xy(115, 13)
+    pdf.set_font('Helvetica', 'B', 28)
+    pdf.set_text_color(*BLU)
+    pdf.cell(80, 13, 'FATTURA', align='R')
+    pdf.set_xy(115, 27)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(80, 5, f'N.  {numero_fattura}', align='R')
+    pdf.set_xy(115, 33)
+    pdf.cell(80, 5, f'Data:  {data_fattura}', align='R')
+
+    pdf.set_draw_color(*BLU)
+    pdf.set_line_width(0.5)
+    pdf.line(15, 72, 195, 72)
+
+    y0 = 76
+    pdf.set_xy(15, y0)
+    pdf.set_font('Helvetica', 'B', 7)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(85, 5, 'FORNITORE')
+    pdf.set_xy(15, y0+5)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(*DARK)
+    pdf.cell(85, 5, 'Fuerte Venture Capital SL')
+    for i, r in enumerate(['CIF B23881691', 'Calle Puipana 3, 35640 Villaverde', 'Las Palmas, España', 'info@fuerteventurecapital.com', 'www.fuerteventurecapital.com']):
+        pdf.set_xy(15, y0+11+i*4.5)
+        pdf.set_font('Helvetica', '', 8.5)
+        pdf.set_text_color(*GRAY)
+        pdf.cell(85, 4.5, r)
+
+    pdf.set_xy(110, y0)
+    pdf.set_font('Helvetica', 'B', 7)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(85, 5, 'INTESTATA A')
+    pdf.set_xy(110, y0+5)
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(*DARK)
+    pdf.cell(85, 5, nome)
+    cl_lines = [email_cl]
+    if paese:     cl_lines.append(f'Paese: {paese}')
+    if cf:        cl_lines.append(f'CF/ID Fiscale: {cf}')
+    if piva:      cl_lines.append(f'P.IVA: {piva}')
+    if indirizzo: cl_lines.append(indirizzo)
+    if cap or citta: cl_lines.append(f'{cap} {citta}'.strip())
+    for i, r in enumerate(cl_lines):
+        pdf.set_xy(110, y0+11+i*4.5)
+        pdf.set_font('Helvetica', '', 8.5)
+        pdf.set_text_color(*GRAY)
+        pdf.cell(85, 4.5, r)
+
+    y_sep = max(pdf.get_y() + 6, 126)
+    pdf.set_draw_color(200, 205, 220)
+    pdf.set_line_width(0.3)
+    pdf.line(15, y_sep, 195, y_sep)
+
+    yt = y_sep + 5
+    pdf.set_fill_color(*BLU)
+    pdf.set_text_color(*WHITE)
+    pdf.set_font('Helvetica', 'B', 9)
+    pdf.set_xy(15, yt)
+    pdf.cell(92, 7, '  DESCRIZIONE', fill=True)
+    pdf.cell(35, 7, 'PERIODO', fill=True, align='C')
+    pdf.cell(15, 7, 'Q.', fill=True, align='C')
+    pdf.cell(33, 7, 'IMPORTO', fill=True, align='R')
+
+    yr = yt + 7
+    pdf.set_fill_color(*LGRAY)
+    pdf.rect(15, yr, 175, 7, style='F')
+    pdf.set_xy(15, yr)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(*DARK)
+    pdf.cell(92, 7, f'  {descrizione}')
+    pdf.cell(35, 7, periodo, align='C')
+    pdf.cell(15, 7, '1', align='C')
+    pdf.set_font('Helvetica', 'B', 9)
+    pdf.cell(33, 7, f'EUR {importo:.2f}', align='R')
+    yr += 7
+
+    pdf.set_draw_color(180, 190, 215)
+    pdf.set_line_width(0.3)
+    pdf.line(15, yr+2, 195, yr+2)
+
+    pdf.set_xy(127, yr+5)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(35, 5.5, 'Subtotale', align='R')
+    pdf.cell(33, 5.5, f'EUR {importo:.2f}', align='R')
+
+    pdf.set_xy(127, yr+11)
+    pdf.set_font('Helvetica', 'I', 8)
+    pdf.cell(35, 5, 'IGIC/IVA (Canarias)', align='R')
+    pdf.cell(33, 5, 'per legge vigente', align='R')
+
+    yt2 = yr + 18
+    pdf.set_fill_color(*BLU)
+    pdf.rect(127, yt2, 68, 10, style='F')
+    pdf.set_xy(127, yt2+1)
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.set_text_color(*WHITE)
+    pdf.cell(35, 8, 'TOTALE', align='R')
+    pdf.cell(33, 8, f'EUR {importo:.2f}', align='R')
+
+    yb = yt2 + 14
+    pdf.set_draw_color(180, 210, 180)
+    pdf.set_line_width(0.25)
+    pdf.rect(15, yb, 175, 26, style='D')
+    pdf.set_fill_color(237, 247, 237)
+    pdf.rect(15, yb, 175, 7, style='F')
+    pdf.set_xy(17, yb + 1)
+    pdf.set_font('Helvetica', 'B', 8)
+    pdf.set_text_color(34, 100, 34)
+    pdf.cell(0, 5, 'MODALITÀ DI PAGAMENTO  -  Bonifico Bancario')
+    _bon_rows = [
+        ('Beneficiario', 'Fuerte Venture Capital SL'),
+        ('Banca',        _banca or 'CaixaBank SA'),
+        ('IBAN',         _iban  or 'DA CONFIGURARE IN config.json'),
+        ('BIC/SWIFT',    _bic   or ''),
+        ('Causale',      f'Servizio FVC  |  Rif. {numero_fattura}'),
+    ]
+    yrow = yb + 8
+    for label, val in _bon_rows:
+        if not val: continue
+        pdf.set_xy(17, yrow)
+        pdf.set_font('Helvetica', 'B', 7.5)
+        pdf.set_text_color(*GRAY)
+        pdf.cell(32, 4.5, label + ':')
+        pdf.set_font('Helvetica', '', 7.5)
+        pdf.set_text_color(*DARK)
+        pdf.cell(130, 4.5, val)
+        yrow += 4.5
+
+    yn = yb + 30
+    pdf.set_xy(15, yn)
+    pdf.set_font('Helvetica', 'B', 7)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(0, 5, 'NOTE LEGALI', new_x='LMARGIN', new_y='NEXT')
+    pdf.set_x(15)
+    pdf.set_font('Helvetica', '', 7.5)
+    pdf.set_text_color(*GRAY)
+    pdf.multi_cell(180, 4.2,
+        'I report e i servizi sono esclusivamente informativi e non costituiscono consulenza finanziaria. '
+        'I dati personali del cliente sono trattati da Fuerte Venture Capital SL in qualità di '
+        'Titolare ai sensi del Reg. UE 2016/679 (GDPR). Diritto di accesso/cancellazione: info@fuerteventurecapital.com.')
+
+    pdf.set_auto_page_break(auto=False)
+    pdf.set_y(-16)
+    pdf.set_draw_color(*BLU)
+    pdf.set_line_width(0.4)
+    pdf.line(15, pdf.get_y()-2, 195, pdf.get_y()-2)
+    pdf.set_font('Helvetica', '', 7)
+    pdf.set_text_color(*GRAY)
+    pdf.cell(0, 5,
+        'Fuerte Venture Capital SL  ·  CIF B23881691  ·  Calle Puipana 3, 35640 Villaverde, Las Palmas, España'
+        '  ·  info@fuerteventurecapital.com  ·  www.fuerteventurecapital.com',
+        align='C')
+
+    return bytes(pdf.output())
+
+
+def _invia_email_fattura_manuale(nome: str, email: str, pdf_bytes: bytes, numero: str) -> bool:
+    """Invia fattura manuale via Brevo SMTP come allegato PDF."""
+    if not BREVO_SMTP_LOGIN or not BREVO_SMTP_PASSWORD:
+        print(f'[EMAIL] SMTP non configurato — fattura {numero} NON inviata a {email}', flush=True)
+        return False
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.base import MIMEBase
+    from email import encoders as _enc
+    msg = MIMEMultipart()
+    msg['Subject'] = f'Fuerte Venture Capital — Fattura {numero}'
+    msg['From']    = f'Fuerte Venture Capital <{BREVO_SENDER_EMAIL}>'
+    msg['To']      = email
+    html_body = f"""<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0f172a;color:#e2e8f0;padding:32px;border-radius:10px">
+<div style="color:#F6AD55;font-size:20px;font-weight:700;margin-bottom:16px">Fuerte Venture Capital SL</div>
+<p>Caro/a <strong>{nome}</strong>,</p>
+<p>In allegato trova la fattura <strong>{numero}</strong>.</p>
+<p>Per qualsiasi informazione: <a href="mailto:info@fuerteventurecapital.com" style="color:#F6AD55">info@fuerteventurecapital.com</a></p>
+<p style="color:#718096;font-size:12px;margin-top:24px">Fuerte Venture Capital SL · CIF B23881691 · Las Palmas, España</p>
+</div>"""
+    msg.attach(MIMEText(html_body, 'html', 'utf-8'))
+    part = MIMEBase('application', 'pdf')
+    part.set_payload(pdf_bytes)
+    _enc.encode_base64(part)
+    part.add_header('Content-Disposition', f'attachment; filename="{numero}.pdf"')
+    msg.attach(part)
+    try:
+        with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=15) as s:
+            s.ehlo(); s.starttls()
+            s.login(BREVO_SMTP_LOGIN, BREVO_SMTP_PASSWORD)
+            s.sendmail(BREVO_SENDER_EMAIL, [email], msg.as_string())
+        print(f'[EMAIL] Fattura {numero} inviata a {email}', flush=True)
+        return True
+    except Exception as e:
+        print(f'[EMAIL] Errore invio fattura {numero}: {e}', flush=True)
+        return False
+
+
 DEFAULT_SERVIZI = {
     "azioni": {
         "basic": {"prezzo":29,"status":"attivo","parametri":{"ev_fcf_max":12.0,"price_book_max":1.2,"roe_min":0.0,"net_debt_ebitda_max":2.5}},
@@ -7961,6 +8206,51 @@ Contatta il supporto per attivare il tuo piano.</p>
 
     def do_POST(self):
         p = self.path.split('?')[0]
+        # ── Fattura manuale ────────────────────────────────────
+        if p == '/api/fatture/manuale' and _is_auth(self):
+            try:
+                req = json.loads(self._body())
+                nome  = req.get('nome', '').strip()
+                email = req.get('email', '').strip()
+                imp   = req.get('importo', 0)
+                if not nome or not email or not imp:
+                    self._json({'ok': False, 'msg': 'Nome, email e importo sono obbligatori'}); return
+                dati = {
+                    'nome': nome, 'email': email,
+                    'descrizione': req.get('descrizione', 'Servizio FVC').strip(),
+                    'importo': float(imp),
+                    'data_fattura': req.get('data_fattura', '').strip(),
+                    'periodo': req.get('periodo', '').strip(),
+                    'paese': req.get('paese', ''), 'cf': req.get('cf', ''),
+                    'piva': req.get('piva', ''), 'indirizzo': req.get('indirizzo', ''),
+                    'cap': req.get('cap', ''), 'citta': req.get('citta', ''),
+                }
+                numero = _prossimo_numero_fattura()
+                pdf_bytes = genera_fattura_manuale_pdf(dati, numero)
+                _salva_fattura(pdf_bytes, numero)
+                email_ok = False
+                if req.get('invia_email') and pdf_bytes:
+                    email_ok = _invia_email_fattura_manuale(nome, email, pdf_bytes, numero)
+                self._json({'ok': True, 'numero': numero, 'email_inviata': email_ok})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
+        # ── Reset contatore fatture ────────────────────────────
+        if p == '/api/fatture/reset-contatore' and _is_auth(self):
+            try:
+                with _fatture_lock:
+                    with open(FATTURE_COUNTER, 'w') as _f:
+                        json.dump({'ultimo': 0}, _f)
+                deleted = 0
+                if os.path.isdir(FATTURE_DIR):
+                    for _fn in os.listdir(FATTURE_DIR):
+                        if _fn.endswith('.pdf'):
+                            os.remove(os.path.join(FATTURE_DIR, _fn))
+                            deleted += 1
+                self._json({'ok': True, 'msg': f'Contatore azzerato. {deleted} PDF eliminati. Prossima: FVC-{datetime.now().year}-0001'})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
         # ── Rimuovi ticker dal Database ────────────────────────
         if p == '/api/database/remove' and _is_auth(self):
             try:
