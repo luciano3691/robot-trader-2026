@@ -1,20 +1,32 @@
 """
 social_enrichment.py — Arricchimento profili social dei prospect Brevo
 
-Cerca su DuckDuckGo LinkedIn / Instagram / Facebook per ogni contatto.
-Priorità: clicker → reader → cold (prospect senza engagement).
-Rate:     6s tra ogni ricerca (10 req/min) — nessuna API key richiesta.
-Output:   social_profiles.json (locale VPS) + write-back campo LINKEDIN su Brevo.
+Modalità operative (in ordine di preferenza):
+  1. Brave Search API  (BRAVE_SEARCH_API_KEY in .env)  — 2000 query/mese GRATIS
+     Registrazione: https://api.search.brave.com  (no carta di credito)
+  2. URL Pattern       (fallback immediato, zero costo, zero API)
+     Genera URL probabili da nome+cognome — confidenza "pattern"
+     Luciano verifica manualmente dalla dashboard → 1 click
+
+Setup Brave:
+  1. Vai su https://api.search.brave.com → Sign Up → Free Plan
+  2. Copia la chiave (BSA...)
+  3. Aggiungi in /root/rt2026/.env:  BRAVE_SEARCH_API_KEY=BSA...
+  4. Riavvia dashboard:  kill $(pgrep -f dashboard.py) && nohup python3 ...
+
+Priorità prospect: clicker → reader → cold
+Rate Brave:        10 req/min (6s tra ogni call)
+Job scheduler:     domenica 02:00, batch 300/settimana
 
 Usage:
-    python social_enrichment.py              # tutti i contatti non arricchiti
-    python social_enrichment.py --batch 300  # max 300 per run (job notturno)
-    python social_enrichment.py --test 5     # solo 5 contatti, per test
+    python social_enrichment.py              # tutti non arricchiti
+    python social_enrichment.py --batch 300  # max 300 per run
+    python social_enrichment.py --test 5     # solo 5 (per test)
+    python social_enrichment.py --patterns   # solo pattern (no API)
 """
 
-import os, sys, re, json, time, random, logging, argparse, urllib.parse
-from datetime import datetime, timedelta
-from pathlib import Path
+import os, sys, re, json, time, random, logging, argparse, urllib.parse, unicodedata
+from datetime import datetime
 
 import requests
 
@@ -23,21 +35,30 @@ BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
 PROFILES_FILE = os.path.join(BASE_DIR, 'social_profiles.json')
 LOG_FILE      = os.path.join(BASE_DIR, 'social_enrichment.log')
 
+# ── Carica .env ───────────────────────────────────────────────────────────
+_env_path = os.path.join(BASE_DIR, '.env')
+if os.path.exists(_env_path):
+    with open(_env_path, encoding='utf-8') as _ef:
+        for _line in _ef:
+            _line = _line.strip()
+            if _line and not _line.startswith('#') and '=' in _line:
+                _k, _, _v = _line.partition('=')
+                os.environ.setdefault(_k.strip(), _v.strip())
+
 # ── Config ────────────────────────────────────────────────────────────────
 try:
-    _cfg_path = os.path.join(BASE_DIR, 'config.json')
-    with open(_cfg_path, encoding='utf-8') as _f:
+    with open(os.path.join(BASE_DIR, 'config.json'), encoding='utf-8') as _f:
         _cfg = json.load(_f)
-    BREVO_KEY = _cfg.get('social', {}).get('brevo', {}).get('api_key', '') or os.getenv('BREVO_API_KEY', '')
+    BREVO_KEY = (_cfg.get('social', {}).get('brevo', {}).get('api_key', '')
+                 or os.getenv('BREVO_API_KEY', ''))
 except Exception:
     BREVO_KEY = os.getenv('BREVO_API_KEY', '')
 
-BREVO_LIST_ID   = 3
-RATE_DELAY_SEC  = 6.0       # 10 req/min
-ENRICH_MAX_AGE  = 30        # ri-arricchisce dopo N giorni
-DDG_URL         = 'https://html.duckduckgo.com/html/'
+BRAVE_KEY      = os.getenv('BRAVE_SEARCH_API_KEY', '')
+BREVO_LIST_ID  = 3
+RATE_DELAY_SEC = 6.0    # 10 req/min
+ENRICH_MAX_AGE = 30     # ri-enrichisce dopo N giorni
 
-# Domini email personali → nessun segnale azienda
 PERSONAL_DOMAINS = {
     'gmail.com','yahoo.com','yahoo.it','yahoo.es','yahoo.fr','yahoo.de',
     'hotmail.com','hotmail.it','outlook.com','live.com','msn.com',
@@ -48,15 +69,6 @@ PERSONAL_DOMAINS = {
     'wanadoo.fr','aol.com','yandex.com','mail.com',
 }
 
-# User-Agent pool per variare le richieste
-_UA_POOL = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-]
-
 # ── Logging ───────────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
@@ -64,7 +76,7 @@ logging.basicConfig(
     handlers=[
         logging.FileHandler(LOG_FILE, encoding='utf-8'),
         logging.StreamHandler(sys.stdout),
-    ]
+    ],
 )
 log = logging.getLogger('enrichment')
 
@@ -96,22 +108,22 @@ def _brevo_headers() -> dict:
     return {'api-key': BREVO_KEY, 'accept': 'application/json', 'content-type': 'application/json'}
 
 
-def _brevo_fetch_all_contacts() -> list:
-    """Scarica tutti i contatti della lista Brevo con paginazione."""
+def _brevo_fetch_all() -> list:
     contacts, offset = [], 0
     while True:
-        url = f'https://api.brevo.com/v3/contacts?limit=500&offset={offset}&listIds={BREVO_LIST_ID}'
+        url = (f'https://api.brevo.com/v3/contacts'
+               f'?limit=500&offset={offset}&listIds={BREVO_LIST_ID}')
         try:
             r = requests.get(url, headers=_brevo_headers(), timeout=20)
             r.raise_for_status()
             batch = r.json().get('contacts', [])
         except Exception as e:
-            log.error(f'Brevo fetch error offset={offset}: {e}')
+            log.error(f'Brevo fetch offset={offset}: {e}')
             break
         if not batch:
             break
         contacts.extend(batch)
-        log.info(f'  Brevo: scaricati {len(contacts)} contatti...')
+        log.info(f'  Brevo: {len(contacts)} contatti...')
         if len(batch) < 500:
             break
         offset += 500
@@ -120,10 +132,10 @@ def _brevo_fetch_all_contacts() -> list:
 
 
 def _brevo_update(email: str, attrs: dict):
-    """Write-back attributi su Brevo (LINKEDIN, JOB_TITLE)."""
     url = f'https://api.brevo.com/v3/contacts/{urllib.parse.quote(email, safe="")}'
     try:
-        r = requests.put(url, json={'attributes': attrs}, headers=_brevo_headers(), timeout=15)
+        r = requests.put(url, json={'attributes': attrs},
+                         headers=_brevo_headers(), timeout=15)
         if r.status_code not in (200, 204):
             log.warning(f'Brevo update {email}: HTTP {r.status_code}')
     except Exception as e:
@@ -131,45 +143,75 @@ def _brevo_update(email: str, attrs: dict):
 
 
 # ─────────────────────────────────────────────────────────────────────────
-# DuckDuckGo scraping
+# Brave Search API  (primario — gratis 2000/mese)
 # ─────────────────────────────────────────────────────────────────────────
 
-def _ddg_search(query: str) -> list[str]:
-    """Restituisce lista di URL dai risultati DuckDuckGo (formato HTML)."""
-    headers = {
-        'User-Agent': random.choice(_UA_POOL),
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
-    }
+def _brave_search(query: str) -> list[str]:
+    """Restituisce lista di URL dal Brave Search API. Vuota se no API key."""
+    if not BRAVE_KEY:
+        return []
     try:
-        r = requests.post(
-            DDG_URL,
-            data={'q': query, 'kl': 'wt-wt', 'b': ''},
-            headers=headers,
+        r = requests.get(
+            'https://api.search.brave.com/res/v1/web/search',
+            params={'q': query, 'count': 5, 'safesearch': 'off'},
+            headers={
+                'Accept': 'application/json',
+                'Accept-Encoding': 'gzip',
+                'X-Subscription-Token': BRAVE_KEY,
+            },
             timeout=15,
-            allow_redirects=True,
         )
-        # Estrai URLs dai redirect uddg= (URL reali codificati)
-        encoded = re.findall(r'uddg=([^&"\']+)', r.text)
-        urls = []
-        for enc in encoded:
-            try:
-                urls.append(urllib.parse.unquote(enc))
-            except Exception:
-                pass
-        return urls
+        if r.status_code == 429:
+            log.warning('Brave API rate limit — attendo 60s')
+            time.sleep(60)
+            return []
+        r.raise_for_status()
+        data = r.json()
+        return [res['url'] for res in data.get('web', {}).get('results', [])]
     except Exception as e:
-        log.warning(f'DDG error per "{query[:60]}": {e}')
+        log.warning(f'Brave search error "{query[:50]}": {e}')
         return []
 
 
 def _extract_match(urls: list[str], pattern: str) -> tuple[str, str]:
-    """Estrae il primo URL che matcha il pattern. Returns (url, confidence)."""
     rx = re.compile(pattern, re.IGNORECASE)
-    for url in urls[:6]:
+    for url in urls[:5]:
         if rx.search(url):
             return url.split('?')[0].rstrip('/'), 'high'
     return '', ''
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# URL Pattern (fallback — zero costo, zero API, immediato)
+# ─────────────────────────────────────────────────────────────────────────
+
+def _normalize(s: str) -> str:
+    """Mario Rossi → mario-rossi (rimuove accenti e caratteri speciali)."""
+    s = unicodedata.normalize('NFD', s.lower())
+    s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
+    s = re.sub(r'[^a-z0-9]', '-', s)
+    s = re.sub(r'-+', '-', s).strip('-')
+    return s
+
+
+def _url_patterns(firstname: str, lastname: str) -> dict:
+    """
+    Genera URL probabili da nome+cognome.
+    Confidenza 'pattern' = non verificato, ma cliccabile dalla dashboard.
+    """
+    fn = _normalize(firstname)
+    ln = _normalize(lastname)
+    fn_raw = firstname.lower().replace(' ', '')
+    ln_raw = lastname.lower().replace(' ', '')
+
+    return {
+        'linkedin_url': f'https://www.linkedin.com/in/{fn}-{ln}',
+        'linkedin_confidence': 'pattern',
+        'instagram_url': f'https://www.instagram.com/{fn_raw}{ln_raw}',
+        'instagram_confidence': 'pattern',
+        'facebook_url': f'https://www.facebook.com/{fn_raw}.{ln_raw}',
+        'facebook_confidence': 'pattern',
+    }
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -177,22 +219,17 @@ def _extract_match(urls: list[str], pattern: str) -> tuple[str, str]:
 # ─────────────────────────────────────────────────────────────────────────
 
 def _priority(contact: dict) -> int:
-    """0=clicker, 1=reader, 2=cold."""
     a = contact.get('attributes', {})
-    if a.get('CLICKERS', 0):
-        return 0
-    if a.get('READERS', 0):
-        return 1
+    if a.get('CLICKERS', 0): return 0
+    if a.get('READERS',  0): return 1
     return 2
 
 
 def _company_from_email(email: str) -> str:
-    """Estrae il nome dell'azienda dal dominio email (se non personale)."""
     try:
         domain = email.split('@')[1].lower()
         if domain in PERSONAL_DOMAINS:
             return ''
-        # Prende il nome principale del dominio (senza TLD)
         parts = domain.split('.')
         return parts[-2] if len(parts) >= 2 else parts[0]
     except Exception:
@@ -200,13 +237,12 @@ def _company_from_email(email: str) -> str:
 
 
 def _needs_enrichment(profile: dict) -> bool:
-    """True se il profilo non è stato arricchito di recente."""
     enriched_at = profile.get('enriched_at', '')
     if not enriched_at:
         return True
     try:
-        age = datetime.utcnow() - datetime.fromisoformat(enriched_at)
-        return age.days >= ENRICH_MAX_AGE
+        age = (datetime.utcnow() - datetime.fromisoformat(enriched_at)).days
+        return age >= ENRICH_MAX_AGE
     except Exception:
         return True
 
@@ -217,45 +253,42 @@ def _needs_enrichment(profile: dict) -> bool:
 
 def _search_all(firstname: str, lastname: str, company: str) -> dict:
     """
-    Cerca LinkedIn, Instagram, Facebook per un prospect.
-    Piattaforme ordinate per rilevanza B2C: Instagram > Facebook > LinkedIn.
+    Cerca con Brave Search API (se disponibile).
+    Priorità B2C: Instagram > Facebook > LinkedIn.
     """
-    name_q   = f'"{firstname} {lastname}"'
-    co_q     = f' "{company}"' if company else ''
-    result   = {
+    name_q = f'"{firstname} {lastname}"'
+    co_q   = f' "{company}"' if company else ''
+
+    result = {
         'linkedin_url': '', 'linkedin_confidence': '',
         'instagram_url': '', 'instagram_confidence': '',
-        'facebook_url': '',  'facebook_confidence': '',
+        'facebook_url': '', 'facebook_confidence': '',
     }
 
-    # ── Instagram (priorità B2C) ──────────────────────────────────────
-    q_ig = f'{name_q} site:instagram.com'
-    urls = _ddg_search(q_ig)
-    ig_url, ig_conf = _extract_match(urls, r'instagram\.com/(?!p/|reel/|stories/|explore/)[^/?#]+')
-    result['instagram_url']        = ig_url
-    result['instagram_confidence'] = ig_conf
-    log.debug(f'  IG: {ig_url or "—"}')
-    time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
+    # ── Instagram (priorità B2C) ──
+    urls = _brave_search(f'{name_q} site:instagram.com')
+    ig_url, ig_c = _extract_match(
+        urls, r'instagram\.com/(?!p/|reel/|stories/|explore/|tv/)[^/?#]+'
+    )
+    result['instagram_url'], result['instagram_confidence'] = ig_url, ig_c
+    if BRAVE_KEY:
+        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
 
-    # ── Facebook ─────────────────────────────────────────────────────
-    q_fb = f'{name_q}{co_q} site:facebook.com'
-    urls = _ddg_search(q_fb)
-    fb_url, fb_conf = _extract_match(
+    # ── Facebook ──
+    urls = _brave_search(f'{name_q}{co_q} site:facebook.com')
+    fb_url, fb_c = _extract_match(
         urls, r'facebook\.com/(?!groups/|events/|pages/|photo|video|share|login|help)[^/?#]+'
     )
-    result['facebook_url']        = fb_url
-    result['facebook_confidence'] = fb_conf
-    log.debug(f'  FB: {fb_url or "—"}')
-    time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
+    result['facebook_url'], result['facebook_confidence'] = fb_url, fb_c
+    if BRAVE_KEY:
+        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
 
-    # ── LinkedIn ─────────────────────────────────────────────────────
-    q_li = f'{name_q}{co_q} site:linkedin.com/in'
-    urls = _ddg_search(q_li)
-    li_url, li_conf = _extract_match(urls, r'linkedin\.com/in/[^/?#]+')
-    result['linkedin_url']        = li_url
-    result['linkedin_confidence'] = li_conf
-    log.debug(f'  LI: {li_url or "—"}')
-    time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
+    # ── LinkedIn ──
+    urls = _brave_search(f'{name_q}{co_q} site:linkedin.com/in')
+    li_url, li_c = _extract_match(urls, r'linkedin\.com/in/[^/?#]+')
+    result['linkedin_url'], result['linkedin_confidence'] = li_url, li_c
+    if BRAVE_KEY:
+        time.sleep(RATE_DELAY_SEC + random.uniform(-1, 1))
 
     return result
 
@@ -264,64 +297,69 @@ def _search_all(firstname: str, lastname: str, company: str) -> dict:
 # Main
 # ─────────────────────────────────────────────────────────────────────────
 
-def run_enrichment(batch_size: int = 0, test_mode: int = 0) -> dict:
+def run_enrichment(batch_size: int = 0, test_mode: int = 0,
+                   patterns_only: bool = False) -> dict:
     """
     Arricchisce i profili social dei prospect Brevo.
 
     Args:
-        batch_size: max contatti da elaborare (0 = tutti)
-        test_mode:  se > 0, elabora solo N contatti (per debug)
-
-    Returns:
-        Stats dict: {processed, found_li, found_ig, found_fb, skipped, errors}
+        batch_size:    max contatti da elaborare (0 = tutti)
+        test_mode:     se > 0, elabora solo N contatti
+        patterns_only: usa solo pattern URL (ignora Brave API)
     """
     profiles = _load_profiles()
     stats    = {'processed': 0, 'found_li': 0, 'found_ig': 0, 'found_fb': 0,
-                'skipped': 0, 'errors': 0}
+                'skipped': 0, 'errors': 0, 'mode': ''}
+
+    use_brave = bool(BRAVE_KEY) and not patterns_only
+    stats['mode'] = 'brave' if use_brave else 'pattern'
 
     log.info('=' * 60)
     log.info('SOCIAL ENRICHMENT — START %s' % datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'))
+    log.info(f'Modalita: {"Brave Search API" if use_brave else "URL Pattern (fallback)"}')
+    if not use_brave:
+        log.info('  → Per abilitare Brave: aggiungi BRAVE_SEARCH_API_KEY in .env')
+        log.info('  → Registrazione gratuita: https://api.search.brave.com')
     log.info('=' * 60)
 
-    # 1. Fetch contatti Brevo
-    log.info('Fetching contatti Brevo lista %d...' % BREVO_LIST_ID)
-    all_contacts = _brevo_fetch_all_contacts()
-    log.info(f'Totale contatti: {len(all_contacts)}')
+    log.info('Fetching contatti Brevo...')
+    all_contacts = _brevo_fetch_all()
+    log.info(f'Totale: {len(all_contacts)}')
 
-    # 2. Ordina per priorità: clicker → reader → cold
     all_contacts.sort(key=_priority)
 
-    # 3. Filtra: solo quelli che hanno bisogno di arricchimento
     to_process = []
     for c in all_contacts:
         email = c.get('email', '')
         if not email:
             continue
         existing = profiles.get(email, {})
+        # In modalità pattern: salta se già ha URL verificati o pattern recenti
         if not _needs_enrichment(existing):
+            stats['skipped'] += 1
+            continue
+        # In modalità Brave: salta se già arricchito con Brave (confidence high/manual)
+        if use_brave and existing.get('linkedin_confidence') in ('high', 'manual'):
             stats['skipped'] += 1
             continue
         to_process.append(c)
 
-    log.info(f'Da arricchire: {len(to_process)} | Già arricchiti: {stats["skipped"]}')
+    log.info(f'Da arricchire: {len(to_process)} | Saltati: {stats["skipped"]}')
 
-    # 4. Applica limite batch / test
     limit = test_mode if test_mode else (batch_size if batch_size else len(to_process))
     to_process = to_process[:limit]
-    log.info(f'Elaboro {len(to_process)} contatti (limit={limit})')
+    log.info(f'Elaboro {len(to_process)} contatti')
 
-    # 5. Ciclo principale
     for i, contact in enumerate(to_process):
         email     = contact.get('email', '')
         attrs     = contact.get('attributes', {})
         firstname = attrs.get('FIRSTNAME', '').strip()
-        lastname  = attrs.get('LASTNAME', '').strip()
+        lastname  = attrs.get('LASTNAME',  '').strip()
         priority  = _priority(contact)
         company   = _company_from_email(email)
         prio_tag  = ['CLICKER', 'READER', 'COLD'][priority]
 
         if not firstname or not lastname:
-            log.info(f'[{i+1}/{len(to_process)}] SKIP {email} — nome mancante')
             stats['errors'] += 1
             continue
 
@@ -331,13 +369,15 @@ def run_enrichment(batch_size: int = 0, test_mode: int = 0) -> dict:
         )
 
         try:
-            found = _search_all(firstname, lastname, company)
+            if use_brave:
+                found = _search_all(firstname, lastname, company)
+            else:
+                found = _url_patterns(firstname, lastname)
         except Exception as e:
-            log.error(f'  Errore ricerca: {e}')
+            log.error(f'  Errore: {e}')
             stats['errors'] += 1
             continue
 
-        # Salva nel profilo locale
         profiles[email] = {
             'firstname':            firstname,
             'lastname':             lastname,
@@ -353,35 +393,26 @@ def run_enrichment(batch_size: int = 0, test_mode: int = 0) -> dict:
             'manually_verified':    False,
         }
 
-        # Stats
         if found['linkedin_url']:  stats['found_li'] += 1
         if found['instagram_url']: stats['found_ig'] += 1
         if found['facebook_url']:  stats['found_fb'] += 1
         stats['processed'] += 1
 
-        # Write-back Brevo
-        brevo_attrs = {}
-        if found['linkedin_url']:
-            brevo_attrs['LINKEDIN'] = found['linkedin_url']
-        if brevo_attrs:
-            _brevo_update(email, brevo_attrs)
+        # Write-back LinkedIn su Brevo (solo se trovato con ricerca reale)
+        if found['linkedin_url'] and found.get('linkedin_confidence') in ('high', 'manual'):
+            _brevo_update(email, {'LINKEDIN': found['linkedin_url']})
 
-        # Salva ogni 20 contatti (checkpoint)
         if (i + 1) % 20 == 0:
             _save_profiles(profiles)
-            log.info(
-                f'  Checkpoint — LI:{stats["found_li"]} IG:{stats["found_ig"]} '
-                f'FB:{stats["found_fb"]} su {stats["processed"]} elaborati'
-            )
+            log.info(f'  [checkpoint] LI:{stats["found_li"]} IG:{stats["found_ig"]} FB:{stats["found_fb"]}')
 
-    # Salva finale
     _save_profiles(profiles)
 
     log.info('=' * 60)
     log.info(
-        f'FINE — processed:{stats["processed"]} | '
-        f'LinkedIn:{stats["found_li"]} | Instagram:{stats["found_ig"]} | '
-        f'Facebook:{stats["found_fb"]} | skip:{stats["skipped"]} | err:{stats["errors"]}'
+        f'FINE [{stats["mode"]}] processed:{stats["processed"]} | '
+        f'LI:{stats["found_li"]} IG:{stats["found_ig"]} FB:{stats["found_fb"]} | '
+        f'skip:{stats["skipped"]} err:{stats["errors"]}'
     )
     log.info('=' * 60)
     return stats
@@ -393,11 +424,14 @@ def run_enrichment(batch_size: int = 0, test_mode: int = 0) -> dict:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Social enrichment prospect Brevo')
-    parser.add_argument('--batch', type=int, default=0,
-                        help='Max contatti per run (0=tutti)')
-    parser.add_argument('--test',  type=int, default=0,
-                        help='Test mode: elabora solo N contatti')
+    parser.add_argument('--batch',    type=int, default=0, help='Max contatti per run')
+    parser.add_argument('--test',     type=int, default=0, help='Test mode: N contatti')
+    parser.add_argument('--patterns', action='store_true',  help='Solo pattern URL (no Brave API)')
     args = parser.parse_args()
 
-    stats = run_enrichment(batch_size=args.batch, test_mode=args.test)
+    stats = run_enrichment(
+        batch_size=args.batch,
+        test_mode=args.test,
+        patterns_only=args.patterns,
+    )
     print(json.dumps(stats, indent=2))
