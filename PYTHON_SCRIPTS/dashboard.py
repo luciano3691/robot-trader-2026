@@ -1572,10 +1572,10 @@ def genera_fattura_pdf(cliente, numero_fattura):
     # Linea blu separatrice
     pdf.set_draw_color(*BLU)
     pdf.set_line_width(0.5)
-    pdf.line(15, 46, 195, 46)
+    pdf.line(15, 72, 195, 72)
 
     # Fornitore (sx)
-    y0 = 50
+    y0 = 76
     pdf.set_xy(15, y0)
     pdf.set_font('Helvetica', 'B', 7)
     pdf.set_text_color(*GRAY)
@@ -1612,7 +1612,7 @@ def genera_fattura_pdf(cliente, numero_fattura):
         pdf.cell(85, 4.5, r)
 
     # Linea grigia
-    y_sep = max(pdf.get_y() + 6, 98)
+    y_sep = max(pdf.get_y() + 6, 126)
     pdf.set_draw_color(200, 205, 220)
     pdf.set_line_width(0.3)
     pdf.line(15, y_sep, 195, y_sep)
@@ -1682,7 +1682,7 @@ def genera_fattura_pdf(cliente, numero_fattura):
     pdf.set_xy(17, yb + 1)
     pdf.set_font('Helvetica', 'B', 8)
     pdf.set_text_color(34, 100, 34)
-    pdf.cell(0, 5, 'MODALITA DI PAGAMENTO  -  Bonifico Bancario')
+    pdf.cell(0, 5, 'MODALITÀ DI PAGAMENTO  -  Bonifico Bancario')
     _bon_rows = [
         ('Beneficiario', 'Fuerte Venture Capital SL'),
         ('Banca',        _banca or 'CaixaBank SA'),
