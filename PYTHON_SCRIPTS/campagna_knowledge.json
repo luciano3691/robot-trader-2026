@@ -17,6 +17,158 @@
       "click_rate_minimo": 0.02,
       "unsub_allarme_giornaliero": 10,
       "giorni_consecutivi_sotto_soglia": 3
+    },
+    "azienda": {
+      "nome": "Fuerte Venture Capital SL",
+      "cif": "B23881691",
+      "sede": "Calle Puipana 3, 35640 Villaverde, Las Palmas, Espana",
+      "email": "info@fuerteventurecapital.com",
+      "sito": "www.fuerteventurecapital.com",
+      "fondatore": "Luciano Manicardi",
+      "social_manager": "Elisabetta Iori"
+    },
+    "prodotti": {
+      "robot_trader_2026": {
+        "descrizione": "Screener quantitativo per investitori individuali. Analisi notturna di 3.072 azioni + 678 ETF + 1.087 fondi su 23 mercati globali con 5 filtri hard: EV/FCF<=12, P/B<=1.2, ROE>=0%, ND/EBITDA<=2.5, Score composito.",
+        "piani": [
+          "BASIC - indici principali, Top 20",
+          "PRO - universo completo, Top 50",
+          "VALUE - filtri ampi, turnaround"
+        ],
+        "url": "https://trader.fuerteventurecapital.com",
+        "target": "Investitori retail, imprenditori, professionisti finanziari",
+        "prezzo_modello": "abbonamento mensile/annuale"
+      },
+      "wealthos": {
+        "descrizione": "SaaS di gestione patrimoniale personale. Dashboard unificato per liquidita, investimenti con prezzi automatici Yahoo Finance, immobili, beni materiali, budget mensile.",
+        "prezzo": "1000 EUR una tantum - licenza perpetua",
+        "target": "Privati affluenti 200k-5M EUR+, famiglie con asset multipli, consulenti finanziari indipendenti, imprenditori",
+        "url": "https://wealth.fuerteventurecapital.com",
+        "cosa_non_e": "Non robo-advisor, non broker, non contabilita aziendale"
+      }
+    },
+    "programma_crm_marketing": {
+      "obiettivo_q4_2026": "Conversioni abbonamenti RT2026 + vendite WealthOS prima chiusura fiscale dicembre",
+      "sequenza_automatica": {
+        "09:00_UTC": "250 email ai prospect - tema del mese, lingua per paese",
+        "10:00_UTC": "Post LinkedIn profilo Luciano + Facebook pagina FVC - stesso tema, 60min dopo"
+      },
+      "canali_attivi": {
+        "brevo_email": "LIVE - 250/giorno, transazionale API",
+        "linkedin": "LIVE - profilo personale Luciano, w_member_social",
+        "facebook": "PENDING - token scaduto, Elisabetta deve rinnovare",
+        "instagram": "PENDING - dipende da Facebook token",
+        "whatsapp": "DISCONNECTED - verifica SMS +34 680 67 87 34 da ritentare"
+      },
+      "limite_email_giornaliero": 250,
+      "calendario_campagna": {
+        "2026-09": {
+          "tema": "SALARY_TRAP",
+          "lang": "IT",
+          "note": "Lancio - hook su stipendio e inflazione"
+        },
+        "2026-10": {
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "note": "Mercato spagnolo - patrimonio sotto controllo"
+        },
+        "2026-11": {
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "note": "Mercato UK/USA - opportunita di mercato"
+        },
+        "2026-12": {
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "note": "Chiusura fiscale - patrimonio e pianificazione anno nuovo"
+        }
+      },
+      "varianti_settimanali": {
+        "settimana_1_PAIN_HOOK": "Il dolore del prospect - stipendio che perde valore, inflazione, mancanza controllo",
+        "settimana_2_SOLUTION": "La soluzione che offriamo - screener sistematico, dashboard patrimonio unificato",
+        "settimana_3_SOCIAL_PROOF": "Prove sociali, numeri concreti, risultati verificabili",
+        "settimana_4_CTA": "Chiamata all azione diretta, offerta, urgenza, prossimo passo chiaro"
+      }
+    },
+    "knowledge_temi": {
+      "SALARY_TRAP": {
+        "concetto_chiave": "Lo stipendio cresce linearmente 1-2% reale/anno, gli investimenti crescono esponenzialmente. Chi non investe perde potere d acquisto anche senza perdere un euro nominale.",
+        "dati_chiave": [
+          "Italia: crescita reale stipendi -2.9% dal 1990 - OCSE 2023",
+          "Germania +30% reale, Francia +25%, Italia la peggiore in Eurozona",
+          "50.000 EUR a 0% con inflazione 3% = 37.000 EUR reali dopo 10 anni",
+          "50.000 EUR investiti in MSCI World 7% = 196.700 EUR dopo 20 anni",
+          "S&P500 storico 10%/anno: 50.000 EUR diventano 336.000 EUR in 20 anni"
+        ],
+        "angolo_emozionale": "Paura di rimanere indietro, frustrazione per lavoro senza vera crescita, desiderio di indipendenza finanziaria",
+        "soluzione_proposta": "Robot Trader 2026 - screener sistematico per trovare opportunita di investimento ogni mattina alle 07:00",
+        "migliore_con_mercato": "ribassista - la paura di perdere potere d acquisto e amplificata dalla volatilita"
+      },
+      "WEALTHOS_PROMO": {
+        "concetto_chiave": "Chi ha patrimonio distribuito su piu conti e piattaforme non sa mai esattamente quanto vale oggi. WealthOS consolida tutto in un unico dashboard aggiornato in tempo reale.",
+        "dati_chiave": [
+          "Prezzo 1000 EUR una tantum - nessun abbonamento nascosto",
+          "Aggiornamento prezzi automatico via Yahoo Finance ogni giorno alle 08:00",
+          "Supporta: azioni, ETF, fondi, immobili, liquidita, beni materiali",
+          "Multi-tenancy: dati isolati e privati per ogni cliente",
+          "Report PDF del patrimonio scaricabile in qualsiasi momento"
+        ],
+        "angolo_emozionale": "Ansia da mancanza di controllo, desiderio di ordine e chiarezza, orgoglio nel vedere il proprio patrimonio crescere",
+        "soluzione_proposta": "WealthOS - un colpo d occhio per sapere esattamente quanto vali oggi",
+        "migliore_con_mercato": "rialzista - chi guadagna vuole vedere e gestire la crescita del patrimonio"
+      },
+      "TREND_MOBILIARE": {
+        "concetto_chiave": "I mercati offrono opportunita ogni settimana. Chi non ha un sistema le lascia passare. Robot Trader monitora 3.072+ strumenti ogni notte e consegna la lista prioritizzata ogni mattina.",
+        "dati_chiave": [
+          "3.072 azioni su 23 mercati globali analizzate ogni notte alle 23:00",
+          "678 ETF con Sharpe Ratio e performance 1 anno",
+          "1.087 fondi comuni di 36 famiglie: Vanguard, Fidelity, BlackRock, PIMCO",
+          "Output: Top 50 ranked per score - pronto alle 07:00",
+          "5 filtri hard eliminano il 95%+ degli strumenti non interessanti"
+        ],
+        "angolo_emozionale": "FOMO paura di perdere opportunita, frustrazione per mercati incomprensibili, desiderio di sistema chiaro e affidabile",
+        "soluzione_proposta": "Robot Trader 2026 - il sistema che trova le opportunita mentre dormi",
+        "migliore_con_mercato": "neutro o lieve rialzo - momentum positivo e fiducia nei mercati"
+      },
+      "VALUE_INTRO": {
+        "concetto_chiave": "5 filtri quantitativi hard eliminano le emozioni dal processo di selezione: EV/FCF, P/B, ROE, ND/EBITDA, Score composito.",
+        "angolo_emozionale": "Razionalita vs emozione - il metodo scientifico contro le intuizioni",
+        "soluzione_proposta": "Robot Trader 2026 - solo numeri, niente emozioni"
+      },
+      "WEALTHOS_ONBOARDING": {
+        "concetto_chiave": "I primi 15 giorni con WealthOS: sequenza di 4 email guidate, inserimento asset, configurazione budget. Licenza perpetua inclusa aggiornamenti futuri.",
+        "angolo_emozionale": "Rassicurazione post-acquisto, guida passo-passo, supporto diretto",
+        "soluzione_proposta": "WealthOS - sei seguito passo dopo passo, non sei solo"
+      }
+    },
+    "prospect_funnel": {
+      "new": "Mai contattato - awareness, hook forte sul problema",
+      "prospect_attivo": "Ha aperto almeno una email - solution, CTA diretta",
+      "da_contattare": "Ha cliccato il link - PASSARE A LUCIANO per contatto personale immediato",
+      "cliente": "Ha acquistato - fuori dalla campagna acquisizione",
+      "inattivo_cold": "3+ email ignorate - re-engagement SOCIAL_PROOF poi stop definitivo",
+      "no_email": "Disiscritto - rimosso permanentemente, mai piu contattato"
+    },
+    "regole_comunicazione": {
+      "tono": "Professionale, credibile, educativo. Mai hype. Mai promesse di rendimento garantito.",
+      "lingua_per_paese": "Adattare la lingua al paese del prospect: IT->italiano, ES->spagnolo, DE->tedesco, FR->francese, tutti gli altri->inglese",
+      "disclaimer_obbligatorio": "Mai promettere rendimenti specifici. I mercati sono incerti. Investire comporta rischi.",
+      "frequenza_massima": "Max 1 email per mese per prospect - tracker mensile anti-duplicati attivo",
+      "regole_assolute": [
+        "Mai reinviare a chi ha gia ricevuto email questo mese",
+        "Mai contattare via email i prospect Da Contattare - tocca a Luciano in persona",
+        "Mai ignorare o ritardare la rimozione dei disiscritti",
+        "Mai usare urgenza falsa o scarcity artificiale",
+        "La pagina LinkedIn company FVC non e raggiungibile via API - solo profilo personale Luciano"
+      ]
+    },
+    "contesto_mercato_regole": {
+      "ribasso_soglia_pct": -1.5,
+      "rialzo_soglia_pct": 1.5,
+      "ribasso_tema_preferito": "SALARY_TRAP",
+      "rialzo_tema_preferito": "WEALTHOS_PROMO",
+      "neutro_tema_preferito": "TREND_MOBILIARE",
+      "nota": "Il sentiment di mercato amplifica la risonanza emotiva del messaggio. Adattare quando possibile senza stravolgere il calendario."
     }
   },
   "empirical": {
