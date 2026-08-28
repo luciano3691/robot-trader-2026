@@ -1,0 +1,84 @@
+# PROGRAMMA DI LAVORO — RT2026 / FVC
+**Aggiornato:** 2026-08-28 | **Lancio:** 1 settembre 2026
+
+---
+
+## 🔴 URGENTE — entro 1 settembre (4 giorni)
+
+| # | Task | Chi | Note |
+|---|---|---|---|
+| 1 | **WhatsApp verifica SMS** +34 680 67 87 34 | Luciano | Rate limit Meta scaduto — ritentare oggi/domani da Business Manager |
+| 2 | **Facebook Page Token** rinnovare | Elisabetta Iori | developers.facebook.com → app 841836765343945 → genera token 60gg → manda il token a Luciano |
+| 3 | **Instagram** | dipende da #2 | Si sblocca automaticamente dopo token Facebook |
+| 4 | **Task Scheduler sync fatture** | Luciano | Eseguire `installa_sync_fatture.bat` come Amministratore — UNA VOLTA SOLA |
+
+---
+
+## 🟡 SESSIONE PROSSIMA — Social Media
+
+| # | Task | Dettaglio |
+|---|---|---|
+| 5 | **LinkedIn OAuth** | Completare il flusso OAuth — LINKEDIN_ACCESS_TOKEN vuoto nel .env |
+| 6 | **Facebook/Instagram publish** | Collegare publish_to_all_channels() dopo token Facebook rinnovato |
+| 7 | **Test post campagna** | Verificare che il 1° settembre alle 10:00 UTC il post LinkedIn+Facebook parta correttamente |
+
+---
+
+## 🟢 DOPO IL LANCIO
+
+| # | Task |
+|---|---|
+| 8 | Social calendar FR/DE (primo post FR: 2027-01-02) |
+| 9 | Brevo webhook su wealth.fuerteventurecapital.com |
+| 10 | WhatsApp template screener_pronto — attendere approvazione Meta |
+
+---
+
+## ✅ COMPLETATO SESSIONE 2026-08-27/28
+
+| Task | Stato |
+|---|---|
+| Email campagna automatica 250/giorno alle 09:00 UTC — daemon live sul VPS | ✅ |
+| Social post automatico LinkedIn+Facebook alle 10:00 UTC (60min dopo email) | ✅ |
+| Calendario 4 mesi Set-Dic 2026 — 30.500 email pianificate | ✅ |
+| Selettore 5 lingue nell'email (IT/ES/EN/FR/DE) | ✅ |
+| Landing page legge ?lang=XX e si traduce automaticamente | ✅ |
+| Immagine WealthOS (logo W) nelle email ottobre e dicembre | ✅ |
+| Sync fatture VPS → Desktop ogni ora (sync_fatture_vps.ps1) | ✅ |
+| Template CRM B2C salvato in Desktop\CRM & MARKETING B2C\ | ✅ |
+| Fatture VPS 0027/0028/0030/0032 sincronizzate in locale | ✅ |
+
+---
+
+## STATO CANALI SOCIAL (2026-08-28)
+
+| Canale | Stato | Azione |
+|---|---|---|
+| Brevo Email | ✅ LIVE | Nessuna |
+| LinkedIn | ❌ Token mancante | OAuth da completare |
+| Facebook | ❌ Token scaduto (errore 190/492) | Elisabetta → rinnova token |
+| Instagram | ⏳ Dipende da Facebook | — |
+| WhatsApp | ⚠️ DISCONNECTED | Verifica SMS da ritentare |
+
+---
+
+## SEQUENZA AUTOMATICA DAL 1 SETTEMBRE
+
+```
+09:00 UTC  →  250 email SALARY TRAP (IT) ai prospect
+10:00 UTC  →  Post LinkedIn + Facebook (stesso tema)
+```
+Nessuna azione richiesta — daemon già attivo sul VPS.
+
+---
+
+## FILE CHIAVE
+
+| File | Percorso |
+|---|---|
+| Script sync fatture | Desktop\Robot Trader 2026\sync_fatture_vps.ps1 |
+| Installa Task Scheduler | Desktop\Robot Trader 2026\installa_sync_fatture.bat |
+| Calendario campagna email | /root/rt2026/campagna_email_calendar.json (VPS) |
+| Tracker invii mensile | /root/rt2026/campagna_invii_tracker.json (VPS) |
+| Social calendar | /root/rt2026/social_calendar.json (VPS) — 231 post |
+| Template CRM B2C | Desktop\CRM & MARKETING B2C\ |
