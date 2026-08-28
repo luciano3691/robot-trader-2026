@@ -33,6 +33,18 @@
 
 ---
 
+## ✅ COMPLETATO SESSIONE 2026-08-28 (sera)
+
+| Task | Stato |
+|---|---|
+| Fattura PDF — fix layout: logo 54mm spostato (separator y=72, FORNITORE y=76, table min 126) | ✅ |
+| Fattura PDF — "MODALITÀ" con accento corretto | ✅ |
+| Fattura manuale — modal dashboard + POST /api/fatture/manuale + genera_fattura_manuale_pdf() | ✅ |
+| Reset contatore fatture — POST /api/fatture/reset-contatore (azzera + cancella PDF) | ✅ |
+| Deploy su VPS — dashboard.py + html_admin.py via SCP + riavvio | ✅ |
+| CRM & MARKETING B2C — parametrizzazione completa (config.json, .env.example, TEMPLATE KB) | ✅ |
+| ISTRUZIONI_USO.md — sezione QUICK START in cima al file | ✅ |
+
 ## ✅ COMPLETATO SESSIONE 2026-08-28 (pomeriggio)
 
 | Task | Stato |
