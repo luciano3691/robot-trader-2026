@@ -18,9 +18,8 @@
 
 | # | Task | Dettaglio |
 |---|---|---|
-| 5 | **LinkedIn OAuth** | Completare il flusso OAuth — LINKEDIN_ACCESS_TOKEN vuoto nel .env |
-| 6 | **Facebook/Instagram publish** | Collegare publish_to_all_channels() dopo token Facebook rinnovato |
-| 7 | **Test post campagna** | Verificare che il 1° settembre alle 10:00 UTC il post LinkedIn+Facebook parta correttamente |
+| 5 | **Facebook/Instagram publish** | Collegare publish_to_all_channels() dopo token Facebook rinnovato |
+| 6 | **Test post campagna** | Verificare che il 1° settembre alle 10:00 UTC il post LinkedIn (profilo Luciano) + Facebook parta correttamente |
 
 ---
 
@@ -55,7 +54,7 @@
 | Canale | Stato | Azione |
 |---|---|---|
 | Brevo Email | ✅ LIVE | Nessuna |
-| LinkedIn | ❌ Token mancante | OAuth da completare |
+| LinkedIn | ✅ LIVE (profilo Luciano) | Company page: impossibile via API (LinkedIn policy) |
 | Facebook | ❌ Token scaduto (errore 190/492) | Elisabetta → rinnova token |
 | Instagram | ⏳ Dipende da Facebook | — |
 | WhatsApp | ⚠️ DISCONNECTED | Verifica SMS da ritentare |

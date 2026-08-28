@@ -1,0 +1,58 @@
+{
+  "strategic": {
+    "priorita_temi": [
+      "SALARY_TRAP",
+      "WEALTHOS_PROMO",
+      "TREND_MOBILIARE"
+    ],
+    "mercati_target": [
+      "IT",
+      "ES",
+      "EN"
+    ],
+    "obiettivi": "Conversioni RT2026 + WealthOS awareness Q4 2026",
+    "note": "",
+    "soglie": {
+      "open_rate_minimo": 0.15,
+      "click_rate_minimo": 0.02,
+      "unsub_allarme_giornaliero": 10,
+      "giorni_consecutivi_sotto_soglia": 3
+    }
+  },
+  "empirical": {
+    "tema_stats": {},
+    "subject_stats": {},
+    "timing": {
+      "monday": [],
+      "tuesday": [],
+      "wednesday": [],
+      "thursday": [],
+      "friday": [],
+      "saturday": [],
+      "sunday": []
+    },
+    "segment_preferences": {
+      "new": "PAIN_HOOK",
+      "opener": "SOLUTION",
+      "clicker": "CTA",
+      "cold": "SOCIAL_PROOF"
+    },
+    "giorni_consecutivi_sotto_soglia": 0,
+    "campagna_in_pausa": false
+  },
+  "market_context": {
+    "ultimo_aggiornamento": null,
+    "trend": "neutro",
+    "vix_proxy": null,
+    "tema_suggerito": null,
+    "note": ""
+  },
+  "content_evolution": {
+    "variants": {},
+    "test_attivi": [],
+    "test_conclusi": []
+  },
+  "insights": [],
+  "alerts": [],
+  "human_feedback": {}
+}
