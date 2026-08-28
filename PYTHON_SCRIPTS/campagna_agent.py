@@ -26,6 +26,10 @@ BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
 KB_FILE         = os.path.join(BASE_DIR, 'campagna_knowledge.json')
 KPI_FILE        = os.path.join(BASE_DIR, 'campagna_kpi.json')
 SUGGESTIONS_FILE= os.path.join(BASE_DIR, 'campagna_suggestions.json')
+INBOX_FILE      = os.path.join(BASE_DIR, 'agente_inbox.json')
+
+LUCIANO_EMAIL   = 'rioluc63@gmail.com'
+LUCIANO_NOME    = 'Luciano'
 
 BREVO_API_URL   = 'https://api.brevo.com/v3'
 ANTHROPIC_URL   = 'https://api.anthropic.com/v1/messages'
@@ -148,6 +152,309 @@ def _save_suggestions(data: list):
     with open(tmp, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     os.replace(tmp, SUGGESTIONS_FILE)
+
+
+# ── INBOX — canale bidirezionale Agente ↔ Luciano ────────────────────────────
+
+def _load_inbox() -> list:
+    if os.path.exists(INBOX_FILE):
+        with open(INBOX_FILE, encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+
+def _save_inbox(msgs: list):
+    tmp = INBOX_FILE + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(msgs, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, INBOX_FILE)
+
+
+def _next_msg_id(msgs: list) -> str:
+    existing = [int(m['id'].split('_')[1]) for m in msgs if '_' in m.get('id', '')]
+    return f"msg_{max(existing) + 1 if existing else 1}"
+
+
+def send_to_luciano(tipo: str, oggetto: str, body: str,
+                    invia_email: bool = False, dati: dict = None) -> str:
+    """
+    Agente scrive a Luciano.
+    tipo: 'alert_critico' | 'report' | 'suggestion' | 'notifica' | 'briefing'
+    Ritorna l'id del messaggio.
+    """
+    msgs = _load_inbox()
+    msg_id = _next_msg_id(msgs)
+    msgs.append({
+        'id':          msg_id,
+        'da':          'agente',
+        'a':           'luciano',
+        'tipo':        tipo,
+        'oggetto':     oggetto,
+        'body':        body,
+        'dati':        dati or {},
+        'data':        datetime.now().isoformat(),
+        'stato':       'non_letto',
+        'risposta':    None
+    })
+    _save_inbox(msgs)
+
+    # Email per alert critici o su richiesta esplicita
+    if invia_email or tipo == 'alert_critico':
+        _email_to_luciano(oggetto, body, tipo)
+
+    print(f'[Agent→Luciano] {tipo}: {oggetto}', flush=True)
+    return msg_id
+
+
+def read_from_luciano() -> list:
+    """
+    Agente legge i messaggi non elaborati di Luciano alle 08:45.
+    Segna i messaggi come letti e ritorna la lista.
+    """
+    msgs = _load_inbox()
+    da_elaborare = [
+        m for m in msgs
+        if m['da'] == 'luciano' and m.get('stato') == 'non_letto'
+    ]
+    for m in da_elaborare:
+        m['stato'] = 'letto_da_agente'
+    _save_inbox(msgs)
+    return da_elaborare
+
+
+def luciano_scrive(tipo: str, oggetto: str, body: str, dati: dict = None) -> str:
+    """Luciano scrive all agente dalla dashboard."""
+    msgs = _load_inbox()
+    msg_id = _next_msg_id(msgs)
+    msgs.append({
+        'id':      msg_id,
+        'da':      'luciano',
+        'a':       'agente',
+        'tipo':    tipo,
+        'oggetto': oggetto,
+        'body':    body,
+        'dati':    dati or {},
+        'data':    datetime.now().isoformat(),
+        'stato':   'non_letto'
+    })
+    _save_inbox(msgs)
+    print(f'[Luciano→Agent] {tipo}: {oggetto}', flush=True)
+    return msg_id
+
+
+def luciano_risponde(msg_id: str, risposta: str, azione: str = None) -> bool:
+    """
+    Luciano risponde a un messaggio dell agente.
+    azione: 'approva' | 'rifiuta' | 'nota' | None
+    """
+    msgs = _load_inbox()
+    for m in msgs:
+        if m['id'] == msg_id and m['da'] == 'agente':
+            m['stato']   = 'risposto'
+            m['risposta'] = risposta
+            m['azione']  = azione
+            m['risposto_il'] = datetime.now().isoformat()
+            _save_inbox(msgs)
+
+            # Applica azione alla KB se necessario
+            if azione == 'approva':
+                _applica_approvazione(m)
+            elif azione == 'rifiuta':
+                _applica_rifiuto(m)
+            return True
+    return False
+
+
+def luciano_segna_letto(msg_id: str) -> bool:
+    msgs = _load_inbox()
+    for m in msgs:
+        if m['id'] == msg_id:
+            m['stato'] = 'letto'
+            _save_inbox(msgs)
+            return True
+    return False
+
+
+def _applica_approvazione(msg: dict):
+    """Applica l approvazione di Luciano alla KB."""
+    kb   = _load_kb()
+    dati = msg.get('dati', {})
+    tipo = msg.get('tipo', '')
+
+    if tipo == 'suggestion' and dati.get('tipo') == 'ab_test_vincitore':
+        # Adotta il soggetto vincitore come standard nel calendario
+        print(f'[Agent] Approvazione ricevuta: adotto "{dati.get("vincitore")}"', flush=True)
+
+    elif tipo == 'suggestion' and 'priorita_temi' in dati:
+        # Aggiorna priorità temi nello strato strategic
+        kb['strategic']['priorita_temi'] = dati['priorita_temi']
+        kb['insights'].append({
+            'data':  date.today().isoformat(),
+            'tipo':  'strategic_update',
+            'msg':   'Priorita temi aggiornate da Luciano',
+            'dati':  dati
+        })
+        _save_kb(kb)
+
+    elif tipo == 'suggestion' and dati.get('tipo') == 'pausa_campagna':
+        kb['empirical']['campagna_in_pausa'] = False
+        _save_kb(kb)
+        print('[Agent] Campagna RIPRESA su approvazione Luciano', flush=True)
+
+
+def _applica_rifiuto(msg: dict):
+    """Registra il rifiuto nella KB come feedback."""
+    kb = _load_kb()
+    kb['human_feedback'][msg['id']] = {
+        'tipo':    msg.get('tipo'),
+        'oggetto': msg.get('oggetto'),
+        'motivo':  msg.get('risposta', ''),
+        'data':    date.today().isoformat()
+    }
+    _save_kb(kb)
+
+
+def _email_to_luciano(oggetto: str, body: str, tipo: str):
+    """Invia email a Luciano via Brevo per alert critici."""
+    api_key = _brevo_key()
+    if not api_key:
+        return
+    try:
+        emoji_map = {
+            'alert_critico': '🚨',
+            'report':        '📊',
+            'suggestion':    '💡',
+            'notifica':      '🔔',
+            'briefing':      '📋'
+        }
+        icon = emoji_map.get(tipo, '🤖')
+        html = f"""
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0f1e;color:#e2e8f0;padding:24px;border-radius:8px">
+          <div style="color:#F6AD55;font-size:18px;font-weight:bold;margin-bottom:16px">
+            {icon} Agente RT2026 — {oggetto}
+          </div>
+          <div style="background:#1a2235;padding:16px;border-radius:6px;white-space:pre-wrap;font-size:14px;line-height:1.6">
+{body}
+          </div>
+          <div style="margin-top:16px;font-size:12px;color:#718096">
+            <a href="https://trader.fuerteventurecapital.com/admin" style="color:#F6AD55">
+              Apri Dashboard →
+            </a>
+            &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')} UTC
+          </div>
+        </div>"""
+
+        requests.post(
+            f'{BREVO_API_URL}/smtp/email',
+            headers={'api-key': api_key, 'Content-Type': 'application/json'},
+            json={
+                'sender':  {'name': 'Agente RT2026', 'email': 'noreply@fuerteventurecapital.com'},
+                'to':      [{'email': LUCIANO_EMAIL, 'name': LUCIANO_NOME}],
+                'subject': f'[RT2026] {icon} {oggetto}',
+                'htmlContent': html
+            },
+            timeout=10
+        )
+        print(f'[Agent] Email inviata a {LUCIANO_EMAIL}: {oggetto}', flush=True)
+    except Exception as e:
+        print(f'[Agent] Errore email a Luciano: {e}', flush=True)
+
+
+def apply_luciano_instructions(istruzioni: list, kb: dict):
+    """
+    Elabora le istruzioni di Luciano lette alle 08:45.
+    Aggiorna la KB in base al contenuto.
+    """
+    for msg in istruzioni:
+        tipo  = msg.get('tipo', '')
+        body  = msg.get('body', '')
+        dati  = msg.get('dati', {})
+
+        if tipo == 'aggiorna_priorita':
+            if 'priorita_temi' in dati:
+                kb['strategic']['priorita_temi'] = dati['priorita_temi']
+                print(f'[Agent] Priorita temi aggiornate: {dati["priorita_temi"]}', flush=True)
+
+        elif tipo == 'aggiorna_obiettivo':
+            kb['strategic']['obiettivi'] = body
+            print(f'[Agent] Obiettivo aggiornato: {body[:80]}', flush=True)
+
+        elif tipo == 'pausa_campagna':
+            kb['empirical']['campagna_in_pausa'] = True
+            print('[Agent] Campagna messa in PAUSA da Luciano', flush=True)
+
+        elif tipo == 'riprendi_campagna':
+            kb['empirical']['campagna_in_pausa'] = False
+            kb['empirical']['giorni_consecutivi_sotto_soglia'] = 0
+            print('[Agent] Campagna RIPRESA da Luciano', flush=True)
+
+        elif tipo == 'aggiorna_soglia':
+            if 'open_rate_minimo' in dati:
+                kb['strategic']['soglie']['open_rate_minimo'] = dati['open_rate_minimo']
+            if 'unsub_allarme_giornaliero' in dati:
+                kb['strategic']['soglie']['unsub_allarme_giornaliero'] = dati['unsub_allarme_giornaliero']
+            print(f'[Agent] Soglie aggiornate: {dati}', flush=True)
+
+        elif tipo == 'nota':
+            kb['strategic']['note'] = body
+            print(f'[Agent] Nota strategica aggiornata', flush=True)
+
+        elif tipo == 'forza_tema':
+            if 'tema' in dati:
+                kb['strategic']['tema_forzato_oggi'] = dati['tema']
+                print(f'[Agent] Tema forzato per oggi: {dati["tema"]}', flush=True)
+
+        # Conferma ricezione
+        send_to_luciano(
+            tipo='notifica',
+            oggetto=f'Istruzione ricevuta: {msg.get("oggetto", tipo)}',
+            body=f'Ho ricevuto ed elaborato la tua istruzione alle {datetime.now().strftime("%H:%M")}.\n\nApplicata alla prossima decisione.',
+            invia_email=False
+        )
+
+    if istruzioni:
+        _save_kb(kb)
+
+
+def send_daily_briefing(giorno: dict, agent_result: dict):
+    """Invia briefing mattutino a Luciano con il piano del giorno."""
+    stats  = agent_result.get('stats_ieri', {})
+    market = agent_result.get('market_context', {})
+    alerts = agent_result.get('alerts', [])
+
+    open_r  = stats.get('open_rate', 0) * 100
+    click_r = stats.get('click_rate', 0) * 100
+    sent    = stats.get('sent', 0)
+
+    alert_txt = ''
+    if alerts:
+        alert_txt = '\n\n⚠️ ALERT:\n' + '\n'.join(f"- {a['msg']}" for a in alerts)
+
+    body = (
+        f"PIANO DI OGGI — {date.today().strftime('%d/%m/%Y')}\n"
+        f"{'─'*40}\n"
+        f"Tema:     {giorno.get('tema', '-')}\n"
+        f"Lingua:   {giorno.get('lang', '-')}\n"
+        f"Soggetto: {agent_result.get('subject', '-')}\n"
+        f"Invii:    250 prospect\n\n"
+        f"IERI:\n"
+        f"{'─'*40}\n"
+        f"Inviati:   {sent}\n"
+        f"Open rate: {open_r:.1f}%\n"
+        f"Click rate:{click_r:.1f}%\n"
+        f"Disiscritti: {stats.get('unsubscribed', 0)}\n\n"
+        f"MERCATO:\n"
+        f"{'─'*40}\n"
+        f"Trend S&P500: {market.get('trend', 'neutro').upper()} "
+        f"({market.get('change_pct_1d', 0):+.1f}%)\n"
+        f"Tema suggerito: {market.get('tema_suggerito', 'nessuno')}"
+        f"{alert_txt}\n\n"
+        f"Reasoning: {agent_result.get('reasoning', '-')}"
+    )
+
+    # Briefing solo in inbox (no email — è giornaliero, non critico)
+    send_to_luciano('briefing', f"Briefing {date.today().strftime('%d/%m')}", body,
+                    invia_email=False)
 
 
 # ── Brevo API ─────────────────────────────────────────────────────────────────
@@ -664,6 +971,13 @@ def run_morning_analysis(giorno: dict) -> dict:
     print('[Agent] === ANALISI MATTUTINA ===', flush=True)
     kb = _load_kb()
 
+    # 0. Legge istruzioni di Luciano e le applica PRIMA di tutto
+    istruzioni = read_from_luciano()
+    if istruzioni:
+        print(f'[Agent] {len(istruzioni)} istruzioni da Luciano — le applico', flush=True)
+        apply_luciano_instructions(istruzioni, kb)
+        kb = _load_kb()  # ricarica dopo aggiornamenti
+
     # 1. Stats ieri
     stats = fetch_yesterday_stats()
     print(f'[Agent] Ieri: sent={stats["sent"]} open={stats["open_rate"]*100:.1f}% '
@@ -738,17 +1052,35 @@ def run_morning_analysis(giorno: dict) -> dict:
     # 11. Salva KB aggiornata
     _save_kb(kb)
 
+    result = {
+        'subject':    soggetto_oggi,
+        'reasoning':  reasoning,
+        'alerts':     alerts,
+        'stats_ieri': stats,
+        'market':     market,
+        'in_pausa':   kb['empirical'].get('campagna_in_pausa', False)
+    }
+
+    # 12. Briefing giornaliero in inbox (no email — solo dashboard)
+    try:
+        send_daily_briefing(giorno, result)
+    except Exception as e:
+        print(f'[Agent] briefing errore: {e}', flush=True)
+
+    # 13. Alert critici → email a Luciano
+    for alert in alerts:
+        if alert.get('richiede_umano'):
+            send_to_luciano(
+                tipo='alert_critico',
+                oggetto=alert['msg'],
+                body=f"{alert['msg']}\n\nAzione consigliata: {alert.get('azione', '-')}\n\nApri la dashboard per gestire l'alert.",
+                invia_email=True,
+                dati=alert
+            )
+
     print(f'[Agent] Decisione: {reasoning}', flush=True)
     print('[Agent] === ANALISI COMPLETATA ===', flush=True)
-
-    return {
-        'subject':   soggetto_oggi,
-        'reasoning': reasoning,
-        'alerts':    alerts,
-        'stats_ieri': stats,
-        'market':    market,
-        'in_pausa':  kb['empirical'].get('campagna_in_pausa', False)
-    }
+    return result
 
 
 def get_dashboard_data() -> dict:
@@ -763,6 +1095,9 @@ def get_dashboard_data() -> dict:
     # Alert attivi non risolti
     alert_attivi = [a for a in kb.get('alerts', []) if not a.get('risolto')]
 
+    inbox = _load_inbox()
+    inbox_non_letti = [m for m in inbox if m['da'] == 'agente' and m['stato'] == 'non_letto']
+
     return {
         'kb_strategic':     kb.get('strategic', {}),
         'kb_empirical':     kb.get('empirical', {}),
@@ -773,5 +1108,7 @@ def get_dashboard_data() -> dict:
         'kpi_totale':       len(kpi),
         'suggestions':      [s for s in sug if s.get('stato') == 'in_attesa'],
         'alerts_attivi':    alert_attivi,
-        'ultimo_kpi':       kpi[-1] if kpi else None
+        'ultimo_kpi':       kpi[-1] if kpi else None,
+        'inbox':            inbox[-50:],
+        'inbox_non_letti':  len(inbox_non_letti)
     }
