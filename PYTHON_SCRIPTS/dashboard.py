@@ -105,6 +105,7 @@ REPORTS_PDF_DIR = os.path.join(os.path.dirname(BASE_DIR), "REPORTS_PDF")
 os.makedirs(REPORTS_PDF_DIR, exist_ok=True)
 FATTURE_COUNTER = os.path.join(BASE_DIR, "fatture_counter.json")
 ORDINI_DIR    = os.path.join(BASE_DIR, "ORDINI")
+BANCHE_EU_PATH = os.path.join(BASE_DIR, "banche_eu.json")
 PARAMETRI_FILE= os.path.join(BASE_DIR, "parametri.json")
 SERVIZI_FILE  = os.path.join(BASE_DIR, "servizi_config.json")
 CLIENTI_FILE  = os.path.join(BASE_DIR, "clienti.json")
@@ -168,6 +169,12 @@ def _rl_fail(ip: str):
         _LOGIN_ATTEMPTS[ip] = []
         print(f"[SECURITY] IP {ip} bloccato per 30 minuti ({_RL_MAX_ATTEMPTS} tentativi falliti)", flush=True)
         _save_rl_blocks()
+
+def _get_real_ip(handler) -> str:
+    xff = handler.headers.get('X-Forwarded-For', '')
+    if xff:
+        return xff.split(',')[0].strip()
+    return handler.client_address[0]
 
 def _rl_ok(ip: str):
     """Azzera i tentativi dopo un login riuscito."""
@@ -308,6 +315,163 @@ def _campagna_save_tracker(data):
         json.dump(data, f, indent=2, ensure_ascii=False)
     os.replace(tmp, CAMPAGNA_TRACKER_FILE)
 
+
+
+# ── FVC LEADS EMAIL ─────────────────────────────────────────
+_ONBOARDING_IT = """
+<p>Gentile {nome},</p>
+<p>Grazie per il suo interesse in <strong>Fuerte Venture Capital SL</strong>.<br>
+Il team di investment banking prenderà in carico la sua richiesta entro 24 ore lavorative.</p>
+<p>In allegato trova il manuale di onboarding con tutti i dettagli sul nostro portale.</p>
+<p>Per qualsiasi esigenza: <a href="mailto:info@fuerteventurecapital.com">info@fuerteventurecapital.com</a></p>
+<br><p><em>Fuerte Venture Capital SL — CIF B23881691<br>
+Canary Islands Special Economic Zone (ZEC) — 4% Corporate Tax</em></p>
+"""
+
+_ONBOARDING_EN = """
+<p>Dear {nome},</p>
+<p>Thank you for your interest in <strong>Fuerte Venture Capital SL</strong>.<br>
+Our investment banking team will process your request within 24 business hours.</p>
+<p>Enclosed you will find our onboarding manual with full portal details.</p>
+<p>For any enquiries: <a href="mailto:info@fuerteventurecapital.com">info@fuerteventurecapital.com</a></p>
+<br><p><em>Fuerte Venture Capital SL — CIF B23881691<br>
+Canary Islands Special Economic Zone (ZEC) — 4% Corporate Tax</em></p>
+"""
+
+_ONBOARDING_DE = """
+<p>Sehr geehrte/r {nome},</p>
+<p>Vielen Dank für Ihr Interesse an <strong>Fuerte Venture Capital SL</strong>.<br>
+Unser Investment-Banking-Team wird Ihre Anfrage innerhalb von 24 Werktagen bearbeiten.</p>
+<p>Im Anhang finden Sie unser Onboarding-Handbuch mit allen Portal-Details.</p>
+<p>Für Rückfragen: <a href="mailto:info@fuerteventurecapital.com">info@fuerteventurecapital.com</a></p>
+<br><p><em>Fuerte Venture Capital SL — CIF B23881691<br>
+Kanarische Sonderzone (ZEC) — 4% Körperschaftsteuer</em></p>
+"""
+
+_ONBOARDING_FR = """
+<p>Cher/Chère {nome},</p>
+<p>Merci pour l'intérêt que vous portez à <strong>Fuerte Venture Capital SL</strong>.<br>
+Notre équipe de banque d'investissement traitera votre demande sous 24 heures ouvrées.</p>
+<p>Vous trouverez ci-joint notre manuel d'onboarding avec tous les détails du portail.</p>
+<p>Pour toute question : <a href="mailto:info@fuerteventurecapital.com">info@fuerteventurecapital.com</a></p>
+<br><p><em>Fuerte Venture Capital SL — CIF B23881691<br>
+Zone Spéciale Canarienne (ZEC) — 4% d'Impôt sur les Sociétés</em></p>
+"""
+
+_ONBOARDING_ES = """
+<p>Estimado/a {nome},</p>
+<p>Gracias por su interés en <strong>Fuerte Venture Capital SL</strong>.<br>
+Nuestro equipo de banca de inversión procesará su solicitud en 24 horas hábiles.</p>
+<p>Adjunto encontrará nuestro manual de onboarding con todos los detalles del portal.</p>
+<p>Para cualquier consulta: <a href="mailto:info@fuerteventurecapital.com">info@fuerteventurecapital.com</a></p>
+<br><p><em>Fuerte Venture Capital SL — CIF B23881691<br>
+Zona Especial Canaria (ZEC) — 4% Impuesto de Sociedades</em></p>
+"""
+
+_ONBOARDING_SUBJ = {
+    "it": "Benvenuto in Fuerte Venture Capital SL — Conferma Registrazione",
+    "en": "Welcome to Fuerte Venture Capital SL — Registration Confirmed",
+    "de": "Willkommen bei Fuerte Venture Capital SL — Registrierung bestätigt",
+    "fr": "Bienvenue chez Fuerte Venture Capital SL — Inscription confirmée",
+    "es": "Bienvenido a Fuerte Venture Capital SL — Registro Confirmado",
+}
+
+_ONBOARDING_BODY = {
+    "it": _ONBOARDING_IT,
+    "en": _ONBOARDING_EN,
+    "de": _ONBOARDING_DE,
+    "fr": _ONBOARDING_FR,
+    "es": _ONBOARDING_ES,
+}
+
+_ONBOARDING_FILES = {
+    "it": "/root/rt2026/onboarding/manuale_utente_it.md",
+    "en": "/root/rt2026/onboarding/manuale_utente_en.md",
+    "de": "/root/rt2026/onboarding/manuale_utente_de.md",
+    "fr": "/root/rt2026/onboarding/manuale_utente_fr.md",
+    "es": "/root/rt2026/onboarding/manuale_utente_es.md",
+}
+
+def _fvc_notifica_admin(lead):
+    """Invia notifica immediata all'admin per nuovo lead FVC."""
+    tipo = lead.get("tipo", "investitore").capitalize()
+    nome = lead.get("nome", "")
+    email = lead.get("email", "")
+    telefono = lead.get("telefono", "—")
+    lingua = lead.get("lingua", "it").upper()
+    note = lead.get("note", "—")
+    ticket = lead.get("ticket", "—")
+    azienda = lead.get("azienda", "—")
+    ts = lead.get("ts", "")
+    bp_file = lead.get("bp_filename", "")
+    bp_info = f"<br><strong>Business Plan:</strong> {bp_file}" if bp_file else ""
+    html = f"""
+<div style="font-family:Arial,sans-serif;background:#0c1e3a;padding:20px;border-radius:8px">
+<h2 style="color:#b3975a;margin:0 0 16px">&#128188; Nuovo Lead FVC — {tipo}</h2>
+<table style="color:#fff;border-collapse:collapse;width:100%">
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a;width:150px">Tipo</td>
+    <td style="padding:6px 12px">{tipo}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Nome</td>
+    <td style="padding:6px 12px">{nome}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Email</td>
+    <td style="padding:6px 12px"><a href="mailto:{email}" style="color:#b3975a">{email}</a></td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Telefono</td>
+    <td style="padding:6px 12px">{telefono}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Azienda</td>
+    <td style="padding:6px 12px">{azienda}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Ticket</td>
+    <td style="padding:6px 12px">{ticket}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Lingua</td>
+    <td style="padding:6px 12px">{lingua}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Note</td>
+    <td style="padding:6px 12px">{note}</td></tr>
+<tr><td style="padding:6px 12px;font-weight:bold;color:#b3975a">Data</td>
+    <td style="padding:6px 12px">{ts}</td></tr>
+</table>
+{bp_info}
+<p style="color:#aaa;font-size:12px;margin-top:16px">Fuerte Venture Capital SL — RT2026 Platform</p>
+</div>"""
+    try:
+        _campagna_send_one(
+            "info@fuerteventurecapital.com",
+            "Admin FVC",
+            f"[FVC Lead] {tipo} — {nome} ({lingua})",
+            html
+        )
+    except Exception as e:
+        log(f"[FVC] notifica admin error: {e}")
+
+def _fvc_benvenuto_lead(lead):
+    """Invia email di benvenuto al lead con manuale onboarding."""
+    lingua = lead.get("lingua", "it").lower()
+    if lingua not in _ONBOARDING_BODY:
+        lingua = "en"
+    nome = lead.get("nome", "")
+    email = lead.get("email", "")
+    subj = _ONBOARDING_SUBJ.get(lingua, _ONBOARDING_SUBJ["en"])
+    body_tmpl = _ONBOARDING_BODY.get(lingua, _ONBOARDING_BODY["en"])
+    body_html = f"""
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+<div style="background:#0c1e3a;padding:24px;text-align:center">
+<h1 style="color:#b3975a;margin:0;font-size:22px">FUERTE VENTURE CAPITAL SL</h1>
+<p style="color:#aaa;margin:4px 0 0;font-size:12px">CIF B23881691 — Canary Islands, Spain</p>
+</div>
+<div style="padding:24px;background:#f9f9f9;color:#333">
+{body_tmpl.format(nome=nome)}
+</div>
+<div style="background:#0c1e3a;padding:12px;text-align:center">
+<p style="color:#aaa;font-size:11px;margin:0">
+www.fuerteventurecapital.com &nbsp;|&nbsp; info@fuerteventurecapital.com
+</p>
+</div>
+</div>"""
+    try:
+        _campagna_send_one(email, nome, subj, body_html)
+    except Exception as e:
+        log(f"[FVC] benvenuto lead error: {e}")
+
+# ── END FVC LEADS EMAIL ─────────────────────────────────────
+
 def _campagna_send_one(email, nome, subject, html_body):
     """Invia una singola email transazionale via Brevo REST API."""
     import urllib.request as _ur2
@@ -438,6 +602,107 @@ def _campagna_batch_daily(forzato=False):
         except Exception as e:
             print(f'[CAMPAGNA] Errore batch giornaliero: {e}', flush=True)
 
+
+def _fetch_linkedin_org_stats(force_refresh=False):
+    """Legge stats LinkedIn org via API. Cache 6h in social_stats.json."""
+    import urllib.request as _ur, urllib.error as _ue, urllib.parse as _up
+    stats_path = os.path.join(BASE_DIR, 'social_stats.json')
+    if not force_refresh and os.path.exists(stats_path):
+        try:
+            with open(stats_path, encoding='utf-8') as _f:
+                cached = json.load(_f)
+            from datetime import datetime as _dt2
+            fetched = _dt2.fromisoformat(cached.get('fetched_at', '2000-01-01'))
+            if (_dt2.now() - fetched).total_seconds() < 21600:
+                return cached
+        except Exception:
+            pass
+    # Legge token da os.environ o direttamente da .env
+    def _env_val(key):
+        v = os.environ.get(key, '')
+        if v: return v
+        try:
+            ep = os.path.join(BASE_DIR, '.env')
+            for ln in open(ep, encoding='utf-8'):
+                ln = ln.strip()
+                if ln.startswith(key + '='):
+                    return ln.split('=', 1)[1].strip()
+        except Exception:
+            pass
+        return ''
+    li_token = _env_val('LINKEDIN_ACCESS_TOKEN')
+    org_id   = _env_val('LINKEDIN_ORG_ID')
+    if not li_token or not org_id:
+        return {'ok': False, 'error': 'LINKEDIN_ACCESS_TOKEN o LINKEDIN_ORG_ID mancante in .env'}
+    org_urn = 'urn:li:organization:' + org_id
+    url = ('https://api.linkedin.com/v2/organizationalEntityShareStatistics'
+           '?q=organizationalEntity&organizationalEntity=' + _up.quote(org_urn, safe=''))
+    try:
+        req = _ur.Request(url, headers={
+            'Authorization': 'Bearer ' + li_token,
+            'X-Restli-Protocol-Version': '2.0.0',
+        })
+        with _ur.urlopen(req, timeout=12) as resp:
+            data = json.loads(resp.read().decode())
+    except _ue.HTTPError as ex:
+        err_body = ex.read().decode()
+        api_error = 'HTTP ' + str(ex.code) + ': ' + err_body[:300]
+        data = None
+    except Exception as ex:
+        api_error = str(ex)
+        data = None
+    else:
+        api_error = None
+    elements = (data.get('elements', []) if data else [])
+    totals = elements[0].get('totalShareStatistics', {}) if elements else {}
+    # Carica post pubblicati dai draft per mostrare la lista con share URN
+    drafts_dir = os.path.join(BASE_DIR, 'SOCIAL_DRAFTS')
+    post_list = []
+    if os.path.isdir(drafts_dir):
+        for fname in sorted(os.listdir(drafts_dir), reverse=True):
+            if not fname.startswith('draft_') or not fname.endswith('.json'):
+                continue
+            try:
+                with open(os.path.join(drafts_dir, fname), encoding='utf-8') as _f:
+                    d = json.load(_f)
+                if d.get('status') == 'published':
+                    pr = d.get('publish_results', {})
+                    li_res = pr.get('linkedin', {})
+                    share_urn = li_res.get('share_urn') or li_res.get('id') or ''
+                    post_list.append({
+                        'draft_id':     d.get('draft_id', ''),
+                        'date':         d.get('date', ''),
+                        'theme':        d.get('theme', ''),
+                        'lang':         d.get('lang', ''),
+                        'share_urn':    share_urn,
+                        'text_preview': (d.get('text_it') or d.get('text_es') or d.get('text_main', ''))[:100],
+                    })
+            except Exception:
+                continue
+    result = {
+        'ok': True,
+        'api_ok': api_error is None,
+        'fetched_at': datetime.now().isoformat(),
+        'org_id': org_id,
+        'totals': {
+            'impressionCount':        totals.get('impressionCount', 0),
+            'uniqueImpressionsCount': totals.get('uniqueImpressionsCount', 0),
+            'likeCount':              totals.get('likeCount', 0),
+            'commentCount':           totals.get('commentCount', 0),
+            'shareCount':             totals.get('shareCount', 0),
+            'clickCount':             totals.get('clickCount', 0),
+            'engagement':             round(totals.get('engagement', 0.0) * 100, 2),
+        },
+        'posts': post_list[:20],
+        'api_error': api_error,
+    }
+    try:
+        with open(stats_path, 'w', encoding='utf-8') as _f:
+            json.dump(result, _f, indent=2)
+    except Exception:
+        pass
+    return result
+
 def _campagna_social_post():
     """Pubblica su LinkedIn+Facebook il post campagna del giorno (10:00 UTC)."""
     try:
@@ -492,6 +757,25 @@ _t_campagna.start()
 _clienti_lock  = threading.Lock()
 _fatture_lock  = threading.Lock()
 _prospect_lock = threading.Lock()
+
+FVC_LEADS_FILE = "/root/rt2026/fvc_leads.json"
+_fvc_leads_lock = threading.Lock()
+
+def read_fvc_leads():
+    with _fvc_leads_lock:
+        if not os.path.exists(FVC_LEADS_FILE):
+            return []
+        try:
+            with open(FVC_LEADS_FILE, "r", encoding="utf-8") as _f:
+                return json.load(_f)
+        except Exception:
+            return []
+
+def save_fvc_leads(leads):
+    with _fvc_leads_lock:
+        with open(FVC_LEADS_FILE, "w", encoding="utf-8") as _f:
+            json.dump(leads, _f, ensure_ascii=False, indent=2)
+
 
 
 
@@ -836,6 +1120,37 @@ def _invia_email_credenziali(nome, email, piani_label, password_temp, pdf_bytes=
     </table>
   </td></tr>
 </table>
+<script>
+var T_ac={{
+  it:{{area_subtitle:'Area Riservata Investitori',logout:'Esci',pwa_title:'Installa Robot Trader 2026',pwa_sub:'Accedi ai tuoi report dalla schermata home',pwa_install:'⬇ Installa',welcome:'Benvenuto',reports_sub:'I tuoi report sono aggiornati ogni lunedì mattina',screener_title:'I tuoi screener',my_orders:'📋 I miei Ordini',no_orders:'Nessun ordine ancora inviato.',add_services_btn:'➕ Aggiungi Servizi',add_services_title:'Aggiungi Servizi',confirm:'Conferma',cancel:'Annulla',no_plan:'nessun piano attivo',download_pdf:'⬇ Scarica PDF',download:'⬇ Scarica',no_report:'Nessun report disponibile',upgrade:'⬆ Upgrade',open_link:'Apri →',change_pwd:'🔑 Modifica password',disclaimer_title:'⚠ SaaS · Non Consulenza Finanziaria',saved_banks:'🏦 Banche Salvate',platforms:'💹 Piattaforme / Broker',bank_order:'✉ Ordine Bancario',platform_order:'📱 Ordine Piattaforma',select_plan:'Aggiungi Piano',upgrade_plan:'Upgrade Piano',level_basic:'BASIC — Accesso base',level_pro:'PRO — Analisi avanzate',level_value:'VALUE — Suite completa',service_lbl:'Servizio: ',current_plan:'Piano attuale: ',select_level:'Seleziona livello',modal_service_lbl:'Servizio aggiuntivo'}},
+  en:{{area_subtitle:'Investors Reserved Area',logout:'Log out',pwa_title:'Install Robot Trader 2026',pwa_sub:'Access your reports from the home screen',pwa_install:'⬇ Install',welcome:'Welcome',reports_sub:'Your reports are updated every Monday morning',screener_title:'Your screeners',my_orders:'📋 My Orders',no_orders:'No orders sent yet.',add_services_btn:'➕ Add Services',add_services_title:'Add Services',confirm:'Confirm',cancel:'Cancel',no_plan:'no active plan',download_pdf:'⬇ Download PDF',download:'⬇ Download',no_report:'No report available',upgrade:'⬆ Upgrade',open_link:'Open →',change_pwd:'🔑 Change password',disclaimer_title:'⚠ SaaS · Not Financial Advice',saved_banks:'🏦 Saved Banks',platforms:'💹 Platforms / Brokers',bank_order:'✉ Bank Order',platform_order:'📱 Platform Order',select_plan:'Add Plan',upgrade_plan:'Upgrade Plan',level_basic:'BASIC — Basic access',level_pro:'PRO — Advanced analysis',level_value:'VALUE — Complete suite',service_lbl:'Service: ',current_plan:'Current plan: ',select_level:'Select level',modal_service_lbl:'Additional service'}},
+  de:{{area_subtitle:'Reservierter Investorenbereich',logout:'Abmelden',pwa_title:'Robot Trader 2026 installieren',pwa_sub:'Berichte vom Startbildschirm abrufen',pwa_install:'⬇ Installieren',welcome:'Willkommen',reports_sub:'Ihre Berichte werden jeden Montag Morgen aktualisiert',screener_title:'Ihre Screener',my_orders:'📋 Meine Aufträge',no_orders:'Noch keine Aufträge gesendet.',add_services_btn:'➕ Dienste hinzufügen',add_services_title:'Dienste hinzufügen',confirm:'Bestätigen',cancel:'Abbrechen',no_plan:'kein aktiver Plan',download_pdf:'⬇ PDF herunterladen',download:'⬇ Herunterladen',no_report:'Kein Bericht verfügbar',upgrade:'⬆ Upgrade',open_link:'Öffnen →',change_pwd:'🔑 Passwort ändern',disclaimer_title:'⚠ SaaS · Keine Finanzberatung',saved_banks:'🏦 Gespeicherte Banken',platforms:'💹 Plattformen / Broker',bank_order:'✉ Bankauftrag',platform_order:'📱 Plattformauftrag',select_plan:'Plan hinzufügen',upgrade_plan:'Plan upgraden',level_basic:'BASIC — Basiszugang',level_pro:'PRO — Erweiterte Analyse',level_value:'VALUE — Komplettpaket',service_lbl:'Dienst: ',current_plan:'Aktueller Plan: ',select_level:'Ebene auswählen',modal_service_lbl:'Zusatzdienst'}},
+  fr:{{area_subtitle:'Espace Réservé Investisseurs',logout:'Déconnexion',pwa_title:'Installer Robot Trader 2026',pwa_sub:"Accédez à vos rapports depuis l'écran d'accueil",pwa_install:'⬇ Installer',welcome:'Bienvenue',reports_sub:'Vos rapports sont mis à jour chaque lundi matin',screener_title:'Vos screeners',my_orders:'📋 Mes Ordres',no_orders:'Aucun ordre envoyé pour le moment.',add_services_btn:'➕ Ajouter des services',add_services_title:'Ajouter des services',confirm:'Confirmer',cancel:'Annuler',no_plan:'aucun plan actif',download_pdf:'⬇ Télécharger PDF',download:'⬇ Télécharger',no_report:'Aucun rapport disponible',upgrade:'⬆ Améliorer',open_link:'Ouvrir →',change_pwd:'🔑 Modifier le mot de passe',disclaimer_title:'⚠ SaaS · Pas de conseil financier',saved_banks:'🏦 Banques enregistrées',platforms:'💹 Plateformes / Courtiers',bank_order:'✉ Ordre bancaire',platform_order:'📱 Ordre de plateforme',select_plan:'Ajouter un plan',upgrade_plan:'Améliorer le plan',level_basic:'BASIC — Accès de base',level_pro:'PRO — Analyses avancées',level_value:'VALUE — Suite complète',service_lbl:'Service : ',current_plan:'Plan actuel : ',select_level:'Sélectionner le niveau',modal_service_lbl:'Service supplémentaire'}},
+  es:{{area_subtitle:'Área Reservada Inversores',logout:'Salir',pwa_title:'Instalar Robot Trader 2026',pwa_sub:'Accede a tus informes desde la pantalla de inicio',pwa_install:'⬇ Instalar',welcome:'Bienvenido',reports_sub:'Tus informes se actualizan cada lunes por la mañana',screener_title:'Tus screeners',my_orders:'📋 Mis Órdenes',no_orders:'No hay órdenes enviadas todavía.',add_services_btn:'➕ Añadir servicios',add_services_title:'Añadir servicios',confirm:'Confirmar',cancel:'Cancelar',no_plan:'ningún plan activo',download_pdf:'⬇ Descargar PDF',download:'⬇ Descargar',no_report:'Sin informe disponible',upgrade:'⬆ Mejorar',open_link:'Abrir →',change_pwd:'🔑 Cambiar contraseña',disclaimer_title:'⚠ SaaS · No es asesoramiento financiero',saved_banks:'🏦 Bancos guardados',platforms:'💹 Plataformas / Brokers',bank_order:'✉ Orden bancaria',platform_order:'📱 Orden de plataforma',select_plan:'Añadir plan',upgrade_plan:'Mejorar plan',level_basic:'BASIC — Acceso básico',level_pro:'PRO — Análisis avanzado',level_value:'VALUE — Suite completa',service_lbl:'Servicio: ',current_plan:'Plan actual: ',select_level:'Seleccionar nivel',modal_service_lbl:'Servicio adicional'}}
+}};
+function setAreaLang(l){{
+  var valid=['it','en','de','fr','es'];
+  if(!valid.includes(l))l='it';
+  var t=T_ac[l];
+  valid.forEach(function(lang){{var b=document.getElementById('ac-btn-'+lang);if(b)b.classList.toggle('act-l',lang===l);}});
+  document.querySelectorAll('[data-t]').forEach(function(el){{
+    var k=el.getAttribute('data-t');
+    if(t[k]!==undefined)el.textContent=t[k];
+  }});
+  if(typeof _livelloLabels!=='undefined'){{
+    _livelloLabels={{'BASIC':t.level_basic,'PRO':t.level_pro,'VALUE':t.level_value}};
+  }}
+  window._acLang=l;window._acT=t;
+  try{{localStorage.setItem('ac_lang',l);}}catch(e){{}}
+}}
+(function(){{
+  var saved=null;try{{saved=localStorage.getItem('ac_lang');}}catch(e){{}}
+  var valid=['it','en','de','fr','es'];
+  var def='{_client_lang}';
+  var l=valid.includes(saved)?saved:(valid.includes(def)?def:'it');
+  setAreaLang(l);
+}})();
+</script>
 </body></html>"""
     try:
         msg = MIMEMultipart("mixed")
@@ -1477,6 +1792,41 @@ def _delete_profilo(email: str, iban: str) -> None:
     folder = _email_to_folder(email)
     os.makedirs(folder, exist_ok=True)
     with open(_profili_path(email), 'w', encoding='utf-8') as f:
+        json.dump(profili, f, ensure_ascii=False)
+
+# ── Profili Broker / Piattaforme ─────────────────────────────
+def _profili_broker_path(email: str) -> str:
+    return os.path.join(_email_to_folder(email), 'profili_broker.json')
+
+def _load_profili_broker(email: str) -> list:
+    path = _profili_broker_path(email)
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def _save_profilo_broker(email: str, profilo: dict) -> None:
+    nome = (profilo.get('piattaforma') or '').strip().lower()
+    if not nome:
+        return
+    folder = _email_to_folder(email)
+    os.makedirs(folder, exist_ok=True)
+    profili = [p for p in _load_profili_broker(email)
+               if (p.get('piattaforma') or '').strip().lower() != nome]
+    profili.insert(0, profilo)
+    with open(_profili_broker_path(email), 'w', encoding='utf-8') as f:
+        json.dump(profili[:20], f, ensure_ascii=False)
+
+def _delete_profilo_broker(email: str, nome: str) -> None:
+    nome = (nome or '').strip().lower()
+    profili = [p for p in _load_profili_broker(email)
+               if (p.get('piattaforma') or '').strip().lower() != nome]
+    folder = _email_to_folder(email)
+    os.makedirs(folder, exist_ok=True)
+    with open(_profili_broker_path(email), 'w', encoding='utf-8') as f:
         json.dump(profili, f, ensure_ascii=False)
 
 def _leggi_ordini_cliente(email: str) -> list:
@@ -2266,7 +2616,8 @@ def _latest_plan_pdf(tipo, piano):
     prefix_map = {
         "azioni": f"AZIONI_{piano}_Report_",
         "etf":    f"ETF_{piano}_Report_",
-        "fondi":  f"FONDI_{piano}_Report_",
+        "fondi":    f"FONDI_{piano}_Report_",
+        "fondi_eu": f"FONDI_EU_{piano}_Report_",
     }
     prefix = prefix_map.get(tipo)
     if not prefix:
@@ -3518,14 +3869,12 @@ function setLang(l){
   // testi semplici
   document.querySelectorAll('[data-t]').forEach(function(el){
     var k=el.getAttribute('data-t');
-    if(T[l][k]!==undefined && k!=='come_funziona' && k!=='scegli_piano' && k!=='hero_title' && k!=='reg_title' && k!=='reg_gdpr_text') el.textContent=T[l][k];
+    if(T[l][k]!==undefined && k!=='come_funziona' && k!=='scegli_piano' && k!=='hero_title') el.textContent=T[l][k];
   });
   // testi con HTML (span colorato o link)
   document.getElementById('hero-title').innerHTML=T[l]['hero_title'];
   document.querySelector('[data-t="come_funziona"]').innerHTML=T[l]['come_funziona'];
   document.querySelector('[data-t="scegli_piano"]').innerHTML=T[l]['scegli_piano'];
-  document.querySelector('[data-t="reg_title"]').innerHTML=T[l]['reg_title'];
-  document.querySelector('[data-t="reg_gdpr_text"]').innerHTML=T[l]['reg_gdpr_text'];
   // rigenera piani con nuova lingua
   if(servizi) renderPlans();
 }
@@ -6142,6 +6491,10 @@ def _build_area_clienti(email):
         return None
 
     nome = cliente.get('nome', email)
+    # lang detection dal paese del cliente
+    _paese = cliente.get('paese', 'IT').upper()
+    _lang_map_ac = {'IT':'it','ES':'es','FR':'fr','DE':'de','UK':'en','US':'en','AT':'de','CH':'de','BE':'fr','LU':'fr','NL':'en'}
+    _client_lang = _lang_map_ac.get(_paese, 'it')
     piani = {
         'azioni': cliente.get('piano_azioni', 'NONE'),
         'etf':    cliente.get('piano_etf',    'NONE'),
@@ -6200,21 +6553,21 @@ def _build_area_clienti(email):
         if p == 'NONE':
             return (f'<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem;'
                     f'display:flex;align-items:center;margin-bottom:.6rem">'
-                    f'<span style="color:#444">{icon} {label} — nessun piano attivo</span></div>')
+                    f'<span style="color:#444">{icon} {label} — <span data-t="no_plan">nessun piano attivo</span></span></div>')
         _fpdf = _latest_plan_pdf(asset, p)
         f     = _latest_plan(asset, p)
         if _fpdf:
             dl    = (f'<a href="/api/report-pdf/{asset}" '
                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
-                     f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica PDF</a>')
+                     f'font-weight:700;font-size:.82rem;text-decoration:none" data-t="download_pdf">⬇ Scarica PDF</a>')
             info  = f'<span style="font-size:.78rem;color:#888">{os.path.basename(_fpdf)}</span>'
         elif f:
             dl    = (f'<a href="/api/report/{asset}" '
                      f'style="background:#F6AD55;color:#0a0f1e;padding:.4rem 1rem;border-radius:6px;'
-                     f'font-weight:700;font-size:.82rem;text-decoration:none">⬇ Scarica</a>')
+                     f'font-weight:700;font-size:.82rem;text-decoration:none" data-t="download">⬇ Scarica</a>')
             info  = f'<span style="font-size:.78rem;color:#888">{os.path.basename(f)}</span>'
         else:
-            dl   = '<span style="color:#555;font-size:.82rem">Nessun report disponibile</span>'
+            dl   = '<span style="color:#555;font-size:.82rem" data-t="no_report">Nessun report disponibile</span>'
             info = ''
         return (f'<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem;'
                 f'display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.6rem">'
@@ -6358,16 +6711,16 @@ def _build_area_clienti(email):
                 )
             _ordini_storico = (
                 f'<div style="margin-top:1.5rem">'
-                f'<h3>📋 I miei Ordini</h3>'
+                f'<h3 data-t="my_orders">📋 I miei Ordini</h3>'
                 f'{ordini_cards}'
                 f'</div>'
             )
         else:
             _ordini_storico = (
                 f'<div style="margin-top:1.5rem">'
-                f'<h3>📋 I miei Ordini</h3>'
+                f'<h3 data-t="my_orders">📋 I miei Ordini</h3>'
                 f'<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.75rem 1rem;'
-                f'font-size:.85rem;color:#555">Nessun ordine ancora inviato.</div>'
+                f'font-size:.85rem;color:#555" data-t="no_orders">Nessun ordine ancora inviato.</div>'
                 f'</div>'
             )
     else:
@@ -6412,22 +6765,22 @@ def _build_area_clienti(email):
   <button onclick="document.getElementById('modal-svc').style.display='flex'"
           style="background:linear-gradient(135deg,#1a365d,#2b6cb0);color:#fff;border:none;
                  border-radius:8px;padding:.65rem 1.4rem;font-size:.88rem;font-weight:700;cursor:pointer">
-    ➕ Aggiungi Servizi
+    <span data-t="add_services_btn">➕ Aggiungi Servizi</span>
   </button>
 </div>
 <div id="modal-svc" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
      background:rgba(0,0,0,.78);z-index:9999;align-items:center;justify-content:center">
   <div style="background:#111827;border:1px solid rgba(246,173,85,.35);border-radius:14px;
               padding:2rem;max-width:420px;width:90%;color:#e0e0e0">
-    <h3 style="color:#F6AD55;margin-bottom:1rem;font-size:1rem">Aggiungi Servizi</h3>
+    <h3 style="color:#F6AD55;margin-bottom:1rem;font-size:1rem" data-t="add_services_title">Aggiungi Servizi</h3>
     {modal_rows_html}
     <div style="display:flex;gap:.8rem;margin-top:1.2rem">
       <button onclick="confermaAggiuntaSvc()"
               style="flex:1;background:#F6AD55;color:#0a0f1e;border:none;border-radius:8px;
-                     padding:.75rem;font-weight:700;cursor:pointer">Conferma</button>
+                     padding:.75rem;font-weight:700;cursor:pointer" data-t="confirm">Conferma</button>
       <button onclick="document.getElementById('modal-svc').style.display='none'"
               style="flex:1;background:transparent;color:#aaa;border:1px solid rgba(255,255,255,.15);
-                     border-radius:8px;padding:.75rem;cursor:pointer">Annulla</button>
+                     border-radius:8px;padding:.75rem;cursor:pointer" data-t="cancel">Annulla</button>
     </div>
     <div id="err-svc" style="color:#FC8181;font-size:.8rem;margin-top:.6rem;text-align:center"></div>
   </div>
@@ -6458,81 +6811,12 @@ function confermaAggiuntaSvc(){{
         aggiungi_section = ''
 
     # ─── Sezione Banche Salvate ──────────────────────────────
-    _banche_section = (
-        '<div style="margin-top:1.5rem">'
-        '<h3>&#x1F3E6; Banche Salvate</h3>'
-        '<div id="banche-list" style="margin-bottom:.8rem"></div>'
-        '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem">'
-        '<div style="font-size:.82rem;color:#F6AD55;font-weight:600;margin-bottom:.8rem">Aggiungi profilo banca</div>'
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">'
-        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Banca / Intermediario</label>'
-        '<input id="nb-banca" type="text" placeholder="es. Banca Sella, Fineco..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
-        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">IBAN Conto Cliente</label>'
-        '<input id="nb-iban" type="text" placeholder="IT60 X054..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;font-family:monospace;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>'
-        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Gestore</label>'
-        '<input id="nb-gestore" type="text" placeholder="es. Mario Rossi" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
-        '<div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Email Gestore</label>'
-        '<input id="nb-email" type="email" placeholder="gestore@banca.it" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div>'
-        '</div>'
-        '<div style="display:flex;align-items:center;gap:.6rem">'
-        '<button onclick="bancaSalva()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:600;cursor:pointer">Salva profilo</button>'
-        '<span id="nb-msg" style="font-size:.78rem"></span>'
-        '</div></div></div>'
-        '<script>'
-        'function bancaLoad(){'
-        '  fetch("/api/banche").then(function(r){return r.json();}).then(function(d){'
-        '    bancaRender(d.profili||[]);'
-        '  }).catch(function(){});'
-        '}'
-        'function bancaRender(list){'
-        '  var el=document.getElementById("banche-list");'
-        '  if(!el)return;'
-        '  if(!list.length){el.innerHTML=\'<div style="font-size:.82rem;color:#555;padding:.4rem 0">Nessun profilo salvato</div>\';return;}'
-        '  el.innerHTML="";'
-        '  list.forEach(function(c){'
-        '    var row=document.createElement("div");'
-        '    row.style.cssText="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.65rem 1rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.8rem";\n'
-        '    var sub=(c.nome_gestore?(c.nome_gestore+(c.email_gestore?" \xb7 "+c.email_gestore:"")):"");\n'
-        '    row.innerHTML=\'<div style="flex:1"><div style="font-weight:600;font-size:.88rem;color:#90cdf4">\''
-        '      +(c.banca||"—")+"</div>"'
-        '      +\'<div style="font-size:.76rem;color:#888;font-family:monospace">\''
-        '      +(c.iban||"—")+"</div>"'
-        '      +(sub?\'<div style="font-size:.75rem;color:#666">\'+sub+"</div>":"")+'
-        '      \'</div>\''
-        '      +\'<span onclick="bancaDel(\\\'\'+c.iban+\'\\\')" style="color:#e53e3e;font-size:.8rem;cursor:pointer;padding:.2rem .5rem">&#x2715;</span>\';\n'
-        '    el.appendChild(row);'
-        '  });'
-        '}'
-        'function bancaSalva(){'
-        '  var banca=document.getElementById("nb-banca").value.trim();'
-        '  var iban=document.getElementById("nb-iban").value.trim();'
-        '  var gestore=document.getElementById("nb-gestore").value.trim();'
-        '  var email=document.getElementById("nb-email").value.trim();'
-        '  var msg=document.getElementById("nb-msg");'
-        '  if(!iban){msg.style.color="#FC8181";msg.textContent="IBAN obbligatorio";return;}'
-        '  fetch("/api/banche/save",{method:"POST",headers:{"Content-Type":"application/json"},'
-        '    body:JSON.stringify({banca:banca,iban:iban,nome_gestore:gestore,email_gestore:email})})'
-        '  .then(function(r){return r.json();}).then(function(d){'
-        '    if(d.ok){'
-        '      msg.style.color="#68D391";msg.textContent="Salvato!";'
-        '      document.getElementById("nb-banca").value="";'
-        '      document.getElementById("nb-iban").value="";'
-        '      document.getElementById("nb-gestore").value="";'
-        '      document.getElementById("nb-email").value="";'
-        '      setTimeout(function(){msg.textContent="";},2500);'
-        '      bancaLoad();'
-        '    }else{msg.style.color="#FC8181";msg.textContent=d.msg||"Errore";}'
-        '  }).catch(function(){msg.style.color="#FC8181";msg.textContent="Errore di rete";});'
-        '}'
-        'function bancaDel(iban){'
-        '  fetch("/api/banche/delete",{method:"POST",headers:{"Content-Type":"application/json"},'
-        '    body:JSON.stringify({iban:iban})})'
-        '  .then(function(r){return r.json();}).then(function(d){if(d.ok)bancaLoad();})'
-        '  .catch(function(){});'
-        '}'
-        'bancaLoad();'
-        '</script>'
-    )
+    _banche_section = '<div style="margin-top:1.5rem"><h3 data-t="saved_banks">&#x1F3E6; Banche Salvate</h3><div id="banche-list" style="margin-bottom:.8rem"></div><div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem"><div style="font-size:.82rem;color:#F6AD55;font-weight:600;margin-bottom:.8rem">Aggiungi profilo banca</div><div style="margin-bottom:.9rem;background:rgba(255,255,255,.02);border:1px solid rgba(246,173,85,.2);border-radius:8px;padding:.8rem 1rem"><label style="font-size:.75rem;color:#F6AD55;display:block;margin-bottom:.4rem;font-weight:600">&#x1F50D; Cerca nella rubrica europea (41 banche / broker)</label><input id="nb-search" type="text" placeholder="es. Fineco, BBVA, Barclays, IBKR..." style="width:100%;box-sizing:border-box;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem" oninput="bancaSearch(this.value)"><div id="nb-results" style="margin-top:.5rem;max-height:180px;overflow-y:auto"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem"><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Banca / Intermediario</label><input id="nb-banca" type="text" placeholder="es. Banca Sella, Fineco..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">IBAN Conto Cliente</label><input id="nb-iban" type="text" placeholder="IT60 X054..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;font-family:monospace;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Nome Gestore</label><input id="nb-gestore" type="text" placeholder="es. Mario Rossi" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Email Gestore</label><input id="nb-email" type="email" placeholder="gestore@banca.it" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div></div><div style="display:flex;align-items:center;gap:.6rem"><button onclick="bancaSalva()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:600;cursor:pointer">Salva profilo</button><span id="nb-msg" style="font-size:.78rem"></span></div></div></div><script>var _banche_eu=[];fetch(\'/api/banche-eu\').then(function(r){return r.json();}).then(function(d){_banche_eu=d.banche||[];});function bancaSearch(q){var res=document.getElementById(\'nb-results\');if(!res)return;if(!q||q.length<2){res.innerHTML=\'\';return;}var ql=q.toLowerCase();var hits=[];for(var i=0;i<_banche_eu.length;i++){if((_banche_eu[i].nome||\'\').toLowerCase().indexOf(ql)>=0)hits.push(i);if(hits.length>=8)break;}if(!hits.length){res.innerHTML=\'<div style="color:#888;font-size:.78rem;padding:.3rem">Nessun risultato</div>\';return;}res.innerHTML=hits.map(function(idx){var b=_banche_eu[idx];return \'<div onclick="bancaPrecompila(\'+idx+\')" style="cursor:pointer;padding:.4rem .7rem;border-radius:6px;background:rgba(255,255,255,.04);margin-bottom:.2rem;font-size:.82rem;display:flex;justify-content:space-between">\'+\'<span>\'+(b.bandiera||\'\')+\' <strong>\'+(b.nome||\'\')+\'</strong></span>\'+\'<span style="color:#888;font-size:.75rem">\'+(b.tipo||\'\')+\' · \'+(b.paese||\'\')+\'</span></div>\';}).join(\'\');}function bancaPrecompila(idx){var b=_banche_eu[idx];if(!b)return;var el=document.getElementById(\'nb-banca\');if(el)el.value=b.nome||\'\';var em=document.getElementById(\'nb-email\');if(em)em.value=b.email_supporto||\'\';document.getElementById(\'nb-results\').innerHTML=\'\';document.getElementById(\'nb-search\').value=\'\';}var _profili_cache=[];function bancaRender(profili){_profili_cache=profili;document.dispatchEvent(new CustomEvent(\'bancaLoaded\'));var el=document.getElementById(\'banche-list\');if(!el)return;if(!profili||!profili.length){el.innerHTML=\'<p style="color:#888;font-size:.85rem">Nessun profilo salvato.</p>\';return;}el.innerHTML=profili.map(function(p,i){return \'<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between">\'+\'<div style="font-size:.85rem"><strong>\'+(p.banca||\'\')+\'</strong> — \'+(p.iban||\'\')\'+\'<span style="color:#888;font-size:.78rem;display:block">\'+(p.nome_gestore||\'\')+\' • \'+(p.email_gestore||\'\')+\'</span></div>\'+\'<button onclick="bancaDel(\'+i+\')" style="background:transparent;border:1px solid rgba(252,129,129,.3);color:#FC8181;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;cursor:pointer">Rimuovi</button>\'+\'</div>\';}).join(\'\');}function bancaLoad(){fetch(\'/api/banche\',{credentials:\'include\'}).then(function(r){return r.json();}).then(function(d){if(d.ok)bancaRender(d.profili);}); }function bancaSalva(){var b=document.getElementById(\'nb-banca\').value.trim();var ib=document.getElementById(\'nb-iban\').value.trim();var g=document.getElementById(\'nb-gestore\').value.trim();var em=document.getElementById(\'nb-email\').value.trim();var msg=document.getElementById(\'nb-msg\');if(!b||!ib){msg.style.color=\'#FC8181\';msg.textContent=\'Banca e IBAN obbligatori\';return;}fetch(\'/api/banche/save\',{method:\'POST\',credentials:\'include\',headers:{\'Content-Type\':\'application/json\'},body:JSON.stringify({banca:b,iban:ib,nome_gestore:g,email_gestore:em})}).then(function(r){return r.json();}).then(function(d){if(d.ok){msg.style.color=\'#68D391\';msg.textContent=\'Salvato!\';bancaLoad();document.getElementById(\'nb-banca\').value=\'\';document.getElementById(\'nb-iban\').value=\'\';document.getElementById(\'nb-gestore\').value=\'\';document.getElementById(\'nb-email\').value=\'\';}else{msg.style.color=\'#FC8181\';msg.textContent=d.msg||\'Errore\';}});}function bancaDel(i){var p=_profili_cache[i];if(!p)return;fetch(\'/api/banche/delete\',{method:\'POST\',credentials:\'include\',headers:{\'Content-Type\':\'application/json\'},body:JSON.stringify({iban:p.iban})}).then(function(r){return r.json();}).then(function(d){if(d.ok)bancaLoad();});}window.addEventListener(\'load\',bancaLoad);</script>'
+
+    _broker_section = '<div style="margin-top:1.5rem"><h3 data-t="platforms">&#x1F4B9; Piattaforme / Broker</h3><div id="pb-list" style="margin-bottom:.8rem"></div><div style="background:rgba(255,255,255,.03);border-radius:10px;padding:1rem 1.2rem"><div style="font-size:.82rem;color:#F6AD55;font-weight:600;margin-bottom:.8rem">Aggiungi profilo broker</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem"><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Piattaforma / Broker</label><input id="pb-piattaforma" type="text" placeholder="es. Fineco, IBKR, Degiro..." style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">N. Conto / Codice Cliente</label><input id="pb-conto" type="text" placeholder="es. IT-123456789" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div style="grid-column:span 2"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Email Supporto / Trading</label><input id="pb-email" type="email" placeholder="trading@broker.com" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div></div><div style="display:flex;align-items:center;gap:.6rem"><button onclick="pbSalva()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:600;cursor:pointer">Salva profilo</button><span id="pb-msg" style="font-size:.78rem"></span></div></div></div><script>var _broker_cache=[];function pbRender(profili){_broker_cache=profili;document.dispatchEvent(new CustomEvent(\'brokerLoaded\'));var el=document.getElementById(\'pb-list\');if(!el)return;if(!profili||!profili.length){el.innerHTML=\'<p style="color:#888;font-size:.85rem">Nessun profilo salvato.</p>\';return;}el.innerHTML=profili.map(function(p,i){return \'<div style="background:rgba(255,255,255,.03);border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between">\'+\'<div style="font-size:.85rem"><strong>\'+(p.piattaforma||\'\')+\'</strong>\'+(p.conto ? \' — \'+p.conto : \'\')+\'<span style="color:#888;font-size:.78rem;display:block">\'+(p.email_supporto||\'\')+\'</span></div>\'+\'<button onclick="pbDel(\'+i+\')" style="background:transparent;border:1px solid rgba(252,129,129,.3);color:#FC8181;border-radius:6px;padding:.25rem .6rem;font-size:.75rem;cursor:pointer">Rimuovi</button>\'+\'</div>\';}).join(\'\');}function pbLoad(){fetch(\'/api/broker\',{credentials:\'include\'}).then(function(r){return r.json();}).then(function(d){if(d.ok)pbRender(d.profili);});}function pbSalva(){var nome=document.getElementById(\'pb-piattaforma\').value.trim();var conto=document.getElementById(\'pb-conto\').value.trim();var em=document.getElementById(\'pb-email\').value.trim();var msg=document.getElementById(\'pb-msg\');if(!nome){msg.style.color=\'#FC8181\';msg.textContent=\'Nome piattaforma obbligatorio\';return;}fetch(\'/api/broker/save\',{method:\'POST\',credentials:\'include\',headers:{\'Content-Type\':\'application/json\'},body:JSON.stringify({piattaforma:nome,conto:conto,email_supporto:em})}).then(function(r){return r.json();}).then(function(d){if(d.ok){msg.style.color=\'#68D391\';msg.textContent=\'Salvato!\';pbLoad();document.getElementById(\'pb-piattaforma\').value=\'\';document.getElementById(\'pb-conto\').value=\'\';document.getElementById(\'pb-email\').value=\'\';}else{msg.style.color=\'#FC8181\';msg.textContent=d.msg||\'Errore\';}});}function pbDel(i){var p=_broker_cache[i];if(!p)return;fetch(\'/api/broker/delete\',{method:\'POST\',credentials:\'include\',headers:{\'Content-Type\':\'application/json\'},body:JSON.stringify({piattaforma:p.piattaforma})}).then(function(r){return r.json();}).then(function(d){if(d.ok)pbDel_reload();});}function pbDel_reload(){pbLoad();}window.addEventListener(\'load\',pbLoad);</script>'
+
+    _ordine_banca_section = '<div style="margin-top:1.5rem;background:rgba(255,255,255,.02);border:1px solid rgba(246,173,85,.15);border-radius:10px;padding:1rem 1.2rem"><h3 style="margin-bottom:.9rem" data-t="bank_order">&#x2709; Ordine Bancario</h3><div style="font-size:.82rem;color:#888;margin-bottom:1rem">Componi un ordine da inviare al tuo gestore bancario via email.</div><div style="margin-bottom:.7rem"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Banca / Gestore</label><select id="ob-banca-sel" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"><option value="">-- Seleziona profilo banca --</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem"><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Titolo</label><input id="ob-titolo" type="text" placeholder="es. Prysmian SpA" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">ISIN</label><input id="ob-isin" type="text" placeholder="es. IT0004176001" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;font-family:monospace;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Quantit&#xe0;</label><input id="ob-qty" type="number" min="1" placeholder="es. 100" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Tipo ordine</label><select id="ob-tipo" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"><option value="Acquisto">Acquisto</option><option value="Vendita">Vendita</option></select></div><div style="grid-column:span 2"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Prezzo limite (&#x20ac;) — lascia vuoto per ordine a mercato</label><input id="ob-prezzo" type="number" min="0" step="0.01" placeholder="es. 14.50" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div></div><div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem"><button onclick="obComponi()" style="background:#F6AD55;color:#0a0f1e;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:700;cursor:pointer">Componi email</button><span id="ob-err" style="font-size:.78rem;color:#FC8181"></span></div><div id="ob-result" style="display:none"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Testo email (copiare e incollare)</label><textarea id="ob-text" readonly rows="14" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.7rem;color:#e0e0e0;font-size:.8rem;font-family:monospace;resize:vertical"></textarea><div style="margin-top:.5rem;display:flex;gap:.6rem"><button onclick="obCopia()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.4rem 1rem;font-size:.8rem;font-weight:600;cursor:pointer">&#x1F4CB; Copia testo</button><a id="ob-mailto" href="#" style="background:transparent;border:1px solid rgba(246,173,85,.4);color:#F6AD55;border-radius:6px;padding:.4rem 1rem;font-size:.8rem;font-weight:600;text-decoration:none">&#x2709; Apri in client email</a></div></div></div><script>function obPopulateBanche(){var sel=document.getElementById(\'ob-banca-sel\');if(!sel)return;while(sel.options.length>1)sel.remove(1);for(var i=0;i<_profili_cache.length;i++){var b=_profili_cache[i];var opt=document.createElement(\'option\');opt.value=i;opt.textContent=(b.banca||\'\')+\' — \'+(b.iban||\'\')+( b.nome_gestore ? \' (\'+b.nome_gestore+\')\' : \'\');sel.appendChild(opt);}}function obComponi(){var err=document.getElementById(\'ob-err\');err.textContent=\'\';var idx=document.getElementById(\'ob-banca-sel\').value;if(idx===\'\'){err.textContent=\'Seleziona un profilo banca\';return;}var banca=_profili_cache[parseInt(idx)];if(!banca){err.textContent=\'Profilo non trovato\';return;}var titolo=document.getElementById(\'ob-titolo\').value.trim();var isin=document.getElementById(\'ob-isin\').value.trim();var qty=document.getElementById(\'ob-qty\').value.trim();var tipo=document.getElementById(\'ob-tipo\').value;var prezzo=document.getElementById(\'ob-prezzo\').value.trim();if(!titolo||!isin||!qty){err.textContent=\'Titolo, ISIN e Quantità obbligatori\';return;}var prezzoStr=prezzo ? \'Limite a € \'+parseFloat(prezzo).toFixed(2).replace(\'.\',\',\') : \'A mercato\';var oggetto=\'Ordine di \'+tipo+\' — \'+titolo+\' (\'+isin+\')\';var corpo=\'Gentile \'+(banca.nome_gestore||\'Responsabile\')+\',\\n\\n\'+\'Le invio il seguente ordine da eseguire sul conto \'+(banca.iban||\'\')+\':\\n\\n\'+\'TIPO ORDINE: \'+tipo+\'\\n\'+\'TITOLO: \'+titolo+\'\\n\'+\'ISIN: \'+isin+\'\\n\'+\'QUANTITÀ: \'+qty+\' titoli\\n\'+\'PREZZO: \'+prezzoStr+\'\\n\\n\'+\'La prego di confermare l\\\'esecuzione via email.\\n\\n\'+\'Distinti saluti\';document.getElementById(\'ob-text\').value=corpo;var mailTo=\'mailto:\'+(banca.email_gestore||\'\')+\'?subject=\'+encodeURIComponent(oggetto)+\'&body=\'+encodeURIComponent(corpo);document.getElementById(\'ob-mailto\').href=mailTo;document.getElementById(\'ob-result\').style.display=\'block\';}function obCopia(){var ta=document.getElementById(\'ob-text\');ta.select();try{document.execCommand(\'copy\');}catch(e){}}window.addEventListener(\'load\',function(){setTimeout(obPopulateBanche,800);});document.addEventListener(\'bancaLoaded\',obPopulateBanche);</script>'
+    _ordine_piattaforma_section = '<div style="margin-top:1.5rem;background:rgba(255,255,255,.02);border:1px solid rgba(246,173,85,.15);border-radius:10px;padding:1rem 1.2rem"><h3 style="margin-bottom:.9rem" data-t="platform_order">&#x1F4F1; Ordine Piattaforma</h3><div style="font-size:.82rem;color:#888;margin-bottom:1rem">Genera le istruzioni operative per eseguire l\'ordine sulla tua piattaforma broker.</div><div style="margin-bottom:.7rem"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Piattaforma / Broker</label><select id="op-broker-sel" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"><option value="">-- Seleziona piattaforma --</option></select></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem"><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Titolo</label><input id="op-titolo" type="text" placeholder="es. Prysmian SpA" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">ISIN</label><input id="op-isin" type="text" placeholder="es. IT0004176001" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem;font-family:monospace;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Quantit&#xe0;</label><input id="op-qty" type="number" min="1" placeholder="es. 100" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div><div><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Tipo ordine</label><select id="op-tipo" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"><option value="Acquisto">Acquisto</option><option value="Vendita">Vendita</option></select></div><div style="grid-column:span 2"><label style="font-size:.75rem;color:#888;display:block;margin-bottom:.25rem">Prezzo limite (&#x20ac;) — lascia vuoto per ordine a mercato</label><input id="op-prezzo" type="number" min="0" step="0.01" placeholder="es. 14.50" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.5rem .7rem;color:#e0e0e0;font-size:.85rem"></div></div><div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem"><button onclick="opGenera()" style="background:#F6AD55;color:#0a0f1e;border:none;border-radius:6px;padding:.5rem 1.2rem;font-size:.83rem;font-weight:700;cursor:pointer">Genera istruzioni</button><span id="op-err" style="font-size:.78rem;color:#FC8181"></span></div><div id="op-result" style="display:none"><div id="op-steps" style="background:#0a0f1e;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.9rem 1rem;font-size:.82rem;line-height:1.9;color:#e0e0e0"></div><div style="margin-top:.6rem;display:flex;gap:.6rem"><button onclick="opCopia()" style="background:#2C5282;color:#fff;border:none;border-radius:6px;padding:.4rem 1rem;font-size:.8rem;font-weight:600;cursor:pointer">&#x1F4CB; Copia istruzioni</button></div></div></div><script>var _OP_GUIDE={\'fineco\':[\'Accedi a <strong>Fineco</strong> (app o web)\',\'Vai su <strong>Trading → Ordini → Nuovo Ordine</strong>\',\'Nel campo di ricerca inserisci l\\\'ISIN: <strong>{ISIN}</strong>\',\'Seleziona il titolo <strong>{TITOLO}</strong>\',\'Scegli <strong>{TIPO}</strong> e inserisci quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Verifica il riepilogo e clicca <strong>Conferma Ordine</strong>\'],\'directa\':[\'Accedi a <strong>Directa</strong>\',\'Vai su <strong>Trading → Inserisci Ordine</strong>\',\'Cerca il titolo con ISIN: <strong>{ISIN}</strong>\',\'Imposta <strong>{TIPO}</strong> — Quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Clicca <strong>Invia Ordine</strong> e conferma\'],\'degiro\':[\'Accedi a <strong>DEGIRO</strong> (app o web)\',\'Cerca il prodotto nella barra di ricerca: <strong>{ISIN}</strong>\',\'Apri la scheda di <strong>{TITOLO}</strong>\',\'Clicca <strong>Compra</strong> (o <strong>Vendi</strong> per Vendita)\',\'Inserisci quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Clicca <strong>Ordine</strong> e poi <strong>Conferma</strong>\'],\'interactive brokers\':[\'Accedi a <strong>IBKR</strong> (TWS / app / web)\',\'Nella barra di ricerca inserisci l\\\'ISIN: <strong>{ISIN}</strong> o il ticker\',\'Seleziona <strong>{TITOLO}</strong> e apri il pannello ordine\',\'Imposta: Action = <strong>{TIPO_EN}</strong> · Qty = <strong>{QTY}</strong>\',\'{PREZZO_STEP_EN}\',\'Clicca <strong>Submit</strong> e conferma l\\\'ordine\'],\'ibkr\':[\'Accedi a <strong>IBKR</strong> (TWS / app / web)\',\'Nella barra di ricerca inserisci l\\\'ISIN: <strong>{ISIN}</strong> o il ticker\',\'Seleziona <strong>{TITOLO}</strong> e apri il pannello ordine\',\'Imposta: Action = <strong>{TIPO_EN}</strong> · Qty = <strong>{QTY}</strong>\',\'{PREZZO_STEP_EN}\',\'Clicca <strong>Submit</strong> e conferma l\\\'ordine\'],\'banca sella\':[\'Accedi a <strong>Banca Sella</strong> (app o web)\',\'Vai su <strong>Investimenti → Titoli</strong>\',\'Cerca tramite ISIN: <strong>{ISIN}</strong>\',\'Seleziona <strong>{TITOLO}</strong> e clicca su <strong>Acquista</strong> o <strong>Vendi</strong>\',\'Inserisci quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Conferma l\\\'ordine con il tuo codice di sicurezza\'],\'hype\':[\'Accedi a <strong>Hype</strong> (app)\',\'Vai su <strong>Investimenti</strong>\',\'Cerca tramite ISIN: <strong>{ISIN}</strong>\',\'Clicca su <strong>Acquista</strong> (o <strong>Vendi</strong>)\',\'Inserisci quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Conferma con Face ID / PIN\']};var _OP_GENERIC=[\'Accedi alla tua piattaforma broker\',\'Cerca il titolo tramite ISIN: <strong>{ISIN}</strong>\',\'Seleziona <strong>{TITOLO}</strong>\',\'Scegli <strong>{TIPO}</strong> e inserisci quantità: <strong>{QTY}</strong>\',\'{PREZZO_STEP}\',\'Conferma l\\\'ordine\'];function opPopulateBroker(){var sel=document.getElementById(\'op-broker-sel\');if(!sel)return;while(sel.options.length>1)sel.remove(1);for(var i=0;i<_broker_cache.length;i++){var b=_broker_cache[i];var opt=document.createElement(\'option\');opt.value=i;opt.textContent=(b.piattaforma||\'\')+(b.conto?\' — \'+b.conto:\'\');sel.appendChild(opt);}}function opGenera(){var err=document.getElementById(\'op-err\');err.textContent=\'\';var idx=document.getElementById(\'op-broker-sel\').value;if(idx===\'\'){err.textContent=\'Seleziona una piattaforma\';return;}var broker=_broker_cache[parseInt(idx)];if(!broker){err.textContent=\'Profilo non trovato\';return;}var titolo=document.getElementById(\'op-titolo\').value.trim();var isin=document.getElementById(\'op-isin\').value.trim();var qty=document.getElementById(\'op-qty\').value.trim();var tipo=document.getElementById(\'op-tipo\').value;var prezzo=document.getElementById(\'op-prezzo\').value.trim();if(!titolo||!isin||!qty){err.textContent=\'Titolo, ISIN e Quantità obbligatori\';return;}var pname=(broker.piattaforma||\'\').toLowerCase();var steps=_OP_GUIDE[pname]||_OP_GENERIC;var prezzoStep=prezzo?\'Imposta <strong>Ordine Limite</strong> a <strong>€ \'+parseFloat(prezzo).toFixed(2).replace(\'.\',\',\')+\'</strong>\':\'Imposta <strong>Ordine a Mercato</strong> (esecuzione immediata)\';var prezzoStepEN=prezzo?\'Set order type: <strong>Limit</strong> at <strong>\'+parseFloat(prezzo).toFixed(2)+\'</strong>\':\'Set order type: <strong>Market</strong>\';var tipoEN=tipo===\'Acquisto\'?\'BUY\':\'SELL\';var html=\'<div style="font-size:.75rem;color:#F6AD55;font-weight:700;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em">\'+(broker.piattaforma||\'\')+\'</div><ol style="margin-left:1.2rem">\';for(var i=0;i<steps.length;i++){var s=steps[i].replace(/{ISIN}/g,isin).replace(/{TITOLO}/g,titolo).replace(/{QTY}/g,qty).replace(/{TIPO}/g,tipo).replace(/{TIPO_EN}/g,tipoEN).replace(/{PREZZO_STEP}/g,prezzoStep).replace(/{PREZZO_STEP_EN}/g,prezzoStepEN);html+=\'<li style="margin-bottom:.3rem">\'+s+\'</li>\';}html+=\'</ol>\';if(broker.conto)html+=\'<div style="margin-top:.7rem;font-size:.78rem;color:#888">Conto: <strong style="color:#e0e0e0">\'+broker.conto+\'</strong></div>\';document.getElementById(\'op-steps\').innerHTML=html;document.getElementById(\'op-result\').style.display=\'block\';}function opCopia(){var el=document.getElementById(\'op-steps\');var txt=el.innerText||el.textContent;if(navigator.clipboard){navigator.clipboard.writeText(txt);}else{var ta=document.createElement(\'textarea\');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand(\'copy\');document.body.removeChild(ta);}}window.addEventListener(\'load\',function(){setTimeout(opPopulateBroker,900);});document.addEventListener(\'brokerLoaded\',opPopulateBroker);</script>'
 
     _num_fatt = cliente.get('numero_fattura', '')
     _fattura_btn = (
@@ -6565,6 +6849,8 @@ body{{background:#0a0f1e;font-family:'Segoe UI',Arial,sans-serif;min-height:100v
 h2{{font-size:1.3rem;margin-bottom:.4rem}}
 .sub{{color:#888;font-size:.9rem;margin-bottom:2rem}}
 h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-transform:uppercase}}
+.ac-lang-btn{{background:transparent;border:1px solid rgba(246,173,85,.25);color:rgba(246,173,85,.6);padding:.18rem .45rem;border-radius:4px;cursor:pointer;font-size:.7rem;font-weight:700;letter-spacing:.5px;line-height:1.4;transition:all .15s}}
+.ac-lang-btn:hover,.ac-lang-btn.act-l{{background:#F6AD55;color:#0a0f1e;border-color:#F6AD55}}
 .logout{{background:transparent;border:1px solid rgba(255,255,255,.15);color:#aaa;padding:.4rem .9rem;border-radius:6px;font-size:.82rem;cursor:pointer;text-decoration:none}}
 .logout:hover{{border-color:#FC8181;color:#FC8181}}
 </style>
@@ -6573,43 +6859,53 @@ h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-tra
 <div class="top">
   <div style="display:flex;align-items:center;gap:1rem">
     <img src="data:image/png;base64,{FUERTE_LOGO_B64}" alt="Fuerte" style="height:36px;display:block">
-    <div style="font-size:.85rem;color:rgba(255,255,255,.5)">Area Riservata Investitori</div>
+    <div style="font-size:.85rem;color:rgba(255,255,255,.5)" data-t="area_subtitle">Area Riservata Investitori</div>
   </div>
-  <a href="/api/client-logout" class="logout">Esci</a>
+  <div style="display:flex;align-items:center;gap:.35rem;flex-shrink:0">
+    <button class="ac-lang-btn act-l" id="ac-btn-it" onclick="setAreaLang('it')">IT</button>
+    <button class="ac-lang-btn" id="ac-btn-en" onclick="setAreaLang('en')">EN</button>
+    <button class="ac-lang-btn" id="ac-btn-de" onclick="setAreaLang('de')">DE</button>
+    <button class="ac-lang-btn" id="ac-btn-fr" onclick="setAreaLang('fr')">FR</button>
+    <button class="ac-lang-btn" id="ac-btn-es" onclick="setAreaLang('es')">ES</button>
+    <a href="/api/client-logout" class="logout" data-t="logout">Esci</a>
+  </div>
 </div>
 <div class="main">
   <div id="pwa-banner" style="display:none;background:linear-gradient(135deg,#1a2744,#0d1b35);border:1px solid rgba(246,173,85,.3);border-radius:10px;padding:.9rem 1.2rem;margin-bottom:1.2rem;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap">
     <div style="display:flex;align-items:center;gap:.75rem">
       <img src="/icons/icon-192.png" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0">
       <div>
-        <div style="font-weight:700;font-size:.9rem;color:#F6AD55">Installa Robot Trader 2026</div>
-        <div style="font-size:.75rem;color:#888;margin-top:.1rem">Accedi ai tuoi report dalla schermata home</div>
+        <div style="font-weight:700;font-size:.9rem;color:#F6AD55" data-t="pwa_title">Installa Robot Trader 2026</div>
+        <div style="font-size:.75rem;color:#888;margin-top:.1rem" data-t="pwa_sub">Accedi ai tuoi report dalla schermata home</div>
       </div>
     </div>
     <div style="display:flex;gap:.5rem;flex-shrink:0;margin-left:auto">
-      <button id="pwa-install-btn" style="background:#F6AD55;color:#0a0f1e;border:none;border-radius:7px;padding:.5rem 1rem;font-weight:700;font-size:.82rem;cursor:pointer">&#x2B07; Installa</button>
+      <button id="pwa-install-btn" data-t="pwa_install" style="background:#F6AD55;color:#0a0f1e;border:none;border-radius:7px;padding:.5rem 1rem;font-weight:700;font-size:.82rem;cursor:pointer">&#x2B07; Installa</button>
       <button id="pwa-dismiss-btn" style="background:transparent;color:#666;border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:.5rem .7rem;font-size:.82rem;cursor:pointer">✕</button>
     </div>
   </div>
-  <h2>Benvenuto, {nome}</h2>
-  <div class="sub">I tuoi report sono aggiornati ogni lunedì mattina</div>
+  <h2><span data-t="welcome">Benvenuto</span>, {nome}</h2>
+  <div class="sub" data-t="reports_sub">I tuoi report sono aggiornati ogni lunedì mattina</div>
   {trial_badge}
-  <h3>I tuoi screener</h3>
+  <h3 data-t="screener_title">I tuoi screener</h3>
   {rows}
   <div style="margin-bottom:.6rem">{_profilo_card}{_idee_card}{_settori_card}</div>
   <div style="margin:1.2rem 0">
     {_ordine_block}
   </div>
   {_ordini_storico}
+  {_ordine_banca_section}
+  {_ordine_piattaforma_section}
   {_banche_section}
+  {_broker_section}
   {aggiungi_section}
   <div style="display:flex;justify-content:flex-end;align-items:center;gap:.8rem;margin-top:1.2rem;margin-bottom:.5rem">
     {_fattura_btn}
-    <a href="/cambia-password?v=1" style="font-size:.78rem;color:#888;text-decoration:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.3rem .75rem;transition:color .2s" onmouseover="this.style.color='#F6AD55'" onmouseout="this.style.color='#888'">&#x1F511; Modifica password</a>
+    <a href="/cambia-password?v=1" style="font-size:.78rem;color:#888;text-decoration:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.3rem .75rem;transition:color .2s" onmouseover="this.style.color='#F6AD55'" onmouseout="this.style.color='#888'" data-t="change_pwd">&#x1F511; Modifica password</a>
   </div>
   <div style="background:rgba(246,173,85,.04);border:1px solid rgba(246,173,85,.1);border-radius:10px;padding:1rem 1.2rem;font-size:.75rem;color:#666;line-height:1.7;margin-top:1.5rem;margin-bottom:1rem">
-    <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.4rem;font-weight:600">⚠ SaaS · Non Consulenza Finanziaria</div>
-    I report forniti da Fuerte Screener sono elaborati automaticamente a scopo esclusivamente informativo e <strong style="color:#aaa">non costituiscono consulenza finanziaria</strong>, raccomandazione di investimento o sollecitazione. Gli investimenti comportano rischi, inclusa la possibile perdita del capitale. Prima di qualsiasi decisione, consulta un consulente finanziario abilitato.
+    <div style="font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.4rem;font-weight:600" data-t="disclaimer_title">⚠ SaaS · Non Consulenza Finanziaria</div>
+    <span data-t="disclaimer_body">I report forniti da Fuerte Screener sono elaborati automaticamente a scopo esclusivamente informativo e <strong style="color:#aaa">non costituiscono consulenza finanziaria</strong>, raccomandazione di investimento o sollecitazione. Gli investimenti comportano rischi, inclusa la possibile perdita del capitale. Prima di qualsiasi decisione, consulta un consulente finanziario abilitato.</span>
   </div>
   <div style="padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.06);font-size:.72rem;color:#444;text-align:center;line-height:1.9">
     <strong style="color:#667">Fuerte Venture Capital SL</strong> &middot; CIF B23881691<br>
@@ -6626,11 +6922,11 @@ h3{{font-size:1rem;color:#F6AD55;margin-bottom:1rem;letter-spacing:.5px;text-tra
     <h3 id="modal-title" style="color:#F6AD55;margin-bottom:.6rem;font-size:1rem">Aggiungi Piano</h3>
     <p id="modal-asset-label" style="color:#aaa;font-size:.88rem;margin-bottom:.4rem"></p>
     <p id="modal-current-label" style="color:#666;font-size:.78rem;margin-bottom:1rem"></p>
-    <label style="font-size:.82rem;color:#888;display:block;margin-bottom:.4rem">Seleziona livello</label>
+    <label id="modal-livello-label" style="font-size:.82rem;color:#888;display:block;margin-bottom:.4rem" data-t="select_level">Seleziona livello</label>
     <select id="modal-livello" style="width:100%;background:#0a0f1e;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.7rem;color:#e0e0e0;font-size:.95rem;margin-bottom:1.2rem"></select>
     <div style="display:flex;gap:.8rem">
-      <button onclick="confermaAggiungiPiano()" style="flex:1;background:#F6AD55;color:#0a0f1e;border:none;border-radius:8px;padding:.75rem;font-weight:700;cursor:pointer">Conferma</button>
-      <button onclick="document.getElementById('modal-piano').style.display='none'" style="flex:1;background:transparent;color:#aaa;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.75rem;cursor:pointer">Annulla</button>
+      <button onclick="confermaAggiungiPiano()" data-t="confirm" style="flex:1;background:#F6AD55;color:#0a0f1e;border:none;border-radius:8px;padding:.75rem;font-weight:700;cursor:pointer">Conferma</button>
+      <button onclick="document.getElementById('modal-piano').style.display='none'" data-t="cancel" style="flex:1;background:transparent;color:#aaa;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.75rem;cursor:pointer">Annulla</button>
     </div>
     <div id="modal-err" style="color:#FC8181;font-size:.8rem;margin-top:.6rem;text-align:center"></div>
   </div>
@@ -6642,9 +6938,10 @@ var _livelloLabels={{'BASIC':'BASIC — Accesso base','PRO':'PRO — Analisi ava
 function apriModalPiano(asset,label,current){{
   _mAsset=asset;
   var isAdd=(current==='NONE');
-  document.getElementById('modal-title').textContent=isAdd?'Aggiungi Piano':'Upgrade Piano';
-  document.getElementById('modal-asset-label').textContent='Servizio: '+label;
-  document.getElementById('modal-current-label').textContent=isAdd?'':'Piano attuale: '+current;
+  var _t=window._acT||T_ac.it;
+  document.getElementById('modal-title').textContent=isAdd?_t.select_plan:_t.upgrade_plan;
+  document.getElementById('modal-asset-label').textContent=(_t.service_lbl||'Servizio: ')+label;
+  document.getElementById('modal-current-label').textContent=isAdd?'':(_t.current_plan||'Piano attuale: ')+current;
   document.getElementById('modal-err').textContent='';
   var sel=document.getElementById('modal-livello');
   sel.innerHTML='';
@@ -7738,6 +8035,28 @@ Contatta il supporto per attivare il tuo piano.</p>
             else:
                 self.send_error(404)
             return
+        # ── Profili banca salvati (GET) ──────────────────────────────
+        if p == '/api/banche':
+            if not _is_client_auth(self):
+                self._json({'ok': False, 'error': 'non autorizzato'}); return
+            tok_c   = _get_client_token(self)
+            c_email = CLIENT_SESSIONS.get(tok_c, '')
+            self._json({'ok': True, 'profili': _load_profili(c_email)}); return
+        # ── Archivio banche EU (accessibile a client autenticati) ──
+        if p == '/api/banche-eu' and (_is_client_auth(self) or _is_auth(self)):
+            try:
+                with open(BANCHE_EU_PATH, encoding='utf-8') as _f:
+                    _beu = json.load(_f)
+            except Exception:
+                _beu = []
+            self._json({'ok': True, 'banche': _beu}); return
+        # ── Profili broker/piattaforme salvati (GET) ──────────────
+        if p == '/api/broker':
+            if not _is_client_auth(self):
+                self._json({'ok': False, 'error': 'non autorizzato'}); return
+            tok_c   = _get_client_token(self)
+            c_email = CLIENT_SESSIONS.get(tok_c, '')
+            self._json({'ok': True, 'profili': _load_profili_broker(c_email)}); return
         # ── Rotte admin (richiede sessione) ────────────────────
         if not _is_auth(self):
             _redirect(self, '/login'); return
@@ -7812,6 +8131,29 @@ Contatta il supporto per attivare il tuo piano.</p>
             self._json(get_mercati())
         elif p == '/api/params':
             self._json(read_params())
+        elif p == '/api/fvc-leads':
+            if not _is_auth(self):
+                self._json({'ok': False, 'msg': 'Non autorizzato'}); return
+            self._json(read_fvc_leads())
+        elif p == '/api/fvc-leads/export':
+            if not _is_auth(self):
+                self._json({'ok': False, 'msg': 'Non autorizzato'}); return
+            import csv as _csv, io as _io
+            leads = read_fvc_leads()
+            out = _io.StringIO()
+            w = _csv.DictWriter(out, fieldnames=[
+                'id','tipo','nome','email','telefono','azienda','ticket','nota','lingua','ts','stato'
+            ], extrasaction='ignore')
+            w.writeheader()
+            for l in leads:
+                l2 = dict(l); l2['nota'] = l2.pop('note', '')
+                w.writerow(l2)
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/csv; charset=utf-8')
+            self.send_header('Content-Disposition', 'attachment; filename="fvc_leads.csv"')
+            self.end_headers()
+            self.wfile.write(out.getvalue().encode('utf-8'))
+            return
         elif p == '/api/clienti':
             self._json(read_clienti())
         elif p == '/api/clienti/export':
@@ -7976,6 +8318,9 @@ Contatta il supporto per attivare il tuo piano.</p>
                 })
             except Exception as e:
                 self._json({'ok': False, 'error': str(e)})
+        elif p == '/api/social/linkedin-stats' and _is_auth(self):
+            force = 'refresh=1' in self.path
+            self._json(_fetch_linkedin_org_stats(force_refresh=force))
         elif p == '/api/social/calendario' and _is_auth(self):
             try:
                 cal_path = os.path.join(BASE_DIR, 'social_calendar.json')
@@ -8018,6 +8363,16 @@ Contatta il supporto per attivare il tuo piano.</p>
                 self._json({'ok': True, 'campagne': data.get('campagne', [])})
             except Exception as e:
                 self._json({'ok': False, 'error': str(e)})
+
+        elif p == '/internal/campagna/batch':
+            if self.client_address[0] != '127.0.0.1':
+                self._json({'ok': False, 'error': 'forbidden'}); return
+            try:
+                threading.Thread(target=_campagna_batch_daily, daemon=True).start()
+                self._json({'ok': True, 'msg': 'batch avviato'})
+            except Exception as e:
+                self._json({'ok': False, 'error': str(e)})
+
 
         elif p == '/api/campagna/invia' and _is_auth(self):
             try:
@@ -8415,7 +8770,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                 if k == 'pwd':
                     import urllib.parse
                     pwd = urllib.parse.unquote_plus(v)
-            _ip = self.client_address[0]
+            _ip = _get_real_ip(self)
             if _rl_check(_ip):
                 self._html(LOGIN_HTML.format(
                     error='<p class="err">Troppi tentativi. Riprova tra 30 minuti.</p>'
@@ -8519,7 +8874,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                 k, _, v = part.partition('=')
                 import urllib.parse
                 fields[k.strip()] = urllib.parse.unquote_plus(v)
-            _ip = self.client_address[0]
+            _ip = _get_real_ip(self)
             _login_logo = f'<img src="data:image/png;base64,{FUERTE_LOGO_B64}" alt="Fuerte Venture Capital">'
             if _rl_check(_ip):
                 self._html(CLIENT_LOGIN_HTML.format(logo=_login_logo,
@@ -8798,6 +9153,13 @@ Contatta il supporto per attivare il tuo piano.</p>
             except Exception as e:
                 self._json({'ok': False, 'msg': str(e)})
             return
+        if p == '/api/banche-eu':
+            try:
+                with open(BANCHE_EU_PATH, encoding='utf-8') as _f:
+                    _beu = json.load(_f)
+            except Exception:
+                _beu = []
+            self._json({'ok': True, 'banche': _beu}); return
         if p in ('/api/banche', '/api/banche/save', '/api/banche/delete'):
             if not _is_client_auth(self):
                 self._json({'ok': False, 'msg': 'Non autorizzato'}); return
@@ -8819,6 +9181,84 @@ Contatta il supporto per attivare il tuo piano.</p>
                     })
                 else:  # /api/banche/delete
                     _delete_profilo(c_email, req.get('iban', ''))
+                self._json({'ok': True})
+            except Exception as e:
+                self._json({'ok': False, 'msg': str(e)})
+            return
+        # ── Profili broker/piattaforme (POST) ────────────────────────
+        # ── FVC Lead (PUBBLICO — no auth) ─────────────────────────────
+        if p == '/api/fvc-lead':
+            try:
+                data = json.loads(self._body())
+            except Exception:
+                self._json({'ok': False, 'msg': 'JSON non valido'}); return
+            tipo    = data.get('tipo', 'investitore')
+            nome    = (data.get('nome') or '').strip()
+            email_l = (data.get('email') or '').strip().lower()
+            tel     = (data.get('telefono') or '').strip()
+            azienda = (data.get('azienda') or '').strip()
+            ticket  = (data.get('ticket') or '').strip()
+            note    = (data.get('note') or '').strip()
+            lingua  = (data.get('lingua') or 'it').strip().lower()
+            gdpr    = data.get('gdpr', False)
+            if not nome or not email_l:
+                self._json({'ok': False, 'msg': 'Nome e email obbligatori'}); return
+            if not gdpr:
+                self._json({'ok': False, 'msg': 'Consenso GDPR obbligatorio'}); return
+            import uuid as _uuid_fvc
+            lead_id = str(_uuid_fvc.uuid4())[:8]
+            ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            lead = {
+                'id': lead_id, 'tipo': tipo, 'nome': nome,
+                'email': email_l, 'telefono': tel,
+                'azienda': azienda, 'ticket': ticket,
+                'note': note, 'lingua': lingua,
+                'ts': ts, 'stato': 'nuovo'
+            }
+            _fl = read_fvc_leads(); _fl.insert(0, lead); save_fvc_leads(_fl)
+            threading.Thread(target=_fvc_notifica_admin, args=(lead,), daemon=True).start()
+            threading.Thread(target=_fvc_benvenuto_lead, args=(lead,), daemon=True).start()
+            self._json({'ok': True, 'id': lead_id}); return
+
+        if p == '/api/fvc-leads/stato':
+            try:
+                data = json.loads(self._body())
+            except Exception:
+                self._json({'ok': False, 'msg': 'JSON non valido'}); return
+            lid = data.get('id'); stato = data.get('stato', 'nuovo')
+            _fl = read_fvc_leads()
+            for _l in _fl:
+                if _l.get('id') == lid: _l['stato'] = stato; break
+            save_fvc_leads(_fl)
+            self._json({'ok': True}); return
+
+        if p == '/api/fvc-leads/delete':
+            try:
+                data = json.loads(self._body())
+            except Exception:
+                self._json({'ok': False, 'msg': 'JSON non valido'}); return
+            lid = data.get('id')
+            save_fvc_leads([_l for _l in read_fvc_leads() if _l.get('id') != lid])
+            self._json({'ok': True}); return
+
+        if p in ('/api/broker/save', '/api/broker/delete'):
+            if not _is_client_auth(self):
+                self._json({'ok': False, 'msg': 'Non autorizzato'}); return
+            tok_c   = _get_client_token(self)
+            c_email = CLIENT_SESSIONS.get(tok_c, '')
+            try:
+                req = json.loads(self._body())
+                if p == '/api/broker/save':
+                    nome = req.get('piattaforma', '').strip()
+                    if not nome:
+                        self._json({'ok': False, 'msg': 'Nome piattaforma obbligatorio'}); return
+                    _save_profilo_broker(c_email, {
+                        'piattaforma':    nome,
+                        'conto':          req.get('conto', '').strip(),
+                        'email_supporto': req.get('email_supporto', '').strip(),
+                    })
+                else:
+                    _delete_profilo_broker(c_email, req.get('piattaforma', ''))
                 self._json({'ok': True})
             except Exception as e:
                 self._json({'ok': False, 'msg': str(e)})

@@ -17,62 +17,9 @@
           "lang": "IT",
           "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-09-02",
-          "giorno_mese": 2,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "SALARY_TRAP",
-          "lang": "IT",
-          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-09-03",
-          "giorno_mese": 3,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "SALARY_TRAP",
-          "lang": "IT",
-          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-09-04",
-          "giorno_mese": 4,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "SALARY_TRAP",
-          "lang": "IT",
-          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-09-05",
-          "giorno_mese": 5,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "SALARY_TRAP",
-          "lang": "IT",
-          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-09-06",
-          "giorno_mese": 6,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "SALARY_TRAP",
-          "lang": "IT",
-          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
-          "batch_size": 250,
-          "stato": "programmato"
+          "stato": "inviato",
+          "n_inviati": 250,
+          "n_errori": 0
         },
         {
           "data": "2026-09-07",
@@ -88,66 +35,66 @@
         {
           "data": "2026-09-08",
           "giorno_mese": 8,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-09",
           "giorno_mese": 9,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-10",
           "giorno_mese": 10,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-11",
           "giorno_mese": 11,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-12",
           "giorno_mese": 12,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-13",
           "giorno_mese": 13,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+          "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -165,66 +112,66 @@
         {
           "data": "2026-09-15",
           "giorno_mese": 15,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-16",
           "giorno_mese": 16,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-17",
           "giorno_mese": 17,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-18",
           "giorno_mese": 18,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-19",
           "giorno_mese": 19,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-20",
           "giorno_mese": 20,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+          "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -242,66 +189,66 @@
         {
           "data": "2026-09-22",
           "giorno_mese": 22,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-23",
           "giorno_mese": 23,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-24",
           "giorno_mese": 24,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-25",
           "giorno_mese": 25,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-26",
           "giorno_mese": 26,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-09-27",
           "giorno_mese": 27,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "SALARY_TRAP",
           "lang": "IT",
-          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -337,6 +284,50 @@
           "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
           "batch_size": 250,
           "stato": "programmato"
+        },
+        {
+          "data": "2026-10-01",
+          "giorno_mese": 1,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "SALARY_TRAP",
+          "lang": "IT",
+          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-10-02",
+          "giorno_mese": 2,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "SALARY_TRAP",
+          "lang": "IT",
+          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-10-03",
+          "giorno_mese": 3,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "SALARY_TRAP",
+          "lang": "IT",
+          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-10-04",
+          "giorno_mese": 4,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "SALARY_TRAP",
+          "lang": "IT",
+          "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+          "batch_size": 250,
+          "stato": "programmato"
         }
       ]
     },
@@ -349,61 +340,6 @@
       "note": "Tema mensile: WEALTHOS_PROMO — 31 giorni × 250/gg = 7750 email totali",
       "giorni": [
         {
-          "data": "2026-10-01",
-          "giorno_mese": 1,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "ES",
-          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-10-02",
-          "giorno_mese": 2,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "ES",
-          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-10-03",
-          "giorno_mese": 3,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "ES",
-          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-10-04",
-          "giorno_mese": 4,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "ES",
-          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-10-05",
-          "giorno_mese": 5,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "ES",
-          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
           "data": "2026-10-06",
           "giorno_mese": 6,
           "settimana": 1,
@@ -412,7 +348,8 @@
           "lang": "ES",
           "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-07",
@@ -423,62 +360,68 @@
           "lang": "ES",
           "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-08",
           "giorno_mese": 8,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
+          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-09",
           "giorno_mese": 9,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
+          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-10",
           "giorno_mese": 10,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
+          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-11",
           "giorno_mese": 11,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
+          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-12",
           "giorno_mese": 12,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
+          "soggetto": "🏛️ ¿Sabes exactamente cuánto vale tu patrimonio hoy?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-13",
@@ -489,7 +432,8 @@
           "lang": "ES",
           "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-14",
@@ -500,62 +444,68 @@
           "lang": "ES",
           "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-15",
           "giorno_mese": 15,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
+          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-16",
           "giorno_mese": 16,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
+          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-17",
           "giorno_mese": 17,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
+          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-18",
           "giorno_mese": 18,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
+          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-19",
           "giorno_mese": 19,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
+          "soggetto": "📱 Todo tu patrimonio en una sola pantalla — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-20",
@@ -566,7 +516,8 @@
           "lang": "ES",
           "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-21",
@@ -577,62 +528,68 @@
           "lang": "ES",
           "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-22",
           "giorno_mese": 22,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-23",
           "giorno_mese": 23,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-24",
           "giorno_mese": 24,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-25",
           "giorno_mese": 25,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-26",
           "giorno_mese": 26,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "ES",
-          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combinación que funciona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-27",
@@ -643,7 +600,8 @@
           "lang": "ES",
           "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-28",
@@ -654,7 +612,8 @@
           "lang": "ES",
           "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-29",
@@ -665,7 +624,8 @@
           "lang": "ES",
           "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-30",
@@ -676,7 +636,8 @@
           "lang": "ES",
           "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-10-31",
@@ -687,7 +648,68 @@
           "lang": "ES",
           "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2026-11-01",
+          "giorno_mese": 1,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2026-11-02",
+          "giorno_mese": 2,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2026-11-03",
+          "giorno_mese": 3,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2026-11-04",
+          "giorno_mese": 4,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2026-11-05",
+          "giorno_mese": 5,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "ES",
+          "soggetto": "💡 Tu oficina financiera personal — actívala ahora",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         }
       ]
     },
@@ -699,61 +721,6 @@
       "totale_email": 7500,
       "note": "Tema mensile: TREND_MOBILIARE — 30 giorni × 250/gg = 7500 email totali",
       "giorni": [
-        {
-          "data": "2026-11-01",
-          "giorno_mese": 1,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "TREND_MOBILIARE",
-          "lang": "EN",
-          "soggetto": "📊 Markets are moving — are you watching or acting?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-11-02",
-          "giorno_mese": 2,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "TREND_MOBILIARE",
-          "lang": "EN",
-          "soggetto": "📊 Markets are moving — are you watching or acting?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-11-03",
-          "giorno_mese": 3,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "TREND_MOBILIARE",
-          "lang": "EN",
-          "soggetto": "📊 Markets are moving — are you watching or acting?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-11-04",
-          "giorno_mese": 4,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "TREND_MOBILIARE",
-          "lang": "EN",
-          "soggetto": "📊 Markets are moving — are you watching or acting?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-11-05",
-          "giorno_mese": 5,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "TREND_MOBILIARE",
-          "lang": "EN",
-          "soggetto": "📊 Markets are moving — are you watching or acting?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
         {
           "data": "2026-11-06",
           "giorno_mese": 6,
@@ -779,55 +746,55 @@
         {
           "data": "2026-11-08",
           "giorno_mese": 8,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "📈 This week's trends — how our screener reads them",
+          "soggetto": "📊 Markets are moving — are you watching or acting?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-09",
           "giorno_mese": 9,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "📈 This week's trends — how our screener reads them",
+          "soggetto": "📊 Markets are moving — are you watching or acting?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-10",
           "giorno_mese": 10,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "📈 This week's trends — how our screener reads them",
+          "soggetto": "📊 Markets are moving — are you watching or acting?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-11",
           "giorno_mese": 11,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "📈 This week's trends — how our screener reads them",
+          "soggetto": "📊 Markets are moving — are you watching or acting?",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-12",
           "giorno_mese": 12,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "📈 This week's trends — how our screener reads them",
+          "soggetto": "📊 Markets are moving — are you watching or acting?",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -856,55 +823,55 @@
         {
           "data": "2026-11-15",
           "giorno_mese": 15,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
+          "soggetto": "📈 This week's trends — how our screener reads them",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-16",
           "giorno_mese": 16,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
+          "soggetto": "📈 This week's trends — how our screener reads them",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-17",
           "giorno_mese": 17,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
+          "soggetto": "📈 This week's trends — how our screener reads them",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-18",
           "giorno_mese": 18,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
+          "soggetto": "📈 This week's trends — how our screener reads them",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-19",
           "giorno_mese": 19,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
+          "soggetto": "📈 This week's trends — how our screener reads them",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -933,55 +900,55 @@
         {
           "data": "2026-11-22",
           "giorno_mese": 22,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-23",
           "giorno_mese": 23,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-24",
           "giorno_mese": 24,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-25",
           "giorno_mese": 25,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
           "batch_size": 250,
           "stato": "programmato"
         },
         {
           "data": "2026-11-26",
           "giorno_mese": 26,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "TREND_MOBILIARE",
           "lang": "EN",
-          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "soggetto": "🌍 23 global markets, one ranked list every morning at 07:00",
           "batch_size": 250,
           "stato": "programmato"
         },
@@ -1028,6 +995,61 @@
           "soggetto": "⚡ Catching the right moment — the quantitative method explained",
           "batch_size": 250,
           "stato": "programmato"
+        },
+        {
+          "data": "2026-12-01",
+          "giorno_mese": 1,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-12-02",
+          "giorno_mese": 2,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-12-03",
+          "giorno_mese": 3,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-12-04",
+          "giorno_mese": 4,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "batch_size": 250,
+          "stato": "programmato"
+        },
+        {
+          "data": "2026-12-05",
+          "giorno_mese": 5,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "TREND_MOBILIARE",
+          "lang": "EN",
+          "soggetto": "⚡ Catching the right moment — the quantitative method explained",
+          "batch_size": 250,
+          "stato": "programmato"
         }
       ]
     },
@@ -1040,61 +1062,6 @@
       "note": "Tema mensile: WEALTHOS_PROMO — 31 giorni × 250/gg = 7750 email totali",
       "giorni": [
         {
-          "data": "2026-12-01",
-          "giorno_mese": 1,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "IT",
-          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-12-02",
-          "giorno_mese": 2,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "IT",
-          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-12-03",
-          "giorno_mese": 3,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "IT",
-          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-12-04",
-          "giorno_mese": 4,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "IT",
-          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
-          "data": "2026-12-05",
-          "giorno_mese": 5,
-          "settimana": 1,
-          "variante": "PAIN_HOOK",
-          "tema": "WEALTHOS_PROMO",
-          "lang": "IT",
-          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
-          "batch_size": 250,
-          "stato": "programmato"
-        },
-        {
           "data": "2026-12-06",
           "giorno_mese": 6,
           "settimana": 1,
@@ -1103,7 +1070,8 @@
           "lang": "IT",
           "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-07",
@@ -1114,62 +1082,68 @@
           "lang": "IT",
           "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-08",
           "giorno_mese": 8,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
+          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-09",
           "giorno_mese": 9,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
+          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-10",
           "giorno_mese": 10,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
+          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-11",
           "giorno_mese": 11,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
+          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-12",
           "giorno_mese": 12,
-          "settimana": 2,
-          "variante": "SOLUTION",
+          "settimana": 1,
+          "variante": "PAIN_HOOK",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
+          "soggetto": "🏛️ Sai esattamente quanto vale il tuo patrimonio oggi?",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-13",
@@ -1180,7 +1154,8 @@
           "lang": "IT",
           "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-14",
@@ -1191,62 +1166,68 @@
           "lang": "IT",
           "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-15",
           "giorno_mese": 15,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
+          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-16",
           "giorno_mese": 16,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
+          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-17",
           "giorno_mese": 17,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
+          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-18",
           "giorno_mese": 18,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
+          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-19",
           "giorno_mese": 19,
-          "settimana": 3,
-          "variante": "SOCIAL_PROOF",
+          "settimana": 2,
+          "variante": "SOLUTION",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
+          "soggetto": "📱 Tutto il tuo patrimonio in un'unica schermata — WealthOS",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-20",
@@ -1257,7 +1238,8 @@
           "lang": "IT",
           "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-21",
@@ -1268,62 +1250,68 @@
           "lang": "IT",
           "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-22",
           "giorno_mese": 22,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-23",
           "giorno_mese": 23,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-24",
           "giorno_mese": 24,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-25",
           "giorno_mese": 25,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-26",
           "giorno_mese": 26,
-          "settimana": 4,
-          "variante": "CTA",
+          "settimana": 3,
+          "variante": "SOCIAL_PROOF",
           "tema": "WEALTHOS_PROMO",
           "lang": "IT",
-          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "soggetto": "🔗 WealthOS + Robot Trader 2026 — la combo che funziona",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-27",
@@ -1334,7 +1322,8 @@
           "lang": "IT",
           "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-28",
@@ -1345,7 +1334,8 @@
           "lang": "IT",
           "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-29",
@@ -1356,7 +1346,8 @@
           "lang": "IT",
           "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-30",
@@ -1367,7 +1358,8 @@
           "lang": "IT",
           "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         },
         {
           "data": "2026-12-31",
@@ -1378,9 +1370,326 @@
           "lang": "IT",
           "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
           "batch_size": 250,
-          "stato": "programmato"
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2027-01-01",
+          "giorno_mese": 1,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2027-01-02",
+          "giorno_mese": 2,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2027-01-03",
+          "giorno_mese": 3,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2027-01-04",
+          "giorno_mese": 4,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
+        },
+        {
+          "data": "2027-01-05",
+          "giorno_mese": 5,
+          "settimana": 4,
+          "variante": "CTA",
+          "tema": "WEALTHOS_PROMO",
+          "lang": "IT",
+          "soggetto": "💡 Il tuo ufficio finanziario personale — attivalo adesso",
+          "batch_size": 250,
+          "stato": "programmato",
+          "image_url": "https://trader.fuerteventurecapital.com/static/wealthos_logo.png"
         }
       ]
+    }
+  ],
+  "calendario": [
+    {
+      "data": "2026-09-01",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "inviato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-07",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-08",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-09",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-10",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-11",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-12",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-13",
+      "fase": "S1",
+      "variante": "PAIN_HOOK",
+      "soggetto": "💸 Il tuo stipendio perde il 3% ogni anno — e tu cosa fai?",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-14",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-15",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-16",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-17",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-18",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-19",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-20",
+      "fase": "S2",
+      "variante": "SOLUTION",
+      "soggetto": "📊 Come 5 filtri trovano le migliori azioni ogni notte",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-21",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-22",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-23",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-24",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-25",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-26",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-27",
+      "fase": "S3",
+      "variante": "SOCIAL_PROOF",
+      "soggetto": "🔍 Robot Trader analizza 3.072 azioni — ecco i risultati",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-28",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-29",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-09-30",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-10-01",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-10-02",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-10-03",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    },
+    {
+      "data": "2026-10-04",
+      "fase": "S4",
+      "variante": "CTA",
+      "soggetto": "🚀 Accesso immediato al tuo screener value — piano BASIC",
+      "stato": "programmato",
+      "n_invii": 250
+    }
+  ],
+  "fasi": [
+    {
+      "fase": "S1",
+      "nome": "Pain Hook",
+      "date": "2026-09-07 / 2026-09-13"
+    },
+    {
+      "fase": "S2",
+      "nome": "Soluzione",
+      "date": "2026-09-14 / 2026-09-20"
+    },
+    {
+      "fase": "S3",
+      "nome": "Prova Sociale",
+      "date": "2026-09-21 / 2026-09-27"
+    },
+    {
+      "fase": "S4",
+      "nome": "CTA",
+      "date": "2026-09-28 / 2026-10-04"
     }
   ]
 }

@@ -3,8 +3,8 @@
 SCHEDULER DAEMON - Robot Trader 2026
 =====================================
 Job schedulati (orario Canarie — Atlantic/Canary):
-  21:00 lun-ven  -> FONDI_EU_FETCH + AZIONI + ETF+FONDI+EU (in sequenza)
-  08:00 lun/mer/ven -> social_automation.py
+  21:00 lun/mar/mer/gio/dom -> FONDI_EU_FETCH + AZIONI + ETF+FONDI+EU (in sequenza)
+  10:00 ogni giorno -> social_automation.py
 
 AVVIO:
   python scheduler_daemon.py
@@ -52,6 +52,7 @@ PYTHON   = sys.executable
 ORCHESTRATOR_PATH       = os.path.join(BASE_DIR, 'orchestrator.py')
 SOCIAL_AUTOMATION_PATH  = os.path.join(BASE_DIR, 'social_automation.py')
 SOCIAL_ENRICHMENT_PATH  = os.path.join(BASE_DIR, 'social_enrichment.py')
+CAMPAGNA_AGENT_PATH     = os.path.join(BASE_DIR, 'campagna_agent.py')
 
 logging.basicConfig(
     level=logging.INFO,
@@ -203,6 +204,20 @@ def run_screeners():
 
 
 
+def run_campagna_agent():
+    if not os.path.exists(CAMPAGNA_AGENT_PATH):
+        logger.warning('campagna_agent.py non trovato - job saltato')
+        return
+    try:
+        out = subprocess.run(
+            [PYTHON, CAMPAGNA_AGENT_PATH],
+            capture_output=True, text=True, timeout=300, cwd=BASE_DIR
+        )
+        logger.info('JOB CAMPAGNA AGENT OUTPUT: ' + (out.stdout or '')[:500] + (out.stderr or '')[:200])
+    except Exception as e:
+        logger.error('JOB CAMPAGNA AGENT ERRORE: ' + str(e))
+
+
 def run_social():
     logger.info('=' * 70)
     logger.info('JOB SOCIAL — INIZIO  %s' % datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
@@ -278,9 +293,9 @@ if __name__ == '__main__':
     logger.info('Start: %s' % datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
     logger.info('=' * 70)
     logger.info('Job schedulati:')
-    logger.info('  [1] Screener completo  -> 21:00 lun-ven  (Fondi EU + Azioni + ETF+Fondi)')
-    logger.info('  [2] Social             -> 08:00 lun/mer/ven')
-    logger.info('  [3] Watchdog + WhatsApp -> 07:00 mar-sab')
+    logger.info('  [1] Screener completo  -> 21:00 lun/mar/mer/gio/dom  (Fondi EU + Azioni + ETF+Fondi)')
+    logger.info('  [2] Social             -> 10:00 ogni giorno')
+    logger.info('  [3] Watchdog + WhatsApp -> 07:00 mar/mer/gio/ven/lun')
     logger.info('  [4] Social Enrichment  -> 02:00 dom (batch 300 prospect)')
     logger.info('')
 
@@ -288,7 +303,7 @@ if __name__ == '__main__':
 
     scheduler.add_job(
         func=run_screeners,
-        trigger=CronTrigger(day_of_week='mon-fri', hour=21, minute=0, timezone='Atlantic/Canary'),
+        trigger=CronTrigger(day_of_week='mon,tue,wed,thu,sun', hour=21, minute=0, timezone='Atlantic/Canary'),
         id='screeners',
         name='Screener completo 21:00',
         misfire_grace_time=300,
@@ -297,7 +312,7 @@ if __name__ == '__main__':
 
     scheduler.add_job(
         func=run_social,
-        trigger=CronTrigger(day_of_week='mon,wed,fri', hour=8, minute=0, timezone='Atlantic/Canary'),
+        trigger=CronTrigger(hour=10, minute=0, timezone='Atlantic/Canary'),
         id='social_automation',
         name='Social Automation',
         misfire_grace_time=1800,
@@ -306,10 +321,19 @@ if __name__ == '__main__':
 
     scheduler.add_job(
         func=_watchdog_check,
-        trigger=CronTrigger(day_of_week='tue,wed,thu,fri,sat', hour=7, minute=0, timezone='Atlantic/Canary'),
+        trigger=CronTrigger(day_of_week='tue,wed,thu,fri,mon', hour=7, minute=0, timezone='Atlantic/Canary'),
         id='watchdog',
         name='Watchdog + WhatsApp 07:00',
         misfire_grace_time=1800,
+        coalesce=True,
+    )
+
+    scheduler.add_job(
+        func=run_campagna_agent,
+        trigger=CronTrigger(hour=9, minute=0, timezone='Atlantic/Canary'),
+        id='campagna_agent',
+        name='Campagna Email+Agent 09:00',
+        misfire_grace_time=3600,
         coalesce=True,
     )
 
@@ -327,7 +351,7 @@ if __name__ == '__main__':
 
     _notify_brevo(
         subject='[RT2026] Scheduler AVVIATO — %s' % datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
-        html='<p>Scheduler RT2026 avviato. Job attivi: Screener 21:00 lun-ven, Social 08:00 lun/mer/ven.</p>',
+        html='<p>Scheduler RT2026 avviato. Job attivi: Screener 21:00 lun-ven, Social 10:00 ogni giorno.</p>',
     )
 
     try:

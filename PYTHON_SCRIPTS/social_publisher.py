@@ -536,14 +536,6 @@ class LinkedInService:
         else:
             results["personal"] = {"ok": False, "detail": "member_sub non in token — rifare OAuth"}
 
-        # 2. Company page (w_organization_social)
-        if self.org_id:
-            org_urn    = f"urn:li:organization:{self.org_id}"
-            res_org    = self._publish_to_author(org_urn, text, url, url_title, url_desc, image_url, lang)
-            results["company"] = res_org
-        else:
-            results["company"] = {"ok": False, "detail": "LINKEDIN_ORG_ID non configurato"}
-
         ok_count = sum(1 for r in results.values() if r.get("ok"))
         return {"ok": ok_count > 0, "results": results,
                 "post_id": results.get("personal", {}).get("post_id") or

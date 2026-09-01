@@ -1,0 +1,2431 @@
+{
+  "_note": "Content Calendar RT2026 + WealthOS — Fuerte Venture Capital — aggiornato 2026-09-01 (riorg. lancio 8/9)",
+  "_cadence": "Lun/Mer: LinkedIn+Facebook | Ven: LinkedIn+Facebook+Email(Brevo) | WhatsApp: automatico dopo screener 21:00",
+  "_themes": "SALARY_TRAP=pain hook | VALUE_INTRO,5_FILTRI,EVFCF,PB_ROE=educational | CASE_STUDY,ETF_SCREENING,FONDI_SCREENING=tecnico | LAUNCH,WEALTHOS_PROMO=prodotto/CTA | TEAM=brand",
+  "calendar": [
+    {
+      "date": "2026-06-08",
+      "theme": "VALUE_INTRO",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-06-10",
+      "theme": "5_FILTRI",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-06-12",
+      "theme": "LAUNCH",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-06-15",
+      "theme": "EVFCF",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-06-17",
+      "theme": "CASE_STUDY",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-06-19",
+      "theme": "ETF_SCREENING",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-06-22",
+      "theme": "PB_ROE",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-06-24",
+      "theme": "FONDI_SCREENING",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-06-26",
+      "theme": "TEAM",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-06-29",
+      "theme": "VALUE_INTRO",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-01",
+      "theme": "5_FILTRI",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-03",
+      "theme": "EVFCF",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-06",
+      "theme": "CASE_STUDY",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-08",
+      "theme": "ETF_SCREENING",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-10",
+      "theme": "LAUNCH",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-13",
+      "theme": "PB_ROE",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-15",
+      "theme": "FONDI_SCREENING",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-17",
+      "theme": "TEAM",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-20",
+      "theme": "VALUE_INTRO",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-22",
+      "theme": "5_FILTRI",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-24",
+      "theme": "CASE_STUDY",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-27",
+      "theme": "EVFCF",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-07-29",
+      "theme": "ETF_SCREENING",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-07-31",
+      "theme": "TEAM",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-03",
+      "theme": "PB_ROE",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-05",
+      "theme": "FONDI_SCREENING",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-07",
+      "theme": "LAUNCH",
+      "lang": "IT",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-10",
+      "theme": "VALUE_INTRO",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-12",
+      "theme": "5_FILTRI",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-14",
+      "theme": "CASE_STUDY",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-17",
+      "theme": "EVFCF",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-19",
+      "theme": "ETF_SCREENING",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-21",
+      "theme": "TEAM",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-24",
+      "theme": "PB_ROE",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2026-08-26",
+      "theme": "FONDI_SCREENING",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-08-28",
+      "theme": "LAUNCH",
+      "lang": "ES",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-09-01",
+      "theme": "SALARY_TRAP",
+      "lang": "EN",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-09-01",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-02",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-03",
+      "theme": "VALUE_INTRO",
+      "lang": "EN",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-09-03",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-04",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-05",
+      "theme": "5_FILTRI",
+      "lang": "EN",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2026-09-05",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-06",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-07",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-08",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-09",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-10",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-11",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-12",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-13",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-14",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-15",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-16",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-17",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-18",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-19",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-20",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-21",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-22",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-23",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-24",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-25",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-26",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-27",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-28",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-29",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-09-30",
+      "time": "10:00",
+      "theme": "SALARY_TRAP",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-01",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-02",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-03",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-04",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-05",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-06",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-07",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-08",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-09",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-10",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-11",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-12",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-13",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-14",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-15",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-16",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-17",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-18",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-19",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-20",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-21",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-22",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-23",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-24",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-25",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-26",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-27",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-28",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-29",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-30",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-10-31",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "ES",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-01",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-02",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-03",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-04",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-05",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-06",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-07",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-08",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-09",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-10",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-11",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-12",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-13",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-14",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-15",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-16",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-17",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-18",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-19",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-20",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-21",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-22",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-23",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-24",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-25",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-26",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-27",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-28",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-29",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-11-30",
+      "time": "10:00",
+      "theme": "TREND_MOBILIARE",
+      "lang": "EN",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-01",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-02",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-03",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-04",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-05",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-06",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-07",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "PAIN_HOOK",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-08",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-09",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-10",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-11",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-12",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-13",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-14",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOLUTION",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-15",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-16",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-17",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-18",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-19",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-20",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-21",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "SOCIAL_PROOF",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-22",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-23",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-24",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-25",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-26",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-27",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-28",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-29",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-30",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2026-12-31",
+      "time": "10:00",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "IT",
+      "variante": "CTA",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null,
+      "source": "campagna"
+    },
+    {
+      "date": "2027-01-02",
+      "theme": "SALARY_TRAP",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-05",
+      "theme": "VALUE_INTRO",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-07",
+      "theme": "5_FILTRI",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-09",
+      "theme": "TREND_MOBILIARE",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-12",
+      "theme": "EVFCF",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-01-14",
+      "theme": "CASE_STUDY",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-01-16",
+      "theme": "ETF_SCREENING",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-19",
+      "theme": "PB_ROE",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-01-21",
+      "theme": "FONDI_SCREENING",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-23",
+      "theme": "LAUNCH",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-26",
+      "theme": "TEAM",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-01-28",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://wealth.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-01-30",
+      "theme": "SALARY_TRAP",
+      "lang": "FR",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-02",
+      "theme": "SALARY_TRAP",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-04",
+      "theme": "VALUE_INTRO",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-06",
+      "theme": "5_FILTRI",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-09",
+      "theme": "TREND_MOBILIARE",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-11",
+      "theme": "EVFCF",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-02-13",
+      "theme": "CASE_STUDY",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-02-16",
+      "theme": "ETF_SCREENING",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-18",
+      "theme": "PB_ROE",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-02-20",
+      "theme": "FONDI_SCREENING",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-23",
+      "theme": "LAUNCH",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": "https://www.fuerteventurecapital.com",
+      "image_url": null
+    },
+    {
+      "date": "2027-02-25",
+      "theme": "TEAM",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook"
+      ],
+      "article_url": null,
+      "image_url": null
+    },
+    {
+      "date": "2027-02-27",
+      "theme": "WEALTHOS_PROMO",
+      "lang": "DE",
+      "channels": [
+        "linkedin",
+        "facebook",
+        "brevo"
+      ],
+      "article_url": "https://wealth.fuerteventurecapital.com",
+      "image_url": null
+    }
+  ]
+}

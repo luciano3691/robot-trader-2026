@@ -1112,3 +1112,58 @@ def get_dashboard_data() -> dict:
         'inbox':            inbox[-50:],
         'inbox_non_letti':  len(inbox_non_letti)
     }
+
+
+# ── Entry point giornaliero ───────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import sys
+    today = date.today().isoformat()
+    print(f"[CampagnaAgent] Avvio job giornaliero — {today}", flush=True)
+
+    # Carica entry di oggi dal calendario
+    cal_file = os.path.join(BASE_DIR, "campagna_email_calendar.json")
+    giorno = None
+    try:
+        with open(cal_file, encoding="utf-8") as f:
+            cal = json.load(f)
+        for camp in cal.get("campagne", []):
+            for g in camp.get("giorni", []):
+                if g.get("data") == today:
+                    giorno = g
+                    break
+            if giorno:
+                break
+    except Exception as e:
+        print(f"[CampagnaAgent] Errore lettura calendario: {e}", flush=True)
+
+    if not giorno:
+        print(f"[CampagnaAgent] Nessun giorno programmato per {today} — skip", flush=True)
+        sys.exit(0)
+
+    if giorno.get("stato") == "inviato":
+        print(f"[CampagnaAgent] Batch {today} già inviato — skip", flush=True)
+        sys.exit(0)
+
+    # Analisi mattutina
+    try:
+        result = run_morning_analysis(giorno)
+        send_daily_briefing(giorno, result)
+    except Exception as e:
+        print(f"[CampagnaAgent] Errore analisi: {e}", flush=True)
+        result = {}
+
+    # Trigger batch via endpoint interno dashboard
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            "http://127.0.0.1:8080/internal/campagna/batch",
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            body = resp.read().decode()
+            print(f"[CampagnaAgent] Batch risposta: {body[:200]}", flush=True)
+    except Exception as e:
+        print(f"[CampagnaAgent] Errore trigger batch: {e}", flush=True)
+
+    print(f"[CampagnaAgent] Job completato — {today}", flush=True)
