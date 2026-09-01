@@ -8358,7 +8358,7 @@ Contatta il supporto per attivare il tuo piano.</p>
                     for g in campagna.get('giorni', []):
                         if g.get('stato') == 'programmato' and g.get('data', '') < today:
                             g['stato'] = 'scaduto'
-                        elif g.get('data', '') == today:
+                        elif g.get('data', '') == today and g.get('stato') != 'inviato':
                             g['stato'] = 'oggi'
                 self._json({'ok': True, 'campagne': data.get('campagne', [])})
             except Exception as e:
